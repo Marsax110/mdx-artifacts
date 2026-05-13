@@ -14,6 +14,8 @@ When asked to create or modify an artifact:
 
 Do not generate raw HTML unless explicitly requested.
 
+Layout primitives such as `Stack`, `Columns`, `Grid`, `SplitPane`, and `Frame` are advanced composition tools. Prefer semantic or workflow components first, and use layout primitives only when a custom arrangement is needed.
+
 Use these public docs for project conventions:
 
 - `ROADMAP.md`

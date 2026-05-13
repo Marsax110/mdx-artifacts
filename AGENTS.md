@@ -82,6 +82,14 @@ When adding or changing a component:
 
 The component registry is the source of truth for CLI lookup, agent usage, and future generated docs.
 
+### Layout Components
+
+Layout primitives such as `Stack`, `Columns`, `Grid`, `SplitPane`, and `Frame` are advanced composition tools.
+
+Use semantic or workflow components first. Use layout primitives only when an artifact needs a custom arrangement that cannot be expressed cleanly with an existing semantic component.
+
+Layout primitives may control spacing, ratios, collapse behavior, and surface treatment. They must not be used to recreate domain semantics that belong in components such as `DecisionMatrix`, `ExportPanel`, or future code review components.
+
 ## Styling Policy
 
 Artifact Kit provides default CSS, but users can inject custom styles through `artifact-kit.config.ts`.
