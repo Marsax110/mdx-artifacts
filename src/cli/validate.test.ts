@@ -11,6 +11,26 @@ describe("validateMdx", () => {
     expect(result.errors).toEqual([]);
   });
 
+  it("accepts CommentExport as an export path", async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), "mdx-artifacts-"));
+    const filePath = path.join(dir, "comment-export.mdx");
+    await writeFile(
+      filePath,
+      `import { CommentExport, CommentLayer } from "../../src/react";
+
+<CommentLayer>
+  <CommentExport />
+</CommentLayer>`,
+      "utf8"
+    );
+
+    const result = await validateMdx(filePath);
+
+    expect(result.warnings).not.toContain(
+      "ExportPanel or equivalent export component not found. Interactive artifacts should provide an export path."
+    );
+  });
+
   it("rejects raw script tags", async () => {
     const dir = await mkdtemp(path.join(tmpdir(), "mdx-artifacts-"));
     const filePath = path.join(dir, "unsafe.mdx");

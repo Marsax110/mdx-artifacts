@@ -120,6 +120,44 @@ Expected improvements:
 - CLI support for querying configured project local components.
 - Validator reporting for inline MDX components and project local component metadata.
 
+## Phase 2.4: Comment and Review Layer
+
+Goal:
+
+- Add a client-side review loop for standalone artifacts.
+- Let authors mark stable component regions as commentable targets.
+- Keep review UI outside the main content flow on wide screens.
+- Preserve a usable fallback on narrow screens without compressing the document.
+
+Implemented components:
+
+- `CommentLayer`
+- `CommentableBlock`
+- `CommentTarget`
+- `CommentExport`
+
+Current direction:
+
+- Use explicit `CommentableBlock` and `CommentTarget` boundaries first.
+- Allow one comment per commentable target in the first review model.
+- Show a side review rail on wide screens and click-open popovers on narrow screens.
+- Share the same comment item rendering between rails and popovers so editing behavior stays consistent.
+- Keep comment state local to the current page; no server persistence or collaboration layer yet.
+
+Next validation step:
+
+- Wrap several large native MDX prose sections in `docs/local/streamlit-style-mixed.zh-CN.local.mdx` with explicit `CommentableBlock`.
+- Verify that explicit prose comments preserve the linear MDX writing experience.
+- Decide whether implicit native Markdown block comments are worth adding after the explicit-block flow stabilizes.
+
+Deferred:
+
+- Automatic wrapping of every native Markdown block.
+- Text selection comments.
+- Multi-comment threads per target.
+- Server-side persistence.
+- Realtime collaboration.
+
 ## Phase 3: Docs Site Adapter
 
 Goal:

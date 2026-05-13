@@ -27,8 +27,8 @@ export async function validateMdx(filePath: string): Promise<ValidationResult> {
     result.errors.push("Do not write <script> directly in MDX. Wrap behavior in a controlled component.");
   }
 
-  if (!source.includes("ExportPanel")) {
-    result.warnings.push("ExportPanel not found. Interactive artifacts should provide an export path.");
+  if (!source.includes("ExportPanel") && !source.includes("CommentExport")) {
+    result.warnings.push("ExportPanel or equivalent export component not found. Interactive artifacts should provide an export path.");
   }
 
   if (source.length > 40_000) {

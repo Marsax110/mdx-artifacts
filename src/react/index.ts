@@ -6,6 +6,16 @@ export { ComparisonSet } from "./components/ComparisonSet";
 export type { ComparisonSetItemProps, ComparisonSetProps } from "./components/ComparisonSet";
 export { CodeBlock } from "./components/CodeBlock";
 export type { CodeBlockProps } from "./components/CodeBlock";
+export { CommentableBlock, CommentExport, CommentLayer, CommentTarget, serializeCommentsToMarkdown } from "./components/Comments";
+export type {
+  ArtifactComment,
+  CommentableBlockProps,
+  CommentExportFormat,
+  CommentExportProps,
+  CommentExportValue,
+  CommentLayerProps,
+  CommentTargetProps
+} from "./components/Comments";
 export { DecisionMatrix } from "./components/DecisionMatrix";
 export type { DecisionMatrixOption, DecisionMatrixProps } from "./components/DecisionMatrix";
 export { DiffBlock } from "./components/DiffBlock";

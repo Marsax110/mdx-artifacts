@@ -506,6 +506,171 @@ export const componentRegistry: ComponentMeta[] = [
 </Frame>`
   },
   {
+    name: "CommentLayer",
+    category: "artifact",
+    stability: "stable",
+    description: "Provides local browser comment state for block-level artifact feedback.",
+    useWhen: ["Reviewable artifacts", "Block-level user feedback", "Agent handoff comments"],
+    props: [
+      {
+        name: "children",
+        type: "ReactNode",
+        required: true,
+        description: "CommentableBlock and CommentExport children that share one local comment state."
+      }
+    ],
+    example: `<CommentLayer>
+  <CommentableBlock blockId="decision" title="Decision">
+    <DecisionMatrix question="Choose a path" options={[]} />
+  </CommentableBlock>
+  <CommentExport />
+</CommentLayer>`
+  },
+  {
+    name: "CommentableBlock",
+    category: "artifact",
+    stability: "stable",
+    description: "Wraps any artifact content with a stable block target and hover-revealed local comment input.",
+    useWhen: ["Commenting on existing components", "Commenting on prose blocks", "Exporting block-level feedback"],
+    props: [
+      {
+        name: "blockId",
+        type: "string",
+        contentType: "plainText",
+        required: true,
+        description: "Stable unique identifier for this comment target within one artifact."
+      },
+      {
+        name: "title",
+        type: "string",
+        contentType: "inlineMarkdown",
+        required: true,
+        description: "Human-readable block title shown in the UI and exported comments."
+      },
+      {
+        name: "description",
+        type: "string",
+        contentType: "plainText",
+        description: "Optional block context exported with comments."
+      },
+      {
+        name: "children",
+        type: "ReactNode",
+        required: true,
+        description: "The prose, semantic component, or layout composition being reviewed."
+      }
+    ],
+    example: `<CommentableBlock
+  blockId="component-menu"
+  title="Component menu"
+  description="Feedback on the option grid"
+>
+  <OptionGrid title="Components" options={[]} />
+</CommentableBlock>`
+  },
+  {
+    name: "CommentTarget",
+    category: "artifact",
+    stability: "stable",
+    description: "Marks a fine-grained comment target with hover affordance and persistent comment count.",
+    useWhen: ["Component internals", "Fine-grained review targets", "Custom local component comment anchors"],
+    props: [
+      {
+        name: "targetId",
+        type: "string",
+        contentType: "plainText",
+        required: true,
+        description: "Stable unique identifier for this fine-grained comment target within one artifact."
+      },
+      {
+        name: "title",
+        type: "string",
+        contentType: "inlineMarkdown",
+        required: true,
+        description: "Human-readable target title shown in the form and exported comments."
+      },
+      {
+        name: "description",
+        type: "string",
+        contentType: "plainText",
+        description: "Optional target context exported with comments."
+      },
+      {
+        name: "children",
+        type: "ReactNode",
+        required: true,
+        description: "The smallest visible content block being reviewed."
+      }
+    ],
+    example: `<CommentTarget targetId="decision-explicit-blocks" title="Explicit blocks">
+  <Frame surface="outlined">Small reviewable block</Frame>
+</CommentTarget>`
+  },
+  {
+    name: "CommentExport",
+    category: "artifact",
+    stability: "stable",
+    description: "Exports all comments from the nearest CommentLayer as Markdown or JSON.",
+    useWhen: ["Returning artifact feedback to an agent", "Copying review comments", "Comment handoff"],
+    props: [
+      {
+        name: "title",
+        type: "string",
+        contentType: "inlineMarkdown",
+        description: "Export section title. Defaults to Export Comments."
+      },
+      {
+        name: "formats",
+        type: "Array<'markdown' | 'json'>",
+        description: "Available comment export formats. Defaults to markdown and json."
+      }
+    ],
+    types: [
+      {
+        name: "ArtifactComment",
+        description: "One block-level comment exported from CommentLayer.",
+        fields: [
+          {
+            name: "blockId",
+            type: "string",
+            contentType: "plainText",
+            required: true,
+            description: "Stable identifier for the commented block."
+          },
+          {
+            name: "blockTitle",
+            type: "string",
+            contentType: "plainText",
+            required: true,
+            description: "Human-readable title for the commented block."
+          },
+          {
+            name: "blockDescription",
+            type: "string",
+            contentType: "plainText",
+            description: "Optional block context."
+          },
+          {
+            name: "comment",
+            type: "string",
+            contentType: "plainText",
+            required: true,
+            description: "User-entered block-level comment."
+          },
+          {
+            name: "createdAt",
+            type: "string",
+            description: "ISO timestamp created in the browser when the comment is added."
+          }
+        ]
+      }
+    ],
+    example: `<CommentExport
+  title="Export artifact feedback"
+  formats={["markdown", "json"]}
+/>`
+  },
+  {
     name: "DecisionMatrix",
     category: "artifact",
     stability: "stable",
