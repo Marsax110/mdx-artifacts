@@ -1,5 +1,6 @@
 import * as Tabs from "@radix-ui/react-tabs";
 import { useMemo, useState } from "react";
+import { CommentTarget } from "./Comments";
 import { InlineText } from "./InlineText";
 
 export type ExportFormat = "markdown" | "json";
@@ -27,33 +28,40 @@ export function ExportPanel({ title = "Export Result", formats = ["markdown", "j
   }
 
   return (
-    <section className="ak-section ak-export-panel">
-      <div className="ak-section-header ak-export-header">
-        <div>
-          <p className="ak-eyebrow">Export</p>
-          <InlineText as="h2" text={title} variant="title" />
+    <CommentTarget
+      className="ak-comment-target-section"
+      description="ExportPanel component"
+      targetId={`export:${slugify(title)}`}
+      title={title}
+    >
+      <section className="ak-section ak-export-panel">
+        <div className="ak-section-header ak-export-header">
+          <div>
+            <p className="ak-eyebrow">Export</p>
+            <InlineText as="h2" text={title} variant="title" />
+          </div>
+          <div className="ak-actions">
+            <Tabs.Root
+              className="ak-format-tabs"
+              onValueChange={(value) => setFormat(value as ExportFormat)}
+              value={format}
+            >
+              <Tabs.List aria-label="Export format" className="ak-format-tabs-list">
+                {formats.map((item) => (
+                  <Tabs.Trigger className="ak-format-trigger" key={item} value={item}>
+                    {item}
+                  </Tabs.Trigger>
+                ))}
+              </Tabs.List>
+            </Tabs.Root>
+            <button className="ak-button ak-button-primary" onClick={copyOutput} type="button">
+              {copied ? "Copied" : "Copy"}
+            </button>
+          </div>
         </div>
-        <div className="ak-actions">
-          <Tabs.Root
-            className="ak-format-tabs"
-            onValueChange={(value) => setFormat(value as ExportFormat)}
-            value={format}
-          >
-            <Tabs.List aria-label="Export format" className="ak-format-tabs-list">
-              {formats.map((item) => (
-                <Tabs.Trigger className="ak-format-trigger" key={item} value={item}>
-                  {item}
-                </Tabs.Trigger>
-              ))}
-            </Tabs.List>
-          </Tabs.Root>
-          <button className="ak-button ak-button-primary" onClick={copyOutput} type="button">
-            {copied ? "Copied" : "Copy"}
-          </button>
-        </div>
-      </div>
-      <pre className="ak-export-output">{output}</pre>
-    </section>
+        <pre className="ak-export-output">{output}</pre>
+      </section>
+    </CommentTarget>
   );
 }
 
@@ -108,4 +116,15 @@ function toMarkdown(value: unknown, depth = 0): string {
   }
 
   return String(value);
+}
+
+function slugify(value: string) {
+  const slug = value
+    .toLowerCase()
+    .replace(/[`*_~[\]()]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 64);
+
+  return slug || "item";
 }

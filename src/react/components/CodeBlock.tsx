@@ -1,3 +1,5 @@
+import { CommentTarget } from "./Comments";
+
 export type CodeBlockProps = {
   code: string;
   language?: string;
@@ -17,37 +19,45 @@ export function CodeBlock({
 }: CodeBlockProps) {
   const lines = splitCodeLines(code);
   const highlighted = new Set(highlightLines);
+  const title = filename ?? (language ? `${language} code block` : "Code block");
 
   return (
-    <figure className={classNames("ak-code-block", className)}>
-      {(filename || language) && (
-        <figcaption className="ak-code-header">
-          {filename && <span className="ak-code-filename">{filename}</span>}
-          {language && <span className="ak-code-language">{language}</span>}
-        </figcaption>
-      )}
-      <pre className="ak-code-pre">
-        <code className={language ? `language-${language}` : undefined}>
-          {lines.map((line, index) => {
-            const lineNumber = index + 1;
-            return (
-              <span
-                className={classNames(
-                  "ak-code-line",
-                  showLineNumbers ? "ak-code-line-numbered" : undefined,
-                  highlighted.has(lineNumber) ? "ak-code-line-highlighted" : undefined
-                )}
-                data-line={lineNumber}
-                key={lineNumber}
-              >
-                {showLineNumbers && <span className="ak-code-line-number">{lineNumber}</span>}
-                <span className="ak-code-line-content">{line || "\u00a0"}</span>
-              </span>
-            );
-          })}
-        </code>
-      </pre>
-    </figure>
+    <CommentTarget
+      className={classNames("ak-comment-target-section", className)}
+      description="CodeBlock component"
+      targetId={`code:${slugify(filename ?? language ?? code)}`}
+      title={title}
+    >
+      <figure className="ak-code-block">
+        {(filename || language) && (
+          <figcaption className="ak-code-header">
+            {filename && <span className="ak-code-filename">{filename}</span>}
+            {language && <span className="ak-code-language">{language}</span>}
+          </figcaption>
+        )}
+        <pre className="ak-code-pre">
+          <code className={language ? `language-${language}` : undefined}>
+            {lines.map((line, index) => {
+              const lineNumber = index + 1;
+              return (
+                <span
+                  className={classNames(
+                    "ak-code-line",
+                    showLineNumbers ? "ak-code-line-numbered" : undefined,
+                    highlighted.has(lineNumber) ? "ak-code-line-highlighted" : undefined
+                  )}
+                  data-line={lineNumber}
+                  key={lineNumber}
+                >
+                  {showLineNumbers && <span className="ak-code-line-number">{lineNumber}</span>}
+                  <span className="ak-code-line-content">{line || "\u00a0"}</span>
+                </span>
+              );
+            })}
+          </code>
+        </pre>
+      </figure>
+    </CommentTarget>
   );
 }
 
@@ -58,4 +68,15 @@ function splitCodeLines(code: string) {
 
 function classNames(...values: Array<string | undefined>) {
   return values.filter(Boolean).join(" ");
+}
+
+function slugify(value: string) {
+  const slug = value
+    .toLowerCase()
+    .replace(/[`*_~[\]()]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 64);
+
+  return slug || "item";
 }

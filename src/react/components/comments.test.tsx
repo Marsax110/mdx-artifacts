@@ -8,7 +8,12 @@ import {
   createArtifactComment,
   serializeCommentsToMarkdown
 } from "./Comments";
+import { AnnotatedCode } from "./AnnotatedCode";
+import { Callout } from "./Callout";
+import { CodeBlock } from "./CodeBlock";
 import { DecisionMatrix } from "./DecisionMatrix";
+import { DiffBlock } from "./DiffBlock";
+import { ExportPanel } from "./ExportPanel";
 import { OptionGrid } from "./OptionGrid";
 
 describe("Comment components", () => {
@@ -62,6 +67,41 @@ describe("Comment components", () => {
 
     expect(html).toContain('data-comment-target-id="decision:comment-target-scope:1:explicit-blocks"');
     expect(html).toContain('data-comment-target-id="option:comment-workflow-pieces:1:commentlayer"');
+  });
+
+  it("adds targets to semantic, code, diff, and export blocks inside a layer", () => {
+    const html = renderToStaticMarkup(
+      <CommentLayer>
+        <Callout body="Check the export path." title="Review focus" tone="warning" />
+        <CodeBlock code="const value = 1;" filename="example.ts" language="ts" />
+        <DiffBlock
+          filename="example.diff"
+          lines={[
+            { type: "remove", oldLine: 1, content: "old" },
+            { type: "add", newLine: 1, content: "new" }
+          ]}
+        />
+        <AnnotatedCode
+          annotations={[
+            {
+              line: 1,
+              title: "Important line",
+              body: "Review the setup."
+            }
+          ]}
+          code="const setup = true;"
+          filename="setup.ts"
+        />
+        <ExportPanel title="Export review result" value={{ ok: true }} />
+      </CommentLayer>
+    );
+
+    expect(html).toContain('data-comment-target-id="callout:review-focus:check-the-export-path"');
+    expect(html).toContain('data-comment-target-id="code:example-ts"');
+    expect(html).toContain('data-comment-target-id="diff:example-diff"');
+    expect(html).toContain('data-comment-target-id="annotated-code:setup-ts"');
+    expect(html).toContain('data-comment-target-id="annotation:setup-ts:1:important-line"');
+    expect(html).toContain('data-comment-target-id="export:export-review-result"');
   });
 
   it("renders an empty comment export inside a layer", () => {
