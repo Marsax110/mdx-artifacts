@@ -2,7 +2,6 @@ import {
   Callout,
   CommentableBlock,
   CommentExport,
-  CommentLayer,
   CommentTarget,
   DecisionMatrix,
   MarkdownBody,
@@ -13,81 +12,79 @@ import {
 
 This example shows a local block-level comment loop. The author marks stable review targets with `CommentableBlock`, the reader adds comments in the browser, and `CommentExport` returns those comments to an agent.
 
-<CommentLayer>
-  <DecisionMatrix
-    question="Should comment targets be explicit blocks in v1?"
-    options={[
-      {
-        name: "Explicit comment blocks",
-        summary: "Authors wrap reviewable sections with a stable block id and title.",
-        pros: ["Stable export target", "Works for prose and components", "Does not change existing component props"],
-        cons: ["Adds one wrapper around reviewable regions"],
-        confidence: "high",
-        verdict: "Recommended for v1"
-      },
-      {
-        name: "Implicit component comments",
-        summary: "Every artifact component becomes commentable by default.",
-        pros: ["Less explicit authoring syntax"],
-        cons: ["Cannot naturally target prose", "Requires changing many component APIs"],
-        confidence: "medium",
-        verdict: "Defer until block comments prove useful"
-      }
-    ]}
-  />
+<DecisionMatrix
+  question="Should comment targets be explicit blocks in v1?"
+  options={[
+    {
+      name: "Explicit comment blocks",
+      summary: "Authors wrap reviewable sections with a stable block id and title.",
+      pros: ["Stable export target", "Works for prose and components", "Does not change existing component props"],
+      cons: ["Adds one wrapper around reviewable regions"],
+      confidence: "high",
+      verdict: "Recommended for v1"
+    },
+    {
+      name: "Implicit component comments",
+      summary: "Every artifact component becomes commentable by default.",
+      pros: ["Less explicit authoring syntax"],
+      cons: ["Cannot naturally target prose", "Requires changing many component APIs"],
+      confidence: "medium",
+      verdict: "Defer until block comments prove useful"
+    }
+  ]}
+/>
 
-  <CommentableBlock
-    blockId="prose-guidance"
-    description="Review prose that is not owned by a workflow component."
-    title="Prose guidance"
-  >
-    <Callout
-      tone="info"
-      title="Why blocks come first"
-      body="A block target gives the export enough context for the next agent turn without requiring text selection or component internals."
-    />
-    <MarkdownBody
-      body={`Use block comments when feedback should attach to a visible region:
+<CommentableBlock
+  blockId="prose-guidance"
+  description="Review prose that is not owned by a workflow component."
+  title="Prose guidance"
+>
+  <Callout
+    tone="info"
+    title="Why blocks come first"
+    body="A block target gives the export enough context for the next agent turn without requiring text selection or component internals."
+  />
+  <MarkdownBody
+    body={`Use block comments when feedback should attach to a visible region:
 
 - a decision matrix
 - an option grid
 - a prose explanation
 - a custom composed section`}
-    />
-  </CommentableBlock>
-
-  <OptionGrid
-    title="Comment workflow pieces"
-    options={[
-      {
-        name: "CommentLayer",
-        intent: "Shares local browser comment state across all wrapped blocks.",
-        tradeoffs: ["No backend", "Refresh clears comments"]
-      },
-      {
-        name: "CommentableBlock",
-        intent: "Marks one stable review target with a blockId and title.",
-        tradeoffs: ["Clear export context", "Authors choose the target boundary"]
-      },
-      {
-        name: "CommentExport",
-        intent: "Exports all comments as Markdown or JSON.",
-        tradeoffs: ["Agent-friendly handoff", "No persistence in v1"]
-      }
-    ]}
   />
+</CommentableBlock>
 
-  <CommentTarget
-    targetId="custom-comment-target"
-    title="Custom comment target"
-    description="A hand-authored target for content that is not inside a built-in component."
-  >
-    <Callout
-      tone="warning"
-      title="Custom targets still work"
-      body="Use CommentTarget when an artifact has a smaller local region that should be commentable without turning the whole section into a target."
-    />
-  </CommentTarget>
+<OptionGrid
+  title="Comment workflow pieces"
+  options={[
+    {
+      name: "CommentLayer",
+      intent: "The artifact shell now provides this review context automatically.",
+      tradeoffs: ["No backend", "Refresh clears comments"]
+    },
+    {
+      name: "CommentableBlock",
+      intent: "Marks one stable review target with a blockId and title.",
+      tradeoffs: ["Clear export context", "Authors choose the target boundary"]
+    },
+    {
+      name: "CommentExport",
+      intent: "Exports all comments as Markdown or JSON.",
+      tradeoffs: ["Agent-friendly handoff", "No persistence in v1"]
+    }
+  ]}
+/>
 
-  <CommentExport title="Export artifact feedback" />
-</CommentLayer>
+<CommentTarget
+  targetId="custom-comment-target"
+  title="Custom comment target"
+  description="A hand-authored target for content that is not inside a built-in component."
+>
+  <Callout
+    tone="warning"
+    title="Custom targets still work"
+    body="Use CommentTarget when an artifact has a smaller local region that should be commentable without turning the whole section into a target."
+  />
+</CommentTarget>
+
+<CommentExport title="Export artifact feedback" />

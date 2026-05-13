@@ -2,6 +2,7 @@ import "../src/react/styles.css";
 
 import type { Preview } from "@storybook/react-vite";
 import { useEffect, type ReactNode } from "react";
+import { CommentLayer } from "../src/react";
 
 const preview: Preview = {
   globalTypes: {
@@ -28,7 +29,9 @@ const preview: Preview = {
       <ThemeScope theme={context.globals.theme}>
         <main className="ak-shell">
           <article className="ak-document">
-            <Story />
+            <CommentLayer>
+              <Story />
+            </CommentLayer>
           </article>
         </main>
       </ThemeScope>

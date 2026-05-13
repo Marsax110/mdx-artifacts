@@ -509,17 +509,18 @@ export const componentRegistry: ComponentMeta[] = [
     name: "CommentLayer",
     category: "artifact",
     stability: "stable",
-    description: "Provides local browser comment state for block-level artifact feedback.",
-    useWhen: ["Reviewable artifacts", "Block-level user feedback", "Agent handoff comments"],
+    description: "Provides local browser comment state for block-level artifact feedback. Artifact and Storybook shells provide this automatically.",
+    useWhen: ["Custom React shells", "Reviewable artifacts", "Block-level user feedback", "Agent handoff comments"],
     props: [
       {
         name: "children",
         type: "ReactNode",
         required: true,
-        description: "CommentableBlock and CommentExport children that share one local comment state."
+        description: "CommentableBlock and CommentExport children that share one local comment state. Most MDX authors should rely on the artifact shell instead of writing this manually."
       }
     ],
-    example: `<CommentLayer>
+    example: `// Usually provided by the artifact shell.
+<CommentLayer>
   <CommentableBlock blockId="decision" title="Decision">
     <DecisionMatrix question="Choose a path" options={[]} />
   </CommentableBlock>

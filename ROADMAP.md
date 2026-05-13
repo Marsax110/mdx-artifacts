@@ -140,6 +140,7 @@ Current direction:
 
 - Use explicit `CommentableBlock` and `CommentTarget` boundaries first.
 - Allow one comment per commentable target in the first review model.
+- Provide `CommentLayer` automatically from the Storybook and artifact shells instead of requiring MDX authors to add it manually.
 - Show a side review rail on wide screens and click-open popovers on narrow screens.
 - Share the same comment item rendering between rails and popovers so editing behavior stays consistent.
 - Keep comment state local to the current page; no server persistence or collaboration layer yet.

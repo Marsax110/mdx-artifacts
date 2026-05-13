@@ -16,11 +16,9 @@ describe("validateMdx", () => {
     const filePath = path.join(dir, "comment-export.mdx");
     await writeFile(
       filePath,
-      `import { CommentExport, CommentLayer } from "../../src/react";
+      `import { CommentExport } from "../../src/react";
 
-<CommentLayer>
-  <CommentExport />
-</CommentLayer>`,
+<CommentExport />`,
       "utf8"
     );
 

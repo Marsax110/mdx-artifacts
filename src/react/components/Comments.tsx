@@ -174,9 +174,16 @@ export function CommentLayer({ children }: CommentLayerProps) {
     [activeTargetId, comments, panels, targetIds, targets]
   );
 
+  const isReviewLayoutActive = activeTargetId !== undefined || openTargetIds.length > 0;
+
   return (
     <CommentContext.Provider value={value}>
-      <div className="ak-review-layout">
+      <div
+        className={classNames(
+          "ak-review-layout",
+          isReviewLayoutActive ? "ak-review-layout-active" : "ak-review-layout-inactive"
+        )}
+      >
         <CommentReviewRail side="left" />
         <div className="ak-review-content">{children}</div>
         <CommentReviewRail side="right" />

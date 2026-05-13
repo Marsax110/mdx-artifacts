@@ -2,7 +2,7 @@ import mdx from "@mdx-js/rollup";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { randomUUID } from "node:crypto";
-import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { access, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createServer, build as viteBuild } from "vite";
@@ -30,6 +30,7 @@ export async function createArtifactProject(
   const entryPath = path.join(srcDir, "entry.tsx");
   const mdxImport = toRelativeImport(entryPath, mdxPath);
   const styleImports = createStyleImports(projectRoot, entryPath, config);
+  const reactEntryImport = toRelativeImport(entryPath, await resolveReactEntryPath());
 
   await mkdir(srcDir, { recursive: true });
   await writeFile(
@@ -52,6 +53,7 @@ export async function createArtifactProject(
     entryPath,
     `import React from "react";
 import { createRoot } from "react-dom/client";
+import { CommentLayer } from "${reactEntryImport}";
 import Doc from "${mdxImport}";
 ${styleImports}
 
@@ -59,7 +61,9 @@ function App() {
   return (
     <main className="ak-shell">
       <article className="ak-document">
-        <Doc />
+        <CommentLayer>
+          <Doc />
+        </CommentLayer>
       </article>
     </main>
   );
@@ -96,6 +100,18 @@ createRoot(document.getElementById("root")!).render(<App />);
     config: viteConfig,
     cleanup: () => rm(tmpDir, { recursive: true, force: true })
   };
+}
+
+async function resolveReactEntryPath() {
+  const builtEntryPath = path.resolve(packageCliDir, "../react/index.js");
+  const sourceEntryPath = path.resolve(packageCliDir, "../react/index.ts");
+
+  try {
+    await access(builtEntryPath);
+    return builtEntryPath;
+  } catch {
+    return sourceEntryPath;
+  }
 }
 
 export async function startDevServer(project: ArtifactProject): Promise<ViteDevServer> {

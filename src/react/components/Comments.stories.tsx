@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { CommentExport, CommentLayer } from "./Comments";
 import { DecisionMatrix } from "./DecisionMatrix";
 import { OptionGrid } from "./OptionGrid";
-import { CommentExport, CommentLayer } from "./Comments";
 
 const meta = {
   title: "Artifact Components/Comments",
@@ -17,7 +17,7 @@ export const BlockComments: Story = {
     children: null
   },
   render: () => (
-    <CommentLayer>
+    <>
       <DecisionMatrix
         question="Should comments target explicit blocks?"
         options={[
@@ -56,6 +56,6 @@ export const BlockComments: Story = {
       />
 
       <CommentExport title="Export artifact feedback" />
-    </CommentLayer>
+    </>
   )
 };

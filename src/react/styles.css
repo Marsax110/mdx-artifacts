@@ -125,7 +125,7 @@ body {
   padding: 36px 0 56px;
 }
 
-.ak-shell:has(.ak-review-layout) {
+.ak-shell:has(.ak-review-layout-active) {
   width: min(
     calc(100% - 32px),
     calc(var(--ak-review-content-width) + var(--ak-review-gap-total) + var(--ak-review-rail-width) + var(--ak-review-rail-width))
@@ -144,10 +144,18 @@ body {
   align-items: start;
 }
 
+.ak-review-layout-inactive {
+  display: block;
+}
+
 .ak-review-content {
   display: grid;
   gap: 24px;
   min-width: 0;
+}
+
+.ak-review-layout-inactive > .ak-review-rail {
+  display: none;
 }
 
 .ak-review-rail {
@@ -164,7 +172,17 @@ body {
 .ak-document > p,
 .ak-document > ul,
 .ak-document > ol,
-.ak-document > blockquote {
+.ak-document > blockquote,
+.ak-review-content > h1,
+.ak-review-content > h2,
+.ak-review-content > h3,
+.ak-review-content > h4,
+.ak-review-content > h5,
+.ak-review-content > h6,
+.ak-review-content > p,
+.ak-review-content > ul,
+.ak-review-content > ol,
+.ak-review-content > blockquote {
   margin: 0;
 }
 
@@ -173,42 +191,59 @@ body {
 .ak-document > h3,
 .ak-document > h4,
 .ak-document > h5,
-.ak-document > h6 {
+.ak-document > h6,
+.ak-review-content > h1,
+.ak-review-content > h2,
+.ak-review-content > h3,
+.ak-review-content > h4,
+.ak-review-content > h5,
+.ak-review-content > h6 {
   line-height: 1.25;
 }
 
-.ak-document > h1 {
+.ak-document > h1,
+.ak-review-content > h1 {
   margin: 0 0 4px;
   font-size: 32px;
   line-height: 1.15;
 }
 
-.ak-document > h2 {
+.ak-document > h2,
+.ak-review-content > h2 {
   font-size: 24px;
 }
 
-.ak-document > h3 {
+.ak-document > h3,
+.ak-review-content > h3 {
   font-size: 20px;
 }
 
-.ak-document > h4 {
+.ak-document > h4,
+.ak-review-content > h4 {
   font-size: 17px;
 }
 
 .ak-document > h5,
-.ak-document > h6 {
+.ak-document > h6,
+.ak-review-content > h5,
+.ak-review-content > h6 {
   color: var(--ak-muted);
   font-size: 15px;
 }
 
 .ak-document > p,
 .ak-document > li,
-.ak-document > blockquote {
+.ak-document > blockquote,
+.ak-review-content > p,
+.ak-review-content > li,
+.ak-review-content > blockquote {
   line-height: 1.65;
 }
 
 .ak-document > ul,
-.ak-document > ol {
+.ak-document > ol,
+.ak-review-content > ul,
+.ak-review-content > ol {
   display: grid;
   gap: 6px;
   padding-left: 22px;
@@ -232,7 +267,8 @@ body {
   list-style-type: circle;
 }
 
-.ak-document > blockquote {
+.ak-document > blockquote,
+.ak-review-content > blockquote {
   border-left: 3px solid var(--ak-border);
   color: var(--ak-muted);
   padding-left: 14px;
@@ -1090,7 +1126,7 @@ body {
 }
 
 @media (max-width: 1548px) {
-  .ak-shell:has(.ak-review-layout) {
+  .ak-shell:has(.ak-review-layout-active) {
     width: min(var(--ak-review-content-width), calc(100% - 32px));
   }
 
