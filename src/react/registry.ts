@@ -8,15 +8,19 @@ export type ComponentPropMeta = {
 
 export type ComponentMeta = {
   name: string;
+  category?: "artifact" | "content" | "layout";
+  stability?: "stable" | "advanced";
   description: string;
   useWhen: string[];
   props: ComponentPropMeta[];
   example: string;
 };
 
-export const componentRegistry = [
+export const componentRegistry: ComponentMeta[] = [
   {
     name: "InlineText",
+    category: "content",
+    stability: "stable",
     description: "Renders short single-line text with controlled inline Markdown.",
     useWhen: ["Titles", "Labels", "Captions", "Short notes", "Inline explanations"],
     props: [
@@ -46,6 +50,8 @@ export const componentRegistry = [
   },
   {
     name: "MarkdownBody",
+    category: "content",
+    stability: "stable",
     description: "Renders controlled multi-line Markdown for component body copy.",
     useWhen: ["Body explanations", "Short artifact notes", "Controlled lists", "Component-local prose"],
     props: [
@@ -72,7 +78,169 @@ export const componentRegistry = [
 />`
   },
   {
+    name: "Stack",
+    category: "layout",
+    stability: "advanced",
+    description: "Arranges children in a single vertical column with controlled spacing and alignment.",
+    useWhen: ["Advanced composition", "Vertical sections", "Storybook layout checks"],
+    props: [
+      {
+        name: "children",
+        type: "ReactNode",
+        required: true,
+        description: "Content to arrange vertically."
+      },
+      {
+        name: "gap",
+        type: "'sm' | 'md' | 'lg'",
+        description: "Spacing between children. Defaults to md."
+      },
+      {
+        name: "align",
+        type: "'start' | 'center' | 'stretch'",
+        description: "Horizontal child alignment. Defaults to stretch."
+      }
+    ],
+    example: `<Stack gap="md">
+  <MarkdownBody body="Use semantic components first." />
+  <ExportPanel value={{ status: "ready" }} />
+</Stack>`
+  },
+  {
+    name: "Columns",
+    category: "layout",
+    stability: "advanced",
+    description: "Arranges children in ratio-based columns that collapse responsively.",
+    useWhen: ["Advanced composition", "Main and supporting content", "Side-by-side artifact sections"],
+    props: [
+      {
+        name: "children",
+        type: "ReactNode",
+        required: true,
+        description: "Content to arrange into columns."
+      },
+      {
+        name: "ratio",
+        type: "'1:1' | '1:1:1' | '1:1:1:1' | '2:1' | '3:1' | '3:1:1' | '1:3:1' | '1:1:3'",
+        description: "Column ratio. Defaults to 1:1."
+      },
+      {
+        name: "gap",
+        type: "'sm' | 'md' | 'lg'",
+        description: "Spacing between columns. Defaults to md."
+      },
+      {
+        name: "collapseAt",
+        type: "'sm' | 'md' | 'lg'",
+        description: "Viewport size where columns collapse to one column. Defaults to md."
+      }
+    ],
+    example: `<Columns ratio="3:1" gap="md">
+  <MarkdownBody body="Main explanation." />
+  <Frame surface="subtle">Supporting notes</Frame>
+</Columns>`
+  },
+  {
+    name: "Grid",
+    category: "layout",
+    stability: "advanced",
+    description: "Arranges children in equal-width two, three, or four column grids.",
+    useWhen: ["Advanced composition", "Equal alternative cards", "Preview groups"],
+    props: [
+      {
+        name: "children",
+        type: "ReactNode",
+        required: true,
+        description: "Content to arrange into equal columns."
+      },
+      {
+        name: "columns",
+        type: "2 | 3 | 4",
+        description: "Number of equal columns. Defaults to 2."
+      },
+      {
+        name: "gap",
+        type: "'sm' | 'md' | 'lg'",
+        description: "Spacing between grid items. Defaults to md."
+      },
+      {
+        name: "collapseAt",
+        type: "'sm' | 'md' | 'lg'",
+        description: "Viewport size where the grid collapses to one column. Defaults to md."
+      }
+    ],
+    example: `<Grid columns={3}>
+  <Frame>Variant A</Frame>
+  <Frame>Variant B</Frame>
+  <Frame>Variant C</Frame>
+</Grid>`
+  },
+  {
+    name: "SplitPane",
+    category: "layout",
+    stability: "advanced",
+    description: "Arranges children into a two-pane layout with a controlled ratio.",
+    useWhen: ["Advanced composition", "Main content with sidebar", "Editor and preview layouts"],
+    props: [
+      {
+        name: "children",
+        type: "ReactNode",
+        required: true,
+        description: "Two panes to arrange."
+      },
+      {
+        name: "ratio",
+        type: "'1:1' | '2:1' | '3:1' | '1:2' | '1:3'",
+        description: "Pane ratio. Defaults to 3:1."
+      },
+      {
+        name: "gap",
+        type: "'sm' | 'md' | 'lg'",
+        description: "Spacing between panes. Defaults to md."
+      },
+      {
+        name: "collapseAt",
+        type: "'sm' | 'md' | 'lg'",
+        description: "Viewport size where panes collapse to one column. Defaults to md."
+      }
+    ],
+    example: `<SplitPane ratio="3:1">
+  <MarkdownBody body="Primary reading surface." />
+  <Frame surface="outlined">Sidebar</Frame>
+</SplitPane>`
+  },
+  {
+    name: "Frame",
+    category: "layout",
+    stability: "advanced",
+    description: "Provides a stable visual boundary for previews, snippets, mockups, or charts.",
+    useWhen: ["Advanced composition", "Preview boundaries", "Code or mockup framing"],
+    props: [
+      {
+        name: "children",
+        type: "ReactNode",
+        required: true,
+        description: "Content to frame."
+      },
+      {
+        name: "surface",
+        type: "'none' | 'plain' | 'subtle' | 'outlined'",
+        description: "Visual surface treatment. Defaults to outlined."
+      },
+      {
+        name: "padding",
+        type: "'none' | 'sm' | 'md' | 'lg'",
+        description: "Inner spacing. Defaults to md."
+      }
+    ],
+    example: `<Frame surface="outlined" padding="md">
+  <MarkdownBody body="A framed preview." />
+</Frame>`
+  },
+  {
     name: "DecisionMatrix",
+    category: "artifact",
+    stability: "stable",
     description: "Compares options by pros, cons, risks, confidence, and recommendation.",
     useWhen: ["Architecture decisions", "Product tradeoffs", "Implementation planning", "Open-source roadmap"],
     props: [
@@ -105,6 +273,8 @@ export const componentRegistry = [
   },
   {
     name: "OptionGrid",
+    category: "artifact",
+    stability: "stable",
     description: "Displays multiple options, component candidates, or prototype directions in a scannable grid.",
     useWhen: ["Option exploration", "Component scope", "Prototype comparison"],
     props: [
@@ -135,6 +305,8 @@ export const componentRegistry = [
   },
   {
     name: "ExportPanel",
+    category: "artifact",
+    stability: "stable",
     description: "Exports conclusions, configuration, or user-edited state as Markdown or JSON.",
     useWhen: ["Exporting decisions", "Copying state back to an agent", "Issue or PR handoff", "Configuration handoff"],
     props: [
@@ -165,7 +337,7 @@ export const componentRegistry = [
   }}
 />`
   }
-] satisfies ComponentMeta[];
+];
 
 export function findComponentMeta(name: string) {
   return componentRegistry.find((component) => component.name.toLowerCase() === name.toLowerCase());

@@ -4,18 +4,85 @@
 
 :root {
   color-scheme: light;
-  --ak-bg: #f8fafc;
-  --ak-surface: #ffffff;
-  --ak-text: #172033;
-  --ak-muted: #64748b;
-  --ak-border: #d9e2ef;
-  --ak-primary: #2563eb;
-  --ak-primary-dark: #1d4ed8;
-  --ak-good: #0f766e;
-  --ak-warn: #a16207;
-  --ak-risk: #b42318;
+  --ak-bg: oklch(1 0 0);
+  --ak-surface: oklch(1 0 0);
+  --ak-surface-subtle: oklch(0.97 0 0);
+  --ak-text: oklch(0.145 0 0);
+  --ak-muted: oklch(0.556 0 0);
+  --ak-border: oklch(0.922 0 0);
+  --ak-primary: oklch(0.205 0 0);
+  --ak-primary-dark: oklch(0.205 0 0);
+  --ak-primary-foreground: oklch(0.985 0 0);
+  --ak-primary-subtle: oklch(0.97 0 0);
+  --ak-good: oklch(0.45 0.12 165);
+  --ak-good-subtle: oklch(0.96 0.03 165);
+  --ak-warn: oklch(0.55 0.12 85);
+  --ak-warn-subtle: oklch(0.97 0.04 85);
+  --ak-risk: oklch(0.577 0.245 27.325);
+  --ak-risk-subtle: oklch(0.971 0.013 17.38);
+  --ak-code-bg: oklch(0.97 0 0);
+  --ak-code-text: oklch(0.269 0 0);
+  --ak-output-bg: oklch(0.145 0 0);
+  --ak-output-text: oklch(0.985 0 0);
+  --ak-shadow: 0 1px 2px rgb(0 0 0 / 4%);
   font-family:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ak-bg: oklch(0.145 0 0);
+  --ak-surface: oklch(0.205 0 0);
+  --ak-surface-subtle: oklch(0.269 0 0);
+  --ak-text: oklch(0.985 0 0);
+  --ak-muted: oklch(0.708 0 0);
+  --ak-border: oklch(1 0 0 / 10%);
+  --ak-primary: oklch(0.922 0 0);
+  --ak-primary-dark: oklch(0.985 0 0);
+  --ak-primary-foreground: oklch(0.145 0 0);
+  --ak-primary-subtle: oklch(1 0 0 / 10%);
+  --ak-good: oklch(0.78 0.12 165);
+  --ak-good-subtle: oklch(0.32 0.06 165);
+  --ak-warn: oklch(0.82 0.12 85);
+  --ak-warn-subtle: oklch(0.34 0.06 85);
+  --ak-risk: oklch(0.704 0.191 22.216);
+  --ak-risk-subtle: oklch(0.31 0.08 22);
+  --ak-code-bg: oklch(1 0 0 / 8%);
+  --ak-code-text: oklch(0.922 0 0);
+  --ak-output-bg: oklch(0.12 0 0);
+  --ak-output-text: oklch(0.985 0 0);
+  --ak-shadow: 0 1px 2px rgb(0 0 0 / 28%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --ak-bg: oklch(0.145 0 0);
+    --ak-surface: oklch(0.205 0 0);
+    --ak-surface-subtle: oklch(0.269 0 0);
+    --ak-text: oklch(0.985 0 0);
+    --ak-muted: oklch(0.708 0 0);
+    --ak-border: oklch(1 0 0 / 10%);
+    --ak-primary: oklch(0.922 0 0);
+    --ak-primary-dark: oklch(0.985 0 0);
+    --ak-primary-foreground: oklch(0.145 0 0);
+    --ak-primary-subtle: oklch(1 0 0 / 10%);
+    --ak-good: oklch(0.78 0.12 165);
+    --ak-good-subtle: oklch(0.32 0.06 165);
+    --ak-warn: oklch(0.82 0.12 85);
+    --ak-warn-subtle: oklch(0.34 0.06 85);
+    --ak-risk: oklch(0.704 0.191 22.216);
+    --ak-risk-subtle: oklch(0.31 0.08 22);
+    --ak-code-bg: oklch(1 0 0 / 8%);
+    --ak-code-text: oklch(0.922 0 0);
+    --ak-output-bg: oklch(0.12 0 0);
+    --ak-output-text: oklch(0.985 0 0);
+    --ak-shadow: 0 1px 2px rgb(0 0 0 / 28%);
+  }
 }
 
 * {
@@ -62,6 +129,98 @@ body {
   line-height: 1.25;
 }
 
+.ak-stack,
+.ak-columns,
+.ak-grid,
+.ak-split-pane {
+  min-width: 0;
+}
+
+.ak-stack {
+  display: grid;
+}
+
+.ak-stack-align-start {
+  justify-items: start;
+}
+
+.ak-stack-align-center {
+  justify-items: center;
+}
+
+.ak-stack-align-stretch {
+  justify-items: stretch;
+}
+
+.ak-columns,
+.ak-grid,
+.ak-split-pane {
+  display: grid;
+  grid-template-columns: var(--ak-layout-columns);
+}
+
+.ak-columns > *,
+.ak-grid > *,
+.ak-split-pane > * {
+  min-width: 0;
+}
+
+.ak-gap-sm {
+  gap: 10px;
+}
+
+.ak-gap-md {
+  gap: 16px;
+}
+
+.ak-gap-lg {
+  gap: 24px;
+}
+
+.ak-frame {
+  min-width: 0;
+  border-radius: 8px;
+}
+
+.ak-surface-none {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.ak-surface-plain {
+  border: 0;
+  background: var(--ak-surface);
+  box-shadow: var(--ak-shadow);
+}
+
+.ak-surface-subtle {
+  border: 1px solid var(--ak-border);
+  background: var(--ak-surface-subtle);
+}
+
+.ak-surface-outlined {
+  border: 1px solid var(--ak-border);
+  background: var(--ak-surface);
+  box-shadow: var(--ak-shadow);
+}
+
+.ak-padding-none {
+  padding: 0;
+}
+
+.ak-padding-sm {
+  padding: 10px;
+}
+
+.ak-padding-md {
+  padding: 16px;
+}
+
+.ak-padding-lg {
+  padding: 24px;
+}
+
 .ak-eyebrow {
   margin: 0;
   color: var(--ak-primary);
@@ -84,7 +243,7 @@ body {
   border-radius: 8px;
   background: var(--ak-surface);
   padding: 16px;
-  box-shadow: 0 1px 2px rgb(15 23 42 / 6%);
+  box-shadow: var(--ak-shadow);
 }
 
 .ak-card h3 {
@@ -113,8 +272,8 @@ body {
 .ak-inline-text code,
 .ak-markdown-body code {
   border-radius: 4px;
-  background: #eef2f7;
-  color: #334155;
+  background: var(--ak-code-bg);
+  color: var(--ak-code-text);
   font-family:
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 0.92em;
@@ -176,17 +335,17 @@ body {
 }
 
 .ak-badge-high {
-  background: #dff5f1;
+  background: var(--ak-good-subtle);
   color: var(--ak-good);
 }
 
 .ak-badge-medium {
-  background: #fef3c7;
+  background: var(--ak-warn-subtle);
   color: var(--ak-warn);
 }
 
 .ak-badge-low {
-  background: #fee2e2;
+  background: var(--ak-risk-subtle);
   color: var(--ak-risk);
 }
 
@@ -256,7 +415,7 @@ body {
 }
 
 .ak-format-trigger[data-state="active"] {
-  background: #eff6ff;
+  background: var(--ak-primary-subtle);
   color: var(--ak-primary-dark);
 }
 
@@ -277,14 +436,14 @@ body {
 }
 
 .ak-button-active {
-  background: #eff6ff;
+  background: var(--ak-primary-subtle);
   color: var(--ak-primary-dark);
 }
 
 .ak-button-primary {
   background: var(--ak-primary);
   border-color: var(--ak-primary);
-  color: white;
+  color: var(--ak-primary-foreground);
 }
 
 .ak-export-output {
@@ -292,12 +451,18 @@ body {
   max-height: 360px;
   margin: 0;
   border-radius: 8px;
-  background: #111827;
-  color: #e5e7eb;
+  background: var(--ak-output-bg);
+  color: var(--ak-output-text);
   padding: 14px;
   font-size: 13px;
   line-height: 1.55;
   white-space: pre-wrap;
+}
+
+@media (max-width: 960px) {
+  .ak-collapse-lg {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 @media (max-width: 720px) {
@@ -312,5 +477,15 @@ body {
 
   .ak-actions {
     justify-content: flex-start;
+  }
+
+  .ak-collapse-md {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 540px) {
+  .ak-collapse-sm {
+    grid-template-columns: 1fr !important;
   }
 }

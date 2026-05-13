@@ -32,6 +32,11 @@ export function componentsCommand(input?: string, options: { json?: boolean } = 
 function printComponent(component: (typeof componentRegistry)[number]) {
   console.log(`${component.name}\n`);
   console.log(component.description);
+  if (component.category || component.stability) {
+    console.log(
+      `\nMetadata: ${[component.category ? `category=${component.category}` : undefined, component.stability ? `stability=${component.stability}` : undefined].filter(Boolean).join(", ")}`
+    );
+  }
   console.log("\nUse when:");
   for (const item of component.useWhen) {
     console.log(`- ${item}`);
