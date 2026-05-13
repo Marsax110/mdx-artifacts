@@ -1,3 +1,5 @@
+export { ComparisonSet } from "./components/ComparisonSet";
+export type { ComparisonSetItemProps, ComparisonSetProps } from "./components/ComparisonSet";
 export { DecisionMatrix } from "./components/DecisionMatrix";
 export type { DecisionMatrixOption, DecisionMatrixProps } from "./components/DecisionMatrix";
 export { ExportPanel } from "./components/ExportPanel";

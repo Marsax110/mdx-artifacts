@@ -61,7 +61,7 @@ export const componentRegistry: ComponentMeta[] = [
         contentType: "blockMarkdown",
         required: true,
         description:
-          "Multi-line Markdown. Supports paragraphs, lists, blockquotes, bold, emphasis, strikethrough, inline code, and links."
+          "Multi-line Markdown. Supports headings, paragraphs, lists, blockquotes, bold, emphasis, strikethrough, inline code, and links. Prefer component title props for main artifact structure."
       },
       {
         name: "variant",
@@ -74,7 +74,8 @@ export const componentRegistry: ComponentMeta[] = [
 
 - **Readable** paragraphs and lists
 - \\\`inline code\\\` for short technical names
-- No headings, tables, HTML, math, or code blocks\`}
+- Headings for local body sections
+- No tables, HTML, math, or code blocks\`}
 />`
   },
   {
@@ -270,6 +271,42 @@ export const componentRegistry: ComponentMeta[] = [
     }
   ]}
 />`
+  },
+  {
+    name: "ComparisonSet",
+    category: "artifact",
+    stability: "stable",
+    description: "Groups comparable candidates while allowing each item to render arbitrary component content.",
+    useWhen: ["Candidate comparison", "Mixed media alternatives", "Prototype comparison", "Reviewable option sets"],
+    props: [
+      {
+        name: "title",
+        type: "string",
+        contentType: "inlineMarkdown",
+        required: true,
+        description: "Comparison set title."
+      },
+      {
+        name: "children",
+        type: "ReactNode",
+        required: true,
+        description:
+          "Use `ComparisonSet.Item` children. Each item accepts title, optional value, and arbitrary component content."
+      },
+      {
+        name: "columns",
+        type: "2 | 3 | 4",
+        description: "Number of comparison columns. Defaults to 2."
+      }
+    ],
+    example: `<ComparisonSet title="Compare artifact forms" columns={3}>
+  <ComparisonSet.Item title="Markdown explanation" value="markdown">
+    <MarkdownBody body="Best for prose-heavy context." />
+  </ComparisonSet.Item>
+  <ComparisonSet.Item title="Code path" value="code">
+    <Frame surface="subtle">Code renderer or local component</Frame>
+  </ComparisonSet.Item>
+</ComparisonSet>`
   },
   {
     name: "OptionGrid",

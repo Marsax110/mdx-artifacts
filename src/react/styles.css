@@ -182,6 +182,16 @@ body {
   border-radius: 8px;
 }
 
+.ak-comparison-item {
+  height: 100%;
+}
+
+.ak-comparison-item-body {
+  display: grid;
+  gap: 12px;
+  margin-top: 10px;
+}
+
 .ak-surface-none {
   border: 0;
   background: transparent;
@@ -304,13 +314,57 @@ body {
   margin: 0;
 }
 
+.ak-markdown-body h1,
+.ak-markdown-body h2,
+.ak-markdown-body h3,
+.ak-markdown-body h4,
+.ak-markdown-body h5,
+.ak-markdown-body h6 {
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.ak-markdown-body h1 {
+  font-size: 1.35em;
+}
+
+.ak-markdown-body h2 {
+  font-size: 1.22em;
+}
+
+.ak-markdown-body h3 {
+  font-size: 1.12em;
+}
+
+.ak-markdown-body h4 {
+  font-size: 1.02em;
+}
+
+.ak-markdown-body h5,
+.ak-markdown-body h6 {
+  color: var(--ak-muted);
+  font-size: 0.95em;
+}
+
 .ak-markdown-body ul,
 .ak-markdown-body ol {
+  display: grid;
+  gap: 4px;
+  margin: 2px 0 0;
   padding-left: 20px;
+}
+
+.ak-markdown-body ul {
+  list-style: disc outside;
+}
+
+.ak-markdown-body ol {
+  list-style: decimal outside;
 }
 
 .ak-markdown-body li {
   margin: 4px 0;
+  padding-left: 2px;
 }
 
 .ak-markdown-body blockquote {
