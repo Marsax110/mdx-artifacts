@@ -115,10 +115,87 @@ body {
   gap: 24px;
 }
 
+.ak-document > h1,
+.ak-document > h2,
+.ak-document > h3,
+.ak-document > h4,
+.ak-document > h5,
+.ak-document > h6,
+.ak-document > p,
+.ak-document > ul,
+.ak-document > ol,
+.ak-document > blockquote {
+  margin: 0;
+}
+
+.ak-document > h1,
+.ak-document > h2,
+.ak-document > h3,
+.ak-document > h4,
+.ak-document > h5,
+.ak-document > h6 {
+  line-height: 1.25;
+}
+
 .ak-document > h1 {
   margin: 0 0 4px;
   font-size: 32px;
   line-height: 1.15;
+}
+
+.ak-document > h2 {
+  font-size: 24px;
+}
+
+.ak-document > h3 {
+  font-size: 20px;
+}
+
+.ak-document > h4 {
+  font-size: 17px;
+}
+
+.ak-document > h5,
+.ak-document > h6 {
+  color: var(--ak-muted);
+  font-size: 15px;
+}
+
+.ak-document > p,
+.ak-document > li,
+.ak-document > blockquote {
+  line-height: 1.65;
+}
+
+.ak-document > ul,
+.ak-document > ol {
+  display: grid;
+  gap: 6px;
+  padding-left: 22px;
+}
+
+.ak-document ul {
+  list-style: disc outside;
+}
+
+.ak-document ol {
+  list-style: decimal outside;
+}
+
+.ak-document li > ul,
+.ak-document li > ol {
+  margin-top: 6px;
+  padding-left: 22px;
+}
+
+.ak-document li > ul {
+  list-style-type: circle;
+}
+
+.ak-document > blockquote {
+  border-left: 3px solid var(--ak-border);
+  color: var(--ak-muted);
+  padding-left: 14px;
 }
 
 .ak-section {

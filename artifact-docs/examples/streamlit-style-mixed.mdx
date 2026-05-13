@@ -1,0 +1,173 @@
+import {
+  Callout,
+  CodeBlock,
+  ComparisonSet,
+  DecisionMatrix,
+  ExportPanel,
+  Frame,
+  MarkdownBody,
+  OptionGrid,
+} from "../../src/react";
+
+# Streamlit-Style Linear Artifact
+
+This example tests the simplest authoring path: write native MDX prose, place a component, continue writing prose, then place the next component.
+
+The goal is not to create a complex layout. The goal is to check whether the artifact already feels natural when the author writes in a linear flow.
+
+## Context
+
+Streamlit works well because authors can write a small amount of text, drop in a widget or chart, then keep going. MDX already gives this project a similar baseline:
+
+- markdown headings define the reading structure
+- paragraphs carry narrative context
+- components own reusable workflow UI
+- the artifact shell controls page width and vertical rhythm
+
+<Callout
+  tone="info"
+  title="What this example is checking"
+  body="The artifact should read as one continuous document, not as disconnected component demos."
+/>
+
+## Decision point
+
+The first question is whether the core authoring experience should stay close to native MDX or move toward more explicit text components.
+
+<DecisionMatrix
+  question="Should top-level prose use native MDX by default?"
+  options={[
+    {
+      name: "Native MDX prose",
+      summary:
+        "Use regular headings, paragraphs, lists, links, and blockquotes between workflow components.",
+      pros: [
+        "Shortest authoring path",
+        "Agent-friendly",
+        "No extra text API to learn",
+      ],
+      cons: [
+        "Needs strong default prose styling",
+        "Harder to constrain every edge case",
+      ],
+      confidence: "high",
+      verdict: "Recommended baseline",
+    },
+    {
+      name: "Text components everywhere",
+      summary:
+        "Require components such as InlineText and MarkdownBody for most visible copy.",
+      pros: ["More controlled rendering", "Clear metadata boundary"],
+      cons: ["Verbose for simple documents", "Less natural than MDX"],
+      confidence: "medium",
+      verdict: "Use inside reusable components",
+    },
+    {
+      name: "Raw HTML escape hatch",
+      summary:
+        "Let authors write arbitrary HTML when layout or text rendering gets specific.",
+      pros: ["Maximum flexibility"],
+      cons: ["Style drift", "Weak validation", "Harder for agents to reuse"],
+      confidence: "low",
+      verdict: "Avoid unless necessary",
+    },
+  ]}
+/>
+
+After the decision block, the document should continue naturally. This paragraph is intentionally plain MDX so the spacing between prose and the component above is easy to judge.
+
+> A good default artifact should let the author think in reading order first, then reach for layout primitives only when the content needs a custom arrangement.
+
+## Component menu
+
+The next block lists the current component roles. It should feel like a continuation of the same document, not a separate app screen.
+
+<OptionGrid
+  title="Linear authoring building blocks"
+  options={[
+    {
+      name: "Native MDX",
+      intent: "Own top-level narrative flow.",
+      tradeoffs: [
+        "Best for headings and explanatory paragraphs",
+        "Needs polished document-level CSS",
+      ],
+    },
+    {
+      name: "MarkdownBody",
+      intent: "Own controlled body copy inside a component slot.",
+      tradeoffs: [
+        "Good for reusable components",
+        "Less convenient for top-level prose",
+      ],
+    },
+    {
+      name: "Workflow components",
+      intent:
+        "Own structured decisions, comparisons, code notes, and export surfaces.",
+      tradeoffs: [
+        "Agent-queryable through the registry",
+        "Should stay higher-level than raw cards",
+      ],
+    },
+  ]}
+/>
+
+## Mixed content
+
+Here is a small comparison set with component-local Markdown inside each item. This shows the boundary between native MDX prose and reusable component content.
+
+<ComparisonSet title="Where each text form belongs" columns={3}>
+  <ComparisonSet.Item title="Top-level MDX" value="top-level-mdx">
+    <Frame surface="subtle">
+      <MarkdownBody
+        variant="compact"
+        body="Use this for the document's main reading order: headings, paragraphs, lists, and short notes between components."
+      />
+    </Frame>
+  </ComparisonSet.Item>
+
+<ComparisonSet.Item title="MarkdownBody" value="markdown-body">
+  <Frame surface="subtle">
+    <MarkdownBody
+      variant="compact"
+      body="Use this when a component needs a controlled body field with safe Markdown rendering."
+    />
+  </Frame>
+</ComparisonSet.Item>
+
+  <ComparisonSet.Item title="CodeBlock" value="code-block">
+    <CodeBlock
+      filename="artifact-docs/examples/streamlit-style-mixed.mdx"
+      language="mdx"
+      code={`# Title
+
+Plain MDX prose.
+
+<DecisionMatrix ... />
+
+More prose.`}
+/>
+
+  </ComparisonSet.Item>
+</ComparisonSet>
+
+## Export
+
+The export block closes the artifact with a structured summary. In a real artifact, this is where the reader or agent can copy the decision back into the workflow.
+
+<ExportPanel
+  title="Export linear authoring verdict"
+  formats={["markdown", "json"]}
+  value={{
+    pattern: "Native MDX prose plus ordered workflow components",
+    recommendation:
+      "Keep native MDX as the top-level write path and use components for reusable structured UI.",
+    checks: [
+      "Top-level headings and paragraphs remain readable.",
+      "Components appear in the same order they are written.",
+      "Document spacing makes the artifact feel continuous.",
+      "MarkdownBody stays useful inside component slots.",
+    ],
+  }}
+/>
