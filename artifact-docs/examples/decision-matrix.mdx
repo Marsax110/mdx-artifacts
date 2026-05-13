@@ -3,11 +3,11 @@ import { DecisionMatrix, ExportPanel, OptionGrid } from "../../src/react";
 # Artifact Kit Stage One Decision
 
 <DecisionMatrix
-  question="Should stage one focus on a Vite single HTML artifact instead of starting with an Astro docs site?"
+  question="Should stage one focus on a **Vite single HTML artifact** instead of starting with an Astro docs site?"
   options={[
     {
-      name: "Vite single HTML artifact",
-      summary: "Validate the shortest MDX-to-interactive-HTML loop first.",
+      name: "**Vite** single HTML artifact",
+      summary: "Validate the shortest `MDX -> HTML` loop first.",
       pros: ["Shortest loop", "Direct interactive component debugging", "Fits one-off tool artifacts"],
       cons: ["No docs-site navigation yet", "Weaker long-term archive experience"],
       confidence: "high",
@@ -25,7 +25,7 @@ import { DecisionMatrix, ExportPanel, OptionGrid } from "../../src/react";
       name: "Raw HTML",
       summary: "Let agents generate complete HTML directly.",
       pros: ["No toolchain", "Fast for very small throwaway pages"],
-      cons: ["Duplicated code", "Style drift", "Export behavior is hard to reuse"],
+      cons: ["Duplicated code", "Style drift", "~~Reusable~~ export behavior is hard to reuse"],
       confidence: "low",
       verdict: "Keep only as fallback"
     }
@@ -38,7 +38,7 @@ import { DecisionMatrix, ExportPanel, OptionGrid } from "../../src/react";
     {
       name: "DecisionMatrix",
       intent: "Compare options",
-      tradeoffs: ["Stable structure", "Does not own complex interaction"]
+      tradeoffs: ["Stable **decision** structure", "Does not own complex interaction"]
     },
     {
       name: "OptionGrid",

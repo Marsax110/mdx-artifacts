@@ -40,6 +40,9 @@ function printComponent(component: (typeof componentRegistry)[number]) {
   console.log("\nProps:");
   for (const prop of component.props) {
     console.log(`- ${prop.name}${prop.required ? " (required)" : ""}: ${prop.type}`);
+    if (prop.contentType) {
+      console.log(`  content type: ${prop.contentType}`);
+    }
     console.log(`  ${prop.description}`);
   }
 

@@ -1,6 +1,7 @@
 export type ComponentPropMeta = {
   name: string;
   type: string;
+  contentType?: "plainText" | "inlineMarkdown" | "blockMarkdown" | "json" | "code";
   required?: boolean;
   description: string;
 };
@@ -15,6 +16,62 @@ export type ComponentMeta = {
 
 export const componentRegistry = [
   {
+    name: "InlineText",
+    description: "Renders short single-line text with controlled inline Markdown.",
+    useWhen: ["Titles", "Labels", "Captions", "Short notes", "Inline explanations"],
+    props: [
+      {
+        name: "text",
+        type: "string",
+        contentType: "inlineMarkdown",
+        required: true,
+        description: "Short text. Supports bold, emphasis, strikethrough, inline code, and links."
+      },
+      {
+        name: "as",
+        type: "'span' | 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'",
+        description: "Semantic element to render. Use this instead of Markdown headings."
+      },
+      {
+        name: "variant",
+        type: "'default' | 'title' | 'subtitle' | 'label' | 'caption'",
+        description: "Visual text variant."
+      }
+    ],
+    example: `<InlineText
+  as="h3"
+  variant="subtitle"
+  text="Use **MDX** as source and ~~raw HTML~~ only as fallback."
+/>`
+  },
+  {
+    name: "MarkdownBody",
+    description: "Renders controlled multi-line Markdown for component body copy.",
+    useWhen: ["Body explanations", "Short artifact notes", "Controlled lists", "Component-local prose"],
+    props: [
+      {
+        name: "body",
+        type: "string",
+        contentType: "blockMarkdown",
+        required: true,
+        description:
+          "Multi-line Markdown. Supports paragraphs, lists, blockquotes, bold, emphasis, strikethrough, inline code, and links."
+      },
+      {
+        name: "variant",
+        type: "'default' | 'compact'",
+        description: "Body density variant."
+      }
+    ],
+    example: `<MarkdownBody
+  body={\`Use MarkdownBody when a component needs controlled body copy:
+
+- **Readable** paragraphs and lists
+- \\\`inline code\\\` for short technical names
+- No headings, tables, HTML, math, or code blocks\`}
+/>`
+  },
+  {
     name: "DecisionMatrix",
     description: "Compares options by pros, cons, risks, confidence, and recommendation.",
     useWhen: ["Architecture decisions", "Product tradeoffs", "Implementation planning", "Open-source roadmap"],
@@ -22,6 +79,7 @@ export const componentRegistry = [
       {
         name: "question",
         type: "string",
+        contentType: "inlineMarkdown",
         required: true,
         description: "The decision question being answered."
       },
@@ -53,6 +111,7 @@ export const componentRegistry = [
       {
         name: "title",
         type: "string",
+        contentType: "inlineMarkdown",
         required: true,
         description: "Grid title."
       },
@@ -82,6 +141,7 @@ export const componentRegistry = [
       {
         name: "title",
         type: "string",
+        contentType: "inlineMarkdown",
         description: "Export section title. Defaults to Export Result."
       },
       {

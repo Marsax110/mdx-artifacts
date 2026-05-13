@@ -1,5 +1,6 @@
 import * as Tabs from "@radix-ui/react-tabs";
 import { useMemo, useState } from "react";
+import { InlineText } from "./InlineText";
 
 export type ExportFormat = "markdown" | "json";
 
@@ -30,7 +31,7 @@ export function ExportPanel({ title = "Export Result", formats = ["markdown", "j
       <div className="ak-section-header ak-export-header">
         <div>
           <p className="ak-eyebrow">Export</p>
-          <h2>{title}</h2>
+          <InlineText as="h2" text={title} variant="title" />
         </div>
         <div className="ak-actions">
           <Tabs.Root

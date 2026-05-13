@@ -1,3 +1,5 @@
+import { InlineText } from "./InlineText";
+
 export type DecisionMatrixOption = {
   name: string;
   summary?: string;
@@ -18,24 +20,24 @@ export function DecisionMatrix({ question, options }: DecisionMatrixProps) {
     <section className="ak-section ak-decision-matrix">
       <div className="ak-section-header">
         <p className="ak-eyebrow">Decision Matrix</p>
-        <h2>{question}</h2>
+        <InlineText as="h2" text={question} variant="title" />
       </div>
       <div className="ak-decision-grid">
         {options.map((option) => (
           <article className="ak-card" key={option.name}>
             <div className="ak-card-header">
-              <h3>{option.name}</h3>
+              <InlineText as="h3" text={option.name} variant="subtitle" />
               {option.confidence ? (
                 <span className={`ak-badge ak-badge-${option.confidence}`}>
                   {option.confidence}
                 </span>
               ) : null}
             </div>
-            {option.summary ? <p className="ak-muted">{option.summary}</p> : null}
+            {option.summary ? <InlineText as="p" className="ak-muted" text={option.summary} /> : null}
             <ListBlock title="Pros" items={option.pros} />
             <ListBlock title="Cons" items={option.cons} />
             <ListBlock title="Risks" items={option.risks} />
-            {option.verdict ? <p className="ak-verdict">{option.verdict}</p> : null}
+            {option.verdict ? <InlineText as="p" className="ak-verdict" text={option.verdict} /> : null}
           </article>
         ))}
       </div>
@@ -53,7 +55,9 @@ function ListBlock({ title, items }: { title: string; items?: string[] }) {
       <h4>{title}</h4>
       <ul>
         {items.map((item) => (
-          <li key={item}>{item}</li>
+          <li key={item}>
+            <InlineText text={item} />
+          </li>
         ))}
       </ul>
     </div>
