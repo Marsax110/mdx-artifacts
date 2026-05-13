@@ -37,6 +37,7 @@ import { DecisionMatrix, ExportPanel } from "../../src/react";
 3. `src/cli` 提供 `dev`、`build`、`validate`、`init`。
 4. CLI 提供 `components` 查询组件参数和示例。
 5. `build` 输出单个 self-contained HTML 文件。
+6. `InlineText` / `MarkdownBody` 提供受控的文本渲染边界。
 
 暂不把核心绑定到 Astro。Astro 后续只作为“结构化文档站 adapter”加入。
 
@@ -110,4 +111,7 @@ export default config;
 
 ## 后续阶段
 
-见 [docs/design.zh-CN.md](docs/design.zh-CN.md)。
+- [公开路线图](ROADMAP.md)
+- [设计说明](docs/design.zh-CN.md)
+- [英文命名规范](docs/naming.md)
+- [英文组件协议](docs/component-protocol.md)

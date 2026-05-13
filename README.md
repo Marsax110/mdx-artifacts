@@ -117,5 +117,8 @@ Custom styles are imported after the default styles, so they can override CSS va
 
 ## Documentation
 
+- [Roadmap](ROADMAP.md)
 - [Design notes](docs/design.md)
+- [Naming conventions](docs/naming.md)
+- [Component protocol](docs/component-protocol.md)
 - [Chinese README](README.zh-CN.md)

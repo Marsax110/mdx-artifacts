@@ -35,6 +35,8 @@ HTML artifact 的价值不在于替代 Markdown，而在于把一些阅读、比
 
 第一批组件：
 
+- `InlineText`：单行短文本，支持受控 inline Markdown。
+- `MarkdownBody`：组件内部正文，支持受控 block Markdown。
 - `DecisionMatrix`：方案比较。
 - `OptionGrid`：多个方案并排展示。
 - `ExportPanel`：导出 Markdown / JSON。
@@ -179,3 +181,14 @@ artifact-kit components ExportPanel --json
 ```
 
 查询数据来自 `componentRegistry`，未来应同时服务 CLI 查询、Storybook docs、validate 规则和 Agent skill 说明。
+
+## 公开路线图与本地执行记录
+
+公开项目方向放在：
+
+- `ROADMAP.md`
+- `docs/design.md`
+- `docs/naming.md`
+- `docs/component-protocol.md`
+
+本地阶段执行记录放在 `docs/local/*.local.md`，不提交到开源仓库。它用于记录临时判断、验收过程和 Agent 工作状态，避免把过程噪音暴露到公开文档中。

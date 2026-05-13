@@ -47,6 +47,14 @@ Storybook is not the artifact build path. The final artifact loop is still verif
 
 Components should be workflow-level and self-describing.
 
+Public component rules live in:
+
+- `docs/naming.md`
+- `docs/component-protocol.md`
+- `ROADMAP.md`
+
+Local phase execution notes belong in `docs/local/*.local.md`. They are ignored by Git and must not be committed as public docs.
+
 Good names:
 
 - `DecisionMatrix`
@@ -118,6 +126,14 @@ Before the first public commit or npm publish:
 8. Confirm `npm pack` does not include `src/`, `.storybook/`, stories, sourcemaps, `node_modules/`, or `dist/artifacts`.
 
 Do not commit generated `dist/artifacts` output.
+
+## Commit Policy
+
+Use English commit messages for this open-source repository.
+
+Commit titles should be concise and describe the public change. Commit bodies may use bullet points for the main changes.
+
+Do not use local-language commit messages in public history. Local working notes can stay in ignored `docs/local/*.local.md` files.
 
 ## Editing Rules
 

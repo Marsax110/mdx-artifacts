@@ -14,6 +14,14 @@ When asked to create or modify an artifact:
 
 Do not generate raw HTML unless explicitly requested.
 
+Use these public docs for project conventions:
+
+- `ROADMAP.md`
+- `docs/naming.md`
+- `docs/component-protocol.md`
+
+Keep local phase execution notes in `docs/local/*.local.md`. They are ignored by Git and should not be committed.
+
 ## Language
 
 Use English in:
@@ -61,3 +69,7 @@ React high-level components
 ```
 
 Astro, shadcn/ui, and daisyUI are future optional adapters/templates, not core dependencies.
+
+## Commits
+
+Use English commit messages for this open-source repository. Keep local execution notes in ignored local files instead of encoding them in public commit history.

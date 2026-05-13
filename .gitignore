@@ -6,3 +6,5 @@ dist/
 *.tgz
 coverage/
 storybook-static/
+docs/local/
+*.local.md

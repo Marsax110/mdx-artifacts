@@ -33,6 +33,8 @@ The core asset is the high-level component protocol, not a specific frontend she
 
 First-stage components:
 
+- `InlineText`: short text with controlled inline Markdown.
+- `MarkdownBody`: controlled component-local body Markdown.
 - `DecisionMatrix`: compare options.
 - `OptionGrid`: show alternatives side by side.
 - `ExportPanel`: export Markdown or JSON.
@@ -184,6 +186,18 @@ Component naming rules:
 - Names must be self-describing, such as `DecisionMatrix` and `ExportPanel`.
 - Avoid generic names such as `Panel` or `CardList`.
 - A component should represent an artifact workflow, not a primitive UI element.
+- Text rendering is intentionally split into `InlineText`, `MarkdownBody`, and future long-form prose components.
+
+## Public Roadmap and Local Execution Notes
+
+Public project direction lives in:
+
+- `ROADMAP.md`
+- `docs/design.md`
+- `docs/naming.md`
+- `docs/component-protocol.md`
+
+Local phase execution notes belong in `docs/local/*.local.md` and are not committed. They can track temporary decisions, verification notes, and agent working state without adding process noise to the public repository.
 
 ## Success Criteria
 
