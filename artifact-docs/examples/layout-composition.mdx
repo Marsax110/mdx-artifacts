@@ -1,0 +1,213 @@
+import {
+  Columns,
+  ComparisonSet,
+  DecisionMatrix,
+  ExportPanel,
+  Frame,
+  Grid,
+  InlineText,
+  MarkdownBody,
+  SplitPane,
+  Stack,
+} from "../../src/react";
+
+# Layout Composition Example
+
+<Stack gap="lg">
+  <Frame surface="plain" padding="lg">
+    <Stack gap="sm">
+      <InlineText
+        as="h2"
+        variant="title"
+        text="A composed artifact using **layout primitives** and text components"
+      />
+      <MarkdownBody
+        body={`This example shows how \`Stack\`, \`Columns\`, \`Grid\`, \`SplitPane\`, and \`Frame\` can arrange existing semantic components without replacing them.
+
+The layout components control placement and surface. Components such as \`DecisionMatrix\`, \`ComparisonSet\`, and \`ExportPanel\` still own the artifact meaning.`}
+/>
+
+</Stack>
+
+  </Frame>
+
+  <SplitPane ratio="3:1" gap="lg">
+    <DecisionMatrix
+      question="Should layout primitives become the default authoring path?"
+      options={[
+        {
+          name: "Semantic-first authoring",
+          summary: "Agents choose task-oriented components first, then use layout only when composition needs it.",
+          pros: ["Stable protocol", "Less ad hoc JSX", "Better validation path"],
+          cons: ["Less free-form than raw HTML"],
+          confidence: "high",
+          verdict: "Recommended"
+        },
+        {
+          name: "Layout-first authoring",
+          summary: "Agents assemble artifacts from generic layout blocks and arbitrary children.",
+          pros: ["Maximum flexibility"],
+          cons: ["Easy to recreate raw HTML", "Harder to query through CLI", "Harder to keep consistent"],
+          confidence: "low",
+          verdict: "Keep as an advanced escape hatch"
+        }
+      ]}
+    />
+
+    <Frame surface="subtle">
+      <Stack gap="sm">
+        <InlineText as="h3" variant="subtitle" text="Reading note" />
+        <MarkdownBody
+          variant="compact"
+          body={`Use layout primitives when the artifact needs a custom reading shape:
+
+- main content plus sidebar
+- equal option previews
+- framed snippets or mockups
+
+Do not use them to rebuild existing semantic components.`}
+/>
+
+</Stack>
+</Frame>
+
+  </SplitPane>
+
+  <Columns ratio="1:1:1" gap="md">
+    <Frame surface="outlined">
+      <InlineText as="h3" variant="subtitle" text="InlineText" />
+      <MarkdownBody
+        variant="compact"
+        body={`Short labels and headings can use **inline Markdown**, including *emphasis*, ~~removed text~~, and \`inline code\`.`}
+      />
+    </Frame>
+
+    <Frame surface="outlined">
+      <InlineText as="h3" variant="subtitle" text="MarkdownBody" />
+      <MarkdownBody
+        variant="compact"
+        body={`Body copy supports controlled Markdown:
+
+1.  paragraphs
+2.  ordered lists
+3.  unordered lists
+4.  blockquotes`}
+    />
+
+                  </Frame>
+
+                  <Frame surface="outlined">
+
+              <InlineText as="h3" variant="subtitle" text="Frame" />
+
+          <MarkdownBody
+
+    variant="compact"
+    body={`Frame provides surface treatment:
+
+- \`none\`
+- \`plain\`
+- \`subtle\`
+- \`outlined\``}
+  />
+
+                </Frame>
+
+            </Columns>
+
+              <ComparisonSet title="Compare content shapes" columns={3}>
+
+          <ComparisonSet.Item title="Markdown body" value="markdown-body">
+
+      <MarkdownBody
+
+  variant="compact"
+  body={`# This **item** is ~~plain Markdown content~~.
+
+  #### **item** is ~~plain Markdown content~~.
+
+- Good for notes
+- Easy for agents to write
+- Easy to validate
+
+1. asdasd
+2. 送到 赛事
+
+`}
+/>
+
+                  </ComparisonSet.Item>
+
+<ComparisonSet.Item title="Framed snippet" value="framed-snippet">
+  <Frame surface="subtle">
+    <MarkdownBody
+      variant="compact"
+      body={`This slot can hold a future \`CodeBlock\`, \`MermaidBlock\`, image renderer, or project-local component.`}
+    />
+  </Frame>
+</ComparisonSet.Item>
+
+                  <ComparisonSet.Item title="Custom composition" value="custom-composition">
+                  <Stack gap="sm">
+                    <InlineText text="Nested layout is allowed when the item needs it." variant="label" />
+                    <MarkdownBody body="The comparison item owns the title. Its body remains open to child components." variant="compact" />
+                  </Stack>
+
+                </ComparisonSet.Item>
+
+            </ComparisonSet>
+
+                <Grid columns={2} gap="md">
+
+              <Frame surface="outlined">
+
+          <InlineText as="h3" variant="subtitle" text="Grid is only layout" />
+
+      <MarkdownBody
+
+body={`This card is built manually from \`Frame\`, \`InlineText\`, and \`MarkdownBody\`.
+
+Use this when there is no reusable artifact meaning beyond placement.`}
+/>
+
+</Frame>
+
+    <Frame surface="plain" padding="lg">
+      <Stack gap="md">
+        <InlineText as="h3" variant="subtitle" text="Surface check" />
+        <MarkdownBody
+          body={`This frame uses \`surface=\"plain\"\`. In light mode it should read as a white surface on a very light neutral page background.
+
+In dark mode it should read as a quiet elevated surface, not as a blue-tinted panel.`}
+/>
+
+</Stack>
+</Frame>
+
+  </Grid>
+
+  <ExportPanel
+    title="Export layout review"
+    formats={["markdown", "json"]}
+    value={{
+      recommendation: "Keep layout primitives as advanced composition tools and use ComparisonSet for comparable mixed-content candidates.",
+      componentsShown: [
+        "Stack",
+        "Columns",
+        "Grid",
+        "SplitPane",
+        "Frame",
+        "ComparisonSet",
+        "InlineText",
+        "MarkdownBody"
+      ],
+      reviewChecklist: [
+        "Light mode surface contrast is readable.",
+        "Dark mode surface contrast is readable.",
+        "Semantic components remain the main authoring path.",
+        "ComparisonSet items can hold mixed child components.",
+        "Text components render controlled Markdown correctly."
+      ]
+    }}
+  />
+</Stack>
