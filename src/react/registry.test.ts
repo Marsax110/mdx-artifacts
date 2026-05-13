@@ -21,6 +21,17 @@ describe("componentRegistry", () => {
         expect(prop.type).toBeTruthy();
         expect(prop.description).toBeTruthy();
       }
+
+      for (const type of component.types ?? []) {
+        expect(type.name).toBeTruthy();
+        expect(type.fields.length).toBeGreaterThan(0);
+
+        for (const field of type.fields) {
+          expect(field.name).toBeTruthy();
+          expect(field.type).toBeTruthy();
+          expect(field.description).toBeTruthy();
+        }
+      }
     }
   });
 
@@ -31,6 +42,32 @@ describe("componentRegistry", () => {
           expect(allowedContentTypes.has(prop.contentType)).toBe(true);
         }
       }
+
+      for (const type of component.types ?? []) {
+        for (const field of type.fields) {
+          if (field.contentType) {
+            expect(allowedContentTypes.has(field.contentType)).toBe(true);
+          }
+        }
+      }
+    }
+  });
+
+  it("documents nested object props with queryable types", () => {
+    const complexProps = componentRegistry.flatMap((component) =>
+      component.props
+        .filter((prop) => /^[A-Z][A-Za-z0-9.]*\[]$/.test(prop.type))
+        .map((prop) => ({
+          component,
+          prop,
+          typeName: prop.type.slice(0, -2)
+        }))
+    );
+
+    expect(complexProps.length).toBeGreaterThan(0);
+
+    for (const { component, prop, typeName } of complexProps) {
+      expect(component.types?.some((type) => type.name === typeName), `${component.name}.${prop.name}`).toBe(true);
     }
   });
 

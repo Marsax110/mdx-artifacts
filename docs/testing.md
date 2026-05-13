@@ -49,6 +49,7 @@ Recommended assertions:
 - Empty lists or missing optional data do not break layout.
 - Controlled Markdown fields respect their documented content type.
 - The component is registered with a clear example.
+- Complex object props have matching registry `types` metadata.
 
 Do not add browser E2E just because a component was added. Add browser tests only when the behavior depends on real browser APIs, focus, layout, clipboard, drag-and-drop, or navigation.
 

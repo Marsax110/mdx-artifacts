@@ -44,13 +44,27 @@ function printComponent(component: (typeof componentRegistry)[number]) {
 
   console.log("\nProps:");
   for (const prop of component.props) {
-    console.log(`- ${prop.name}${prop.required ? " (required)" : ""}: ${prop.type}`);
-    if (prop.contentType) {
-      console.log(`  content type: ${prop.contentType}`);
+    printProp(prop);
+  }
+
+  if (component.types?.length) {
+    console.log("\nNested types:");
+    for (const type of component.types) {
+      console.log(`\n${type.name}${type.description ? `: ${type.description}` : ""}`);
+      for (const field of type.fields) {
+        printProp(field);
+      }
     }
-    console.log(`  ${prop.description}`);
   }
 
   console.log("\nExample:");
   console.log(component.example);
+}
+
+function printProp(prop: { name: string; type: string; contentType?: string; required?: boolean; description: string }) {
+  console.log(`- ${prop.name}${prop.required ? " (required)" : ""}: ${prop.type}`);
+  if (prop.contentType) {
+    console.log(`  content type: ${prop.contentType}`);
+  }
+  console.log(`  ${prop.description}`);
 }

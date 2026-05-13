@@ -6,6 +6,12 @@ export type ComponentPropMeta = {
   description: string;
 };
 
+export type ComponentTypeMeta = {
+  name: string;
+  description?: string;
+  fields: ComponentPropMeta[];
+};
+
 export type ComponentMeta = {
   name: string;
   category?: "artifact" | "content" | "layout" | "semantic";
@@ -13,6 +19,7 @@ export type ComponentMeta = {
   description: string;
   useWhen: string[];
   props: ComponentPropMeta[];
+  types?: ComponentTypeMeta[];
   example: string;
 };
 
@@ -152,6 +159,37 @@ export const componentRegistry: ComponentMeta[] = [
         description: "Optional language label and future highlighter hook. Does not enable syntax highlighting in v1."
       }
     ],
+    types: [
+      {
+        name: "DiffLine",
+        description: "One structured row in a rendered diff.",
+        fields: [
+          {
+            name: "type",
+            type: "'add' | 'remove' | 'context'",
+            required: true,
+            description: "Diff row kind. Use add for inserted lines, remove for deleted lines, and context for unchanged lines."
+          },
+          {
+            name: "oldLine",
+            type: "number",
+            description: "Original file line number. Required for remove rows and usually present for context rows."
+          },
+          {
+            name: "newLine",
+            type: "number",
+            description: "New file line number. Required for add rows and usually present for context rows."
+          },
+          {
+            name: "content",
+            type: "string",
+            contentType: "code",
+            required: true,
+            description: "Line content without the leading diff marker."
+          }
+        ]
+      }
+    ],
     example: `<DiffBlock
   filename="src/exporter.ts"
   language="ts"
@@ -257,6 +295,38 @@ export const componentRegistry: ComponentMeta[] = [
         name: "highlightLines",
         type: "number[]",
         description: "Additional one-based line numbers to visually emphasize."
+      }
+    ],
+    types: [
+      {
+        name: "CodeAnnotation",
+        description: "Line-level explanation attached to a CodeBlock line.",
+        fields: [
+          {
+            name: "line",
+            type: "number",
+            required: true,
+            description: "One-based line number in the code string."
+          },
+          {
+            name: "body",
+            type: "string",
+            contentType: "blockMarkdown",
+            required: true,
+            description: "Controlled Markdown explanation for this line."
+          },
+          {
+            name: "title",
+            type: "string",
+            contentType: "inlineMarkdown",
+            description: "Optional short annotation title."
+          },
+          {
+            name: "severity",
+            type: "'info' | 'low' | 'medium' | 'high' | 'critical'",
+            description: "Optional severity label. Defaults to info in the rendered badge."
+          }
+        ]
       }
     ],
     example: `<AnnotatedCode
@@ -456,6 +526,56 @@ export const componentRegistry: ComponentMeta[] = [
         description: "Options to compare. Each option can include name, pros, cons, risks, confidence, and verdict."
       }
     ],
+    types: [
+      {
+        name: "DecisionMatrixOption",
+        description: "One option in a decision comparison.",
+        fields: [
+          {
+            name: "name",
+            type: "string",
+            contentType: "inlineMarkdown",
+            required: true,
+            description: "Option title."
+          },
+          {
+            name: "summary",
+            type: "string",
+            contentType: "inlineMarkdown",
+            description: "Short option summary."
+          },
+          {
+            name: "pros",
+            type: "string[]",
+            contentType: "inlineMarkdown",
+            description: "Advantages for this option."
+          },
+          {
+            name: "cons",
+            type: "string[]",
+            contentType: "inlineMarkdown",
+            description: "Disadvantages for this option."
+          },
+          {
+            name: "risks",
+            type: "string[]",
+            contentType: "inlineMarkdown",
+            description: "Risks or failure modes for this option."
+          },
+          {
+            name: "confidence",
+            type: "'low' | 'medium' | 'high'",
+            description: "Confidence level for this option."
+          },
+          {
+            name: "verdict",
+            type: "string",
+            contentType: "inlineMarkdown",
+            description: "Short recommendation or conclusion for this option."
+          }
+        ]
+      }
+    ],
     example: `<DecisionMatrix
   question="Should the first stage focus on a Vite single HTML artifact?"
   options={[
@@ -496,6 +616,33 @@ export const componentRegistry: ComponentMeta[] = [
         description: "Number of comparison columns. Defaults to 2."
       }
     ],
+    types: [
+      {
+        name: "ComparisonSet.Item",
+        description: "Compound child used inside ComparisonSet.",
+        fields: [
+          {
+            name: "title",
+            type: "string",
+            contentType: "inlineMarkdown",
+            required: true,
+            description: "Item title."
+          },
+          {
+            name: "children",
+            type: "ReactNode",
+            required: true,
+            description: "Arbitrary component content for this comparable item."
+          },
+          {
+            name: "value",
+            type: "string",
+            contentType: "plainText",
+            description: "Optional stable machine value for future review or export flows."
+          }
+        ]
+      }
+    ],
     example: `<ComparisonSet title="Compare artifact forms" columns={3}>
   <ComparisonSet.Item title="Markdown explanation" value="markdown">
     <MarkdownBody body="Best for prose-heavy context." />
@@ -524,6 +671,39 @@ export const componentRegistry: ComponentMeta[] = [
         type: "OptionGridItem[]",
         required: true,
         description: "Items to display. Each item can include name, intent, description, and tradeoffs."
+      }
+    ],
+    types: [
+      {
+        name: "OptionGridItem",
+        description: "One option in an OptionGrid.",
+        fields: [
+          {
+            name: "name",
+            type: "string",
+            contentType: "inlineMarkdown",
+            required: true,
+            description: "Option title."
+          },
+          {
+            name: "intent",
+            type: "string",
+            contentType: "inlineMarkdown",
+            description: "Short statement of what this option is trying to achieve."
+          },
+          {
+            name: "description",
+            type: "string",
+            contentType: "inlineMarkdown",
+            description: "Short option description."
+          },
+          {
+            name: "tradeoffs",
+            type: "string[]",
+            contentType: "inlineMarkdown",
+            description: "Tradeoffs or caveats for this option."
+          }
+        ]
       }
     ],
     example: `<OptionGrid

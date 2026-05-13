@@ -59,6 +59,28 @@ artifact-kit components <ComponentName>
 artifact-kit components <ComponentName> --json
 ```
 
+## Complex Prop Types
+
+Complex object props must be queryable without opening TypeScript source files.
+
+If a prop type references a named object or object array, add `types` metadata in `src/react/registry.ts`.
+
+Examples:
+
+- `DecisionMatrixOption[]` requires a `DecisionMatrixOption` type entry.
+- `DiffLine[]` requires a `DiffLine` type entry.
+- `CodeAnnotation[]` requires a `CodeAnnotation` type entry.
+
+Each nested field should include:
+
+- `name`
+- `type`
+- `required` when true
+- `contentType` when the field contains text, Markdown, JSON, or code
+- `description`
+
+The CLI output should be sufficient for an agent to write valid MDX without relying on editor LSP hover information.
+
 ## Markdown Levels
 
 `inlineMarkdown` supports:
@@ -71,6 +93,7 @@ artifact-kit components <ComponentName> --json
 
 `blockMarkdown` supports:
 
+- headings
 - paragraphs
 - ordered lists
 - unordered lists
@@ -81,9 +104,9 @@ artifact-kit components <ComponentName> --json
 - inline code
 - links
 
-`blockMarkdown` intentionally does not support headings, tables, HTML, math, or code blocks.
+`blockMarkdown` intentionally does not support tables, HTML, math, or code blocks.
 
-Heading level is controlled by component props such as `as`, not by Markdown heading syntax inside strings.
+For main artifact structure, prefer component title props or `InlineText as="h2"` instead of headings inside body strings. Headings inside `MarkdownBody` are for local body sections.
 
 Use:
 

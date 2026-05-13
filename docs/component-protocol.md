@@ -36,6 +36,7 @@ import { DecisionMatrix, ExportPanel } from "mdx-artifacts/react";
 - use cases
 - prop names
 - content types
+- nested object type fields
 - examples
 
 The CLI reads the same registry:
@@ -47,6 +48,39 @@ artifact-kit components --json
 ```
 
 When adding or changing a component, update the registry in the same change.
+
+Complex props must be self-describing through the registry. Do not rely on TypeScript LSP alone for agent usage. If a prop type references a named object or object array, such as `DecisionMatrixOption[]`, `DiffLine[]`, or `CodeAnnotation[]`, add a matching entry to the component's `types` metadata:
+
+```ts
+{
+  name: "DiffBlock",
+  props: [
+    {
+      name: "lines",
+      type: "DiffLine[]",
+      contentType: "json",
+      required: true,
+      description: "Structured diff rows."
+    }
+  ],
+  types: [
+    {
+      name: "DiffLine",
+      description: "One structured row in a rendered diff.",
+      fields: [
+        {
+          name: "type",
+          type: "'add' | 'remove' | 'context'",
+          required: true,
+          description: "Diff row kind."
+        }
+      ]
+    }
+  ]
+}
+```
+
+The CLI must show these nested fields in `artifact-kit components <ComponentName>` and return them in `artifact-kit components <ComponentName> --json`.
 
 ## Extension Lifecycle
 
@@ -136,7 +170,9 @@ Content rendering primitives may grow beyond text and Markdown. Future candidate
 
 - Use for component-local body copy.
 - Accepts controlled `blockMarkdown`.
-- Does not support headings, tables, HTML, math, or code blocks.
+- Supports local headings, paragraphs, lists, blockquotes, bold, emphasis, strikethrough, inline code, and links.
+- Does not support tables, HTML, math, or code blocks.
+- Prefer component title props for main artifact structure.
 
 `DecisionMatrix`
 

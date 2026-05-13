@@ -12,6 +12,8 @@ When asked to create or modify an artifact:
 4. Run `pnpm artifact:validate` before building.
 5. Run `pnpm artifact:build` to verify standalone HTML output.
 
+For complex props such as `CodeAnnotation[]`, `DiffLine[]`, or `DecisionMatrixOption[]`, use the CLI metadata instead of guessing object fields. The component registry should expose nested type fields in the `types` metadata.
+
 Do not generate raw HTML unless explicitly requested.
 
 Layout primitives such as `Stack`, `Columns`, `Grid`, `SplitPane`, and `Frame` are advanced composition tools. Prefer semantic or workflow components first, and use layout primitives only when a custom arrangement is needed.

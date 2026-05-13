@@ -75,10 +75,11 @@ When adding or changing a component:
 
 1. Update the React component.
 2. Update `src/react/registry.ts`.
-3. Add or update Storybook stories.
-4. Add or update an MDX example if it changes the artifact workflow.
-5. Run `pnpm artifact components <ComponentName>` to confirm the CLI metadata is useful.
-6. Follow `docs/testing.md` for the minimum required test layer.
+3. Add registry `types` metadata for complex object props such as `Foo[]` or `Foo`.
+4. Add or update Storybook stories.
+5. Add or update an MDX example if it changes the artifact workflow.
+6. Run `pnpm artifact components <ComponentName>` to confirm the CLI metadata is useful.
+7. Follow `docs/testing.md` for the minimum required test layer.
 
 The component registry is the source of truth for CLI lookup, agent usage, and future generated docs.
 
