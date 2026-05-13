@@ -19,6 +19,7 @@ Use these public docs for project conventions:
 - `ROADMAP.md`
 - `docs/naming.md`
 - `docs/component-protocol.md`
+- `docs/component-taxonomy.md`
 - `docs/testing.md`
 
 Keep local phase execution notes in `docs/local/*.local.md`. They are ignored by Git and should not be committed.

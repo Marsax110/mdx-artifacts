@@ -24,6 +24,7 @@ In scope:
 - CLI component lookup
 - Storybook component previews
 - Single artifact validation and build loop
+- Documented extension lifecycle for inline, project local, plugin, and built-in components
 
 Out of scope:
 
@@ -34,6 +35,7 @@ Out of scope:
 - Markdown tables
 - Drag-and-drop tools
 - Multi-file artifact data loaders
+- Runtime plugin system
 
 Completion criteria:
 
@@ -42,26 +44,77 @@ Completion criteria:
 - CLI can list and inspect all first-stage components.
 - Text fields declare their content type.
 - Public docs explain naming and component protocol rules.
+- Public docs explain when to use inline MDX components, project local components, future plugins, and built-in components.
 - Basic tests protect registry metadata, text rendering, CLI component lookup, and MDX validation.
 
-## Phase 2: Interactive Tool Components
+## Phase 2: Component Expansion
 
 Goal:
 
-- Add higher-value components for temporary agent-generated tools.
+- Add higher-value primitives and components for agent-generated artifacts.
+- Use `docs/component-taxonomy.md` to prioritize candidates from recurring artifact use cases.
+
+## Phase 2.1: Theme and Advanced Layout Primitives
+
+Goal:
+
+- Establish the light/dark theme variable foundation before adding more components.
+- Add a minimal set of advanced layout primitives for composition tests and Storybook previews.
+- Keep layout primitives separate from semantic components.
+
+Candidate components:
+
+- `Stack`
+- `Columns`
+- `Grid`
+- `SplitPane`
+- `Frame`
+
+Expected improvements:
+
+- Components share the same `--ak-*` color, spacing, border, and surface variables.
+- Default theme follows `prefers-color-scheme`.
+- Users can override the theme with `data-theme="light"` or `data-theme="dark"`.
+- Storybook can preview layout primitives and composed artifacts in light and dark modes.
+
+Non-goals:
+
+- No general UI kit.
+- No `Card`, `Panel`, or button system.
+- No shadcn/ui or daisyUI dependency.
+- No layout-first guidance for agents.
+
+## Phase 2.2: Semantic and Explanation Components
+
+Candidate components:
+
+- `Callout`
+- `SeverityBadge`
+- `AnnotatedCode`
+- `DiffExplainer`
+
+Expected improvements:
+
+- More consistent code review and explanation artifacts.
+- Better reuse across PR review, implementation plans, research notes, and incident reports.
+- Reduced repeated MDX composition for common explanation patterns.
+
+## Phase 2.3: Interactive Tool Components
 
 Candidate components:
 
 - `PriorityBoard`
 - `PromptWorkbench`
 - `ParameterTuner`
-- `DiffExplainer`
+- `FeatureFlagEditor`
 
 Expected improvements:
 
 - Structured export formats.
 - Better state handoff back to agents.
 - More focused examples for PR review, planning, and prompt tuning.
+- CLI support for querying configured project local components.
+- Validator reporting for inline MDX components and project local component metadata.
 
 ## Phase 3: Docs Site Adapter
 

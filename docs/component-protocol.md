@@ -48,6 +48,82 @@ artifact-kit components --json
 
 When adding or changing a component, update the registry in the same change.
 
+## Extension Lifecycle
+
+The protocol should allow agents and users to go beyond the built-in component set, but that freedom needs a lifecycle. Otherwise MDX Artifacts would collapse back into agents hand-writing one-off React or HTML for every artifact.
+
+Use these extension levels:
+
+| Level | Location | Purpose | Registry Status |
+|---|---|---|---|
+| Built-in component | `mdx-artifacts/react` | Stable protocol components maintained by this package. | Required |
+| Project local component | User project component folder, such as `artifact-components/` | Reusable project-specific extension. | Configured in the user project |
+| Inline MDX component | Inside a single `.mdx` file | Tiny one-off expression for the current artifact. | Detected, not registered |
+| NPM plugin | External package | Future reusable ecosystem extension. | Future plugin registry |
+
+Inline MDX components are allowed as an escape hatch for small, single-use presentation details. They should not contain complex state, effects, drag-and-drop behavior, export logic, or large UI implementations. A strict validation mode may forbid inline components.
+
+Project local components are the preferred path when a user needs a reusable extension that is not general enough for the core package. They should live outside the MDX file and be registered in project configuration with a name, import path, description, prop metadata, and examples. The CLI should be able to query these components alongside built-in components.
+
+Project local components are build-time extensions, not runtime plugins. The artifact renderer can bundle them into the final HTML through the same MDX/Vite pipeline. This keeps the model simple and avoids a dynamic plugin runtime.
+
+Promotion path:
+
+1. Start with an inline MDX component for a tiny one-off need.
+2. Move repeated project-specific behavior into a project local component.
+3. Publish reusable cross-project behavior as a plugin package later.
+4. Promote broadly useful, stable, tested behavior into the built-in registry.
+
+Promotion into the built-in registry requires a stable name, schema, examples, tests, registry metadata, and a clear validation path.
+
+## Abstraction Boundary
+
+The public protocol should favor semantic components over layout containers.
+
+Preferred public code components:
+
+- encode a recognizable artifact task
+- have stable props
+- reduce repeated HTML or interaction code
+- can be explained by their name
+- can export decisions, state, or configuration when interactive
+
+Examples:
+
+- `DecisionMatrix`
+- `DiffExplainer`
+- `PriorityBoard`
+- `PromptWorkbench`
+- `FeatureFlagEditor`
+
+Workflow-level names such as `DiffExplainer`, `FeatureExplainer`, `StatusReport`, and `IncidentReport` do not need to start as large React components. They can first exist as agent recipes or MDX templates that explain which semantic primitives to combine.
+
+Promote a workflow recipe to a code component only when:
+
+- the section structure is stable
+- the schema is stable
+- repeated MDX composition creates noise or errors
+- the component still lets users hide, add, or replace sections
+
+Layout primitives should usually remain internal:
+
+- `Stack`
+- `Columns`
+- `Grid`
+- `MosaicGrid`
+- `SplitPane`
+- `Frame`
+
+These are useful arrangement strategies, but exposing too many of them pushes agents back toward hand-building UI. Only expose a layout primitive if users genuinely need to compose that structure directly in MDX.
+
+If layout primitives are exposed, they should allow content rendering primitives and semantic primitives as children. For example, a `Columns` layout can hold `MarkdownBody`, `Callout`, `AnnotatedCode`, or `Timeline`. The layout controls placement; the child component owns meaning.
+
+Avoid exposing domain-shaped layout names such as `ReportHeader`, `MetricBand`, `EditorSplitLayout`, or `TablePanel` as public protocol components. Those are better treated as internal sections inside recipes, templates, or higher-level components.
+
+Semantic primitives are different from containers. For example, `AnnotatedCode` owns file paths, line ranges, annotations, and severity. A future `DiffExplainer` owns changed files, diff hunks, findings, and review handoff. Those concepts should not be reduced to arbitrary children inside a generic card.
+
+Content rendering primitives may grow beyond text and Markdown. Future candidates include controlled `CodeBlock`, `MathBlock`, and `MermaidBlock` renderers. These should remain narrow format renderers with explicit safety boundaries; they should not become arbitrary HTML or script injection points.
+
 ## First-stage Components
 
 `InlineText`

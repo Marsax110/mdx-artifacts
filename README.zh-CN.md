@@ -125,4 +125,5 @@ export default config;
 - [设计说明](docs/design.zh-CN.md)
 - [英文命名规范](docs/naming.md)
 - [英文组件协议](docs/component-protocol.md)
+- [英文组件分类](docs/component-taxonomy.md)
 - [英文测试协议](docs/testing.md)

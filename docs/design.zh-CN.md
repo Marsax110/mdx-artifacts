@@ -211,5 +211,7 @@ artifact-kit components ExportPanel --json
 - `docs/design.md`
 - `docs/naming.md`
 - `docs/component-protocol.md`
+- `docs/component-taxonomy.md`
+- `docs/testing.md`
 
 本地阶段执行记录放在 `docs/local/*.local.md`，不提交到开源仓库。它用于记录临时判断、验收过程和 Agent 工作状态，避免把过程噪音暴露到公开文档中。

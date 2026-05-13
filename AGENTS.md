@@ -53,6 +53,7 @@ Public component rules live in:
 
 - `docs/naming.md`
 - `docs/component-protocol.md`
+- `docs/component-taxonomy.md`
 - `docs/testing.md`
 - `ROADMAP.md`
 

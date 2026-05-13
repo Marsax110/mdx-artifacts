@@ -217,6 +217,8 @@ Public project direction lives in:
 - `docs/design.md`
 - `docs/naming.md`
 - `docs/component-protocol.md`
+- `docs/component-taxonomy.md`
+- `docs/testing.md`
 
 Local phase execution notes belong in `docs/local/*.local.md` and are not committed. They can track temporary decisions, verification notes, and agent working state without adding process noise to the public repository.
 
