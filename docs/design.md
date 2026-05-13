@@ -152,8 +152,29 @@ Current workflow:
 
 ```text
 Component development: pnpm storybook
-Artifact verification: pnpm artifact:validate / pnpm artifact:build
+Protocol verification: pnpm typecheck / pnpm test / pnpm artifact:validate
+Artifact verification: pnpm artifact:build
 ```
+
+## Testing Protocol
+
+The first test baseline protects the component protocol rather than browser behavior.
+
+Current coverage:
+
+- registry metadata contract
+- `InlineText` and `MarkdownBody` controlled Markdown rendering
+- CLI component lookup output
+- MDX validation rules
+
+The operational testing path lives in `docs/testing.md`.
+
+Out of scope for the first baseline:
+
+- browser E2E
+- visual regression
+- Astro adapter tests
+- package tarball smoke tests
 
 ## Agent Contract
 

@@ -30,6 +30,8 @@ Use these commands for local verification:
 
 ```bash
 pnpm typecheck
+pnpm test
+pnpm check
 pnpm build:cli
 pnpm artifact:validate
 pnpm artifact:build
@@ -51,6 +53,7 @@ Public component rules live in:
 
 - `docs/naming.md`
 - `docs/component-protocol.md`
+- `docs/testing.md`
 - `ROADMAP.md`
 
 Local phase execution notes belong in `docs/local/*.local.md`. They are ignored by Git and must not be committed as public docs.
@@ -74,6 +77,7 @@ When adding or changing a component:
 3. Add or update Storybook stories.
 4. Add or update an MDX example if it changes the artifact workflow.
 5. Run `pnpm artifact components <ComponentName>` to confirm the CLI metadata is useful.
+6. Follow `docs/testing.md` for the minimum required test layer.
 
 The component registry is the source of truth for CLI lookup, agent usage, and future generated docs.
 
@@ -119,11 +123,12 @@ Before the first public commit or npm publish:
 1. Run a sensitive-content scan.
 2. Run `rg "[\u4e00-\u9fff]" src artifact-docs agents README.md docs/design.md package.json LICENSE`.
 3. Run `pnpm typecheck`.
-4. Run `pnpm build:cli`.
-5. Run `pnpm artifact:validate`.
-6. Run `pnpm artifact:build`.
-7. Run `npm pack --dry-run --cache /private/tmp/mdx-artifacts-npm-cache`.
-8. Confirm `npm pack` does not include `src/`, `.storybook/`, stories, sourcemaps, `node_modules/`, or `dist/artifacts`.
+4. Run `pnpm test`.
+5. Run `pnpm build:cli`.
+6. Run `pnpm artifact:validate`.
+7. Run `pnpm artifact:build`.
+8. Run `npm pack --dry-run --cache /private/tmp/mdx-artifacts-npm-cache`.
+9. Confirm `npm pack` does not include `src/`, `.storybook/`, stories, sourcemaps, `node_modules/`, or `dist/artifacts`.
 
 Do not commit generated `dist/artifacts` output.
 

@@ -46,6 +46,7 @@ import { DecisionMatrix, ExportPanel } from "../../src/react";
 安装依赖后：
 
 ```bash
+pnpm check
 pnpm artifact:validate
 pnpm artifact:dev
 pnpm artifact:build
@@ -80,6 +81,14 @@ pnpm storybook
 
 Storybook 只用于隔离调试 React 组件；最终 artifact 闭环仍以 `artifact-kit validate/build` 为准。
 
+基础测试：
+
+```bash
+pnpm test
+pnpm typecheck
+pnpm artifact:validate
+```
+
 ## 样式注入
 
 默认情况下，Artifact Kit 会注入内置样式。使用者可以在 `artifact-kit.config.ts` 里追加自己的品牌 CSS：
@@ -108,6 +117,7 @@ export default config;
 - 核心组件保持 React/TypeScript，可被 Vite、Astro、Claude artifact builder 复用。
 - Tailwind 作为内部样式构建能力，最终仍输出内联 CSS 的单 HTML。
 - Radix 只按需用于复杂交互 primitives，不把 shadcn/ui 或 daisyUI 作为核心依赖。
+- 基础测试覆盖 registry 元数据、受控文本渲染、CLI 组件查询和 MDX validate。
 
 ## 后续阶段
 
@@ -115,3 +125,4 @@ export default config;
 - [设计说明](docs/design.zh-CN.md)
 - [英文命名规范](docs/naming.md)
 - [英文组件协议](docs/component-protocol.md)
+- [英文测试协议](docs/testing.md)

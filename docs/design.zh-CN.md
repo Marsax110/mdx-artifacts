@@ -153,8 +153,29 @@ Storybook 不负责：
 
 ```text
 组件开发：pnpm storybook
-artifact 验证：pnpm artifact:validate / pnpm artifact:build
+协议验证：pnpm typecheck / pnpm test / pnpm artifact:validate
+artifact 验证：pnpm artifact:build
 ```
+
+## 测试协议
+
+第一版测试基线先保护组件协议，不直接进入浏览器 E2E。
+
+当前覆盖：
+
+- registry 元数据约束
+- `InlineText` / `MarkdownBody` 的受控 Markdown 渲染
+- CLI 组件查询输出
+- MDX validate 规则
+
+具体测试路径见 `docs/testing.md`。
+
+第一版暂不覆盖：
+
+- 浏览器 E2E
+- 视觉回归
+- Astro adapter 测试
+- npm tarball 安装 smoke test
 
 ## Agent 使用约定
 

@@ -53,6 +53,7 @@ pnpm install
 Validate and build the example artifact:
 
 ```bash
+pnpm check
 pnpm artifact:validate
 pnpm artifact:build
 ```
@@ -85,6 +86,14 @@ pnpm storybook
 
 Storybook is only for component development. The artifact workflow is still verified through `artifact-kit validate/build`.
 
+Run the test baseline:
+
+```bash
+pnpm test
+pnpm typecheck
+pnpm artifact:validate
+```
+
 ## Style Injection
 
 Artifact Kit injects default styles by default. Users can add brand styles through `artifact-kit.config.ts`:
@@ -114,6 +123,7 @@ Custom styles are imported after the default styles, so they can override CSS va
 - Tailwind is an internal styling build tool; the final artifact still inlines CSS.
 - Radix primitives are introduced only when complex interactions need them.
 - shadcn/ui and daisyUI are not core dependencies; they may become optional templates or registries later.
+- Basic tests protect registry metadata, controlled text rendering, CLI component lookup, and MDX validation.
 
 ## Documentation
 
@@ -121,4 +131,5 @@ Custom styles are imported after the default styles, so they can override CSS va
 - [Design notes](docs/design.md)
 - [Naming conventions](docs/naming.md)
 - [Component protocol](docs/component-protocol.md)
+- [Testing](docs/testing.md)
 - [Chinese README](README.zh-CN.md)

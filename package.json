@@ -45,6 +45,9 @@
     "artifact:build": "tsx src/cli/index.ts build artifact-docs/examples/decision-matrix.mdx",
     "artifact:validate": "tsx src/cli/index.ts validate artifact-docs/examples/decision-matrix.mdx",
     "storybook": "storybook dev -p 6106 --no-open",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check": "pnpm typecheck && pnpm test && pnpm artifact:validate",
     "typecheck": "tsc --noEmit",
     "clean:lib": "rm -rf dist/lib",
     "build:lib": "tsc -p tsconfig.build.json",
@@ -70,6 +73,7 @@
     "@types/react-dom": "^19.0.0",
     "storybook": "^10.3.6",
     "tsx": "^4.20.0",
-    "typescript": "^5.8.0"
+    "typescript": "^5.8.0",
+    "vitest": "^4.1.6"
   }
 }

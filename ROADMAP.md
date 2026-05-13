@@ -42,6 +42,7 @@ Completion criteria:
 - CLI can list and inspect all first-stage components.
 - Text fields declare their content type.
 - Public docs explain naming and component protocol rules.
+- Basic tests protect registry metadata, text rendering, CLI component lookup, and MDX validation.
 
 ## Phase 2: Interactive Tool Components
 

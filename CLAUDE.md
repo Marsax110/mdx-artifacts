@@ -19,6 +19,7 @@ Use these public docs for project conventions:
 - `ROADMAP.md`
 - `docs/naming.md`
 - `docs/component-protocol.md`
+- `docs/testing.md`
 
 Keep local phase execution notes in `docs/local/*.local.md`. They are ignored by Git and should not be committed.
 
@@ -44,6 +45,8 @@ Use these commands before considering work complete:
 
 ```bash
 pnpm typecheck
+pnpm test
+pnpm check
 pnpm build:cli
 pnpm artifact:validate
 pnpm artifact:build
