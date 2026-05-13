@@ -98,6 +98,7 @@ Candidate components:
 Expected improvements:
 
 - Stable code and compact diff rendering primitives before larger explanation components.
+- Small semantic primitives for notes, risks, severities, and line-level explanations.
 - More consistent code review and explanation artifacts.
 - Better reuse across PR review, implementation plans, research notes, and incident reports.
 - Reduced repeated MDX composition for common explanation patterns.

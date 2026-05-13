@@ -8,7 +8,7 @@ export type ComponentPropMeta = {
 
 export type ComponentMeta = {
   name: string;
-  category?: "artifact" | "content" | "layout";
+  category?: "artifact" | "content" | "layout" | "semantic";
   stability?: "stable" | "advanced";
   description: string;
   useWhen: string[];
@@ -160,6 +160,118 @@ export const componentRegistry: ComponentMeta[] = [
     { type: "remove", oldLine: 13, content: "  return JSON.stringify(value);" },
     { type: "add", newLine: 13, content: "  return JSON.stringify(value, null, 2);" },
     { type: "context", oldLine: 14, newLine: 14, content: "}" }
+  ]}
+/>`
+  },
+  {
+    name: "SeverityBadge",
+    category: "semantic",
+    stability: "stable",
+    description: "Renders a compact severity, confidence, status, or risk label.",
+    useWhen: ["Code review findings", "Risk labels", "Status summaries", "Annotated explanations"],
+    props: [
+      {
+        name: "level",
+        type: "'info' | 'low' | 'medium' | 'high' | 'critical'",
+        description: "Severity level. Defaults to info."
+      },
+      {
+        name: "label",
+        type: "string",
+        contentType: "plainText",
+        description: "Optional visible label. Defaults to a title-cased version of the level."
+      }
+    ],
+    example: `<SeverityBadge level="high" label="Regression risk" />`
+  },
+  {
+    name: "Callout",
+    category: "semantic",
+    stability: "stable",
+    description: "Highlights a focused note, warning, recommendation, or risk with controlled Markdown body copy.",
+    useWhen: ["Review notes", "Assumptions", "Warnings", "Implementation gotchas", "Recommendations"],
+    props: [
+      {
+        name: "body",
+        type: "string",
+        contentType: "blockMarkdown",
+        required: true,
+        description: "Controlled Markdown body. Use for the message inside the callout."
+      },
+      {
+        name: "title",
+        type: "string",
+        contentType: "inlineMarkdown",
+        description: "Optional callout title."
+      },
+      {
+        name: "tone",
+        type: "'info' | 'success' | 'warning' | 'danger'",
+        description: "Visual tone. Defaults to info."
+      }
+    ],
+    example: `<Callout
+  tone="warning"
+  title="Review focus"
+  body="Check the **export path** before treating this artifact as complete."
+/>`
+  },
+  {
+    name: "AnnotatedCode",
+    category: "semantic",
+    stability: "stable",
+    description: "Combines a CodeBlock with line-level annotations and severity labels.",
+    useWhen: ["Code explanations", "Review focus areas", "Implementation walkthroughs", "Risk notes tied to code lines"],
+    props: [
+      {
+        name: "code",
+        type: "string",
+        contentType: "code",
+        required: true,
+        description: "Raw code text. Whitespace and indentation are preserved."
+      },
+      {
+        name: "annotations",
+        type: "CodeAnnotation[]",
+        contentType: "json",
+        required: true,
+        description: "Line-level annotations with line, optional title, Markdown body, and optional severity."
+      },
+      {
+        name: "language",
+        type: "string",
+        description: "Optional language label passed through to CodeBlock."
+      },
+      {
+        name: "filename",
+        type: "string",
+        contentType: "plainText",
+        description: "Optional filename shown above the code."
+      },
+      {
+        name: "showLineNumbers",
+        type: "boolean",
+        description: "Shows line numbers. Defaults to true."
+      },
+      {
+        name: "highlightLines",
+        type: "number[]",
+        description: "Additional one-based line numbers to visually emphasize."
+      }
+    ],
+    example: `<AnnotatedCode
+  filename="src/export-panel.ts"
+  language="ts"
+  code={\`export function copyOutput(value: string) {
+  return navigator.clipboard.writeText(value);
+}\`}
+  annotations={[
+    {
+      line: 2,
+      severity: "medium",
+      title: "Clipboard boundary",
+      body: "Keep a fallback for local artifact previews."
+    }
   ]}
 />`
   },

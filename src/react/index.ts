@@ -1,3 +1,7 @@
+export { AnnotatedCode } from "./components/AnnotatedCode";
+export type { AnnotatedCodeProps, CodeAnnotation } from "./components/AnnotatedCode";
+export { Callout } from "./components/Callout";
+export type { CalloutProps, CalloutTone } from "./components/Callout";
 export { ComparisonSet } from "./components/ComparisonSet";
 export type { ComparisonSetItemProps, ComparisonSetProps } from "./components/ComparisonSet";
 export { CodeBlock } from "./components/CodeBlock";
@@ -27,6 +31,8 @@ export { MarkdownBody } from "./components/MarkdownBody";
 export type { MarkdownBodyProps, MarkdownBodyVariant } from "./components/MarkdownBody";
 export { OptionGrid } from "./components/OptionGrid";
 export type { OptionGridItem, OptionGridProps } from "./components/OptionGrid";
+export { SeverityBadge } from "./components/SeverityBadge";
+export type { SeverityBadgeProps, SeverityLevel } from "./components/SeverityBadge";
 export { componentRegistry, findComponentMeta } from "./registry";
 export type { ComponentMeta, ComponentPropMeta } from "./registry";
 export type { ArtifactKitConfig } from "../cli/types";

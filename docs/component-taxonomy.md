@@ -102,15 +102,18 @@ Already available:
 - `MarkdownBody`: controlled block Markdown for component-local body copy.
 - `CodeBlock`: controlled code rendering with filename, language label, line numbers, and highlighted lines.
 - `DiffBlock`: structured diff rendering with add, remove, context rows, and compact effective line numbers.
+- `Callout`: semantic note, warning, recommendation, or risk block with controlled Markdown body copy.
+- `SeverityBadge`: compact severity, confidence, status, or risk label.
+- `AnnotatedCode`: code block with line-level annotations and severity labels.
 - `ExportPanel`: structured Markdown or JSON handoff.
 
 Candidate foundation components:
 
 | Component | Purpose | Priority | Notes |
 |---|---|---:|---|
-| `Callout` | Highlight warnings, assumptions, gotchas, or decisions. | P1 | Useful across reports, code review, research, and plans. |
-| `SeverityBadge` | Show severity, confidence, status, or risk. | P1 | Small but widely reused by review/report components. |
-| `AnnotatedCode` | Render code with line notes and severity markers. | P1 | Build on `CodeBlock` after the code rendering primitive is stable. |
+| `Callout` | Highlight warnings, assumptions, gotchas, or decisions. | Shipped | Useful across reports, code review, research, and plans. |
+| `SeverityBadge` | Show severity, confidence, status, or risk. | Shipped | Small but widely reused by review/report components. |
+| `AnnotatedCode` | Render code with line notes and severity markers. | Shipped | First version uses a code block plus annotation list. |
 | `CodeBlock` | Render code with language, filename, line numbers, and highlighted lines. | Shipped | Syntax highlighting and copy affordance remain future enhancements. |
 | `DiffBlock` | Render structured diff rows with compact effective line numbers. | Shipped | Accepts structured lines first; raw unified diff parsing can be a later helper. |
 | `Timeline` | Show ordered events, milestones, incidents, or plans. | P2 | Reusable for status reports, incidents, and implementation plans. |
