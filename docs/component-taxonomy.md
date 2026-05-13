@@ -100,6 +100,8 @@ Already available:
 
 - `InlineText`: controlled inline Markdown for short text.
 - `MarkdownBody`: controlled block Markdown for component-local body copy.
+- `CodeBlock`: controlled code rendering with filename, language label, line numbers, and highlighted lines.
+- `DiffBlock`: structured diff rendering with add, remove, context rows, and compact effective line numbers.
 - `ExportPanel`: structured Markdown or JSON handoff.
 
 Candidate foundation components:
@@ -108,8 +110,9 @@ Candidate foundation components:
 |---|---|---:|---|
 | `Callout` | Highlight warnings, assumptions, gotchas, or decisions. | P1 | Useful across reports, code review, research, and plans. |
 | `SeverityBadge` | Show severity, confidence, status, or risk. | P1 | Small but widely reused by review/report components. |
-| `AnnotatedCode` | Render code with line notes and severity markers. | P1 | Core building block for PR review and code understanding. |
-| `CodeBlock` | Render code with language, filename, and copy affordance. | P2 | Can start simple before syntax highlighting. |
+| `AnnotatedCode` | Render code with line notes and severity markers. | P1 | Build on `CodeBlock` after the code rendering primitive is stable. |
+| `CodeBlock` | Render code with language, filename, line numbers, and highlighted lines. | Shipped | Syntax highlighting and copy affordance remain future enhancements. |
+| `DiffBlock` | Render structured diff rows with compact effective line numbers. | Shipped | Accepts structured lines first; raw unified diff parsing can be a later helper. |
 | `Timeline` | Show ordered events, milestones, incidents, or plans. | P2 | Reusable for status reports, incidents, and implementation plans. |
 | `MetricCard` | Show compact numeric status with label and trend. | P2 | Useful for status reports and dashboards. |
 | `DataTable` | Show simple structured rows such as shipped PRs, impact metrics, or comparisons. | P2/P3 | Keep narrow; do not turn the core package into a table framework. |
@@ -192,21 +195,31 @@ They are better treated as templates, examples, or future adapters after the cor
 
 ## Suggested Implementation Order
 
-Phase 2.1: Code and explanation foundation
+Phase 2.1: Theme and advanced layout primitives
 
-1. `Callout`
-2. `SeverityBadge`
-3. `AnnotatedCode`
-4. `DiffExplainer`
+1. `Stack`
+2. `Columns`
+3. `Grid`
+4. `SplitPane`
+5. `Frame`
 
-Phase 2.2: Operable custom editors
+Phase 2.2: Code and explanation foundation
+
+1. `CodeBlock`
+2. `DiffBlock`
+3. `Callout`
+4. `SeverityBadge`
+5. `AnnotatedCode`
+6. `DiffExplainer`
+
+Phase 2.3: Operable custom editors
 
 1. `PriorityBoard`
 2. `PromptWorkbench`
 3. `FeatureFlagEditor`
 4. `ParameterTuner`
 
-Phase 2.3: Reports and plans
+Phase 2.4: Reports and plans
 
 1. `Timeline`
 2. `ImplementationPlan`

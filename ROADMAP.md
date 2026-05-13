@@ -84,10 +84,12 @@ Non-goals:
 - No shadcn/ui or daisyUI dependency.
 - No layout-first guidance for agents.
 
-## Phase 2.2: Semantic and Explanation Components
+## Phase 2.2: Code Rendering and Explanation Components
 
 Candidate components:
 
+- `CodeBlock`
+- `DiffBlock`
 - `Callout`
 - `SeverityBadge`
 - `AnnotatedCode`
@@ -95,6 +97,7 @@ Candidate components:
 
 Expected improvements:
 
+- Stable code and compact diff rendering primitives before larger explanation components.
 - More consistent code review and explanation artifacts.
 - Better reuse across PR review, implementation plans, research notes, and incident reports.
 - Reduced repeated MDX composition for common explanation patterns.

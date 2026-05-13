@@ -79,6 +79,91 @@ export const componentRegistry: ComponentMeta[] = [
 />`
   },
   {
+    name: "CodeBlock",
+    category: "content",
+    stability: "stable",
+    description: "Renders code text with optional filename, language label, line numbers, and highlighted lines.",
+    useWhen: ["Code examples", "Implementation notes", "Technical explanations", "Code review context"],
+    props: [
+      {
+        name: "code",
+        type: "string",
+        contentType: "code",
+        required: true,
+        description: "Raw code text. Whitespace and indentation are preserved."
+      },
+      {
+        name: "language",
+        type: "string",
+        description: "Optional language label and future highlighter hook. Does not enable syntax highlighting in v1."
+      },
+      {
+        name: "filename",
+        type: "string",
+        contentType: "plainText",
+        description: "Optional filename shown above the code."
+      },
+      {
+        name: "showLineNumbers",
+        type: "boolean",
+        description: "Shows one-based line numbers when true."
+      },
+      {
+        name: "highlightLines",
+        type: "number[]",
+        description: "One-based line numbers to visually emphasize."
+      }
+    ],
+    example: `<CodeBlock
+  filename="src/artifact.ts"
+  language="ts"
+  showLineNumbers
+  highlightLines={[2]}
+  code={\`export function createArtifact(input: ArtifactInput) {
+  return normalizeInput(input);
+}\`}
+/>`
+  },
+  {
+    name: "DiffBlock",
+    category: "content",
+    stability: "stable",
+    description:
+      "Renders structured diff lines with add, remove, and context rows plus a compact effective line number column.",
+    useWhen: ["Code review context", "Patch explanations", "Before and after code changes", "Implementation reports"],
+    props: [
+      {
+        name: "lines",
+        type: "DiffLine[]",
+        contentType: "json",
+        required: true,
+        description:
+          "Structured diff rows. Each row has type, optional oldLine, optional newLine, and content. The UI shows one effective line number."
+      },
+      {
+        name: "filename",
+        type: "string",
+        contentType: "plainText",
+        description: "Optional filename shown above the diff."
+      },
+      {
+        name: "language",
+        type: "string",
+        description: "Optional language label and future highlighter hook. Does not enable syntax highlighting in v1."
+      }
+    ],
+    example: `<DiffBlock
+  filename="src/exporter.ts"
+  language="ts"
+  lines={[
+    { type: "context", oldLine: 12, newLine: 12, content: "export function serialize(value: unknown) {" },
+    { type: "remove", oldLine: 13, content: "  return JSON.stringify(value);" },
+    { type: "add", newLine: 13, content: "  return JSON.stringify(value, null, 2);" },
+    { type: "context", oldLine: 14, newLine: 14, content: "}" }
+  ]}
+/>`
+  },
+  {
     name: "Stack",
     category: "layout",
     stability: "advanced",

@@ -1,7 +1,11 @@
 export { ComparisonSet } from "./components/ComparisonSet";
 export type { ComparisonSetItemProps, ComparisonSetProps } from "./components/ComparisonSet";
+export { CodeBlock } from "./components/CodeBlock";
+export type { CodeBlockProps } from "./components/CodeBlock";
 export { DecisionMatrix } from "./components/DecisionMatrix";
 export type { DecisionMatrixOption, DecisionMatrixProps } from "./components/DecisionMatrix";
+export { DiffBlock } from "./components/DiffBlock";
+export type { DiffBlockProps, DiffLine, DiffLineType } from "./components/DiffBlock";
 export { ExportPanel } from "./components/ExportPanel";
 export type { ExportFormat, ExportPanelProps } from "./components/ExportPanel";
 export { InlineText } from "./components/InlineText";

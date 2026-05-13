@@ -22,6 +22,9 @@
   --ak-risk-subtle: oklch(0.971 0.013 17.38);
   --ak-code-bg: oklch(0.97 0 0);
   --ak-code-text: oklch(0.269 0 0);
+  --ak-code-highlight-bg: oklch(0.91 0.055 85);
+  --ak-code-add-bg: oklch(0.91 0.06 155);
+  --ak-code-remove-bg: oklch(0.93 0.055 25);
   --ak-output-bg: oklch(0.145 0 0);
   --ak-output-text: oklch(0.985 0 0);
   --ak-shadow: 0 1px 2px rgb(0 0 0 / 4%);
@@ -53,6 +56,9 @@
   --ak-risk-subtle: oklch(0.31 0.08 22);
   --ak-code-bg: oklch(1 0 0 / 8%);
   --ak-code-text: oklch(0.922 0 0);
+  --ak-code-highlight-bg: oklch(0.34 0.06 85);
+  --ak-code-add-bg: oklch(0.28 0.055 155);
+  --ak-code-remove-bg: oklch(0.3 0.06 25);
   --ak-output-bg: oklch(0.12 0 0);
   --ak-output-text: oklch(0.985 0 0);
   --ak-shadow: 0 1px 2px rgb(0 0 0 / 28%);
@@ -79,6 +85,9 @@
     --ak-risk-subtle: oklch(0.31 0.08 22);
     --ak-code-bg: oklch(1 0 0 / 8%);
     --ak-code-text: oklch(0.922 0 0);
+    --ak-code-highlight-bg: oklch(0.34 0.06 85);
+    --ak-code-add-bg: oklch(0.28 0.055 155);
+    --ak-code-remove-bg: oklch(0.3 0.06 25);
     --ak-output-bg: oklch(0.12 0 0);
     --ak-output-text: oklch(0.985 0 0);
     --ak-shadow: 0 1px 2px rgb(0 0 0 / 28%);
@@ -371,6 +380,109 @@ body {
   border-left: 3px solid var(--ak-border);
   color: var(--ak-muted);
   padding-left: 12px;
+}
+
+.ak-code-block {
+  overflow: hidden;
+  margin: 0;
+  border: 1px solid var(--ak-border);
+  border-radius: 8px;
+  background: var(--ak-code-bg);
+  color: var(--ak-code-text);
+}
+
+.ak-code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--ak-border);
+  background: var(--ak-surface-subtle);
+  color: var(--ak-muted);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 8px 12px;
+}
+
+.ak-code-filename,
+.ak-code-language {
+  min-width: 0;
+}
+
+.ak-code-language {
+  flex: 0 0 auto;
+  text-transform: lowercase;
+}
+
+.ak-code-pre {
+  overflow: auto;
+  margin: 0;
+  padding: 10px 0;
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.ak-code-pre code {
+  display: block;
+  min-width: max-content;
+}
+
+.ak-code-line,
+.ak-diff-line {
+  min-height: 1.55em;
+  padding: 0 12px;
+  white-space: pre;
+}
+
+.ak-code-line {
+  display: block;
+}
+
+.ak-code-line-numbered {
+  display: grid;
+  grid-template-columns: minmax(3.5ch, auto) 1fr;
+  gap: 12px;
+}
+
+.ak-code-line-highlighted {
+  background: var(--ak-code-highlight-bg);
+}
+
+.ak-code-line-number,
+.ak-diff-marker,
+.ak-diff-line-number {
+  color: var(--ak-muted);
+  text-align: right;
+  user-select: none;
+}
+
+.ak-code-line-content,
+.ak-diff-line-content {
+  min-width: 0;
+}
+
+.ak-diff-line {
+  display: grid;
+  grid-template-columns: minmax(3.5ch, auto) 2ch 1fr;
+  gap: 10px;
+}
+
+.ak-diff-line-add {
+  background: var(--ak-code-add-bg);
+}
+
+.ak-diff-line-add .ak-diff-marker {
+  color: var(--ak-good);
+}
+
+.ak-diff-line-remove {
+  background: var(--ak-code-remove-bg);
+}
+
+.ak-diff-line-remove .ak-diff-marker {
+  color: var(--ak-risk);
 }
 
 .ak-card-header {
