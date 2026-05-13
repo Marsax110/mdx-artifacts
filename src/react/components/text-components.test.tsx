@@ -51,11 +51,13 @@ describe("MarkdownBody", () => {
     expect(html).toContain("<blockquote>");
   });
 
-  it("does not render headings as headings", () => {
-    const html = renderToStaticMarkup(<MarkdownBody body="# Hidden heading" />);
+  it("renders markdown headings inside body copy", () => {
+    const html = renderToStaticMarkup(<MarkdownBody body={`# Main
 
-    expect(html).not.toContain("<h1");
-    expect(html).toContain("Hidden heading");
+### Local section`} />);
+
+    expect(html).toContain("<h1>Main</h1>");
+    expect(html).toContain("<h3>Local section</h3>");
   });
 
   it("skips raw html", () => {
