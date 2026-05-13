@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.artifact-kit/
+.DS_Store
+*.log
+*.tgz
+coverage/
+storybook-static/

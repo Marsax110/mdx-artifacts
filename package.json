@@ -1,0 +1,73 @@
+{
+  "name": "mdx-artifacts",
+  "version": "0.1.0",
+  "description": "Build interactive MDX artifacts with reusable React components and a local CLI.",
+  "type": "module",
+  "license": "MIT",
+  "homepage": "https://github.com/Marsax110/mdx-artifacts#readme",
+  "bugs": {
+    "url": "https://github.com/Marsax110/mdx-artifacts/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Marsax110/mdx-artifacts.git"
+  },
+  "files": [
+    "dist/lib",
+    "agents",
+    "artifact-docs/examples",
+    "docs",
+    "README.md",
+    "README.zh-CN.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/lib/react/index.d.ts",
+      "import": "./dist/lib/react/index.js"
+    },
+    "./react": {
+      "types": "./dist/lib/react/index.d.ts",
+      "import": "./dist/lib/react/index.js"
+    },
+    "./registry": {
+      "types": "./dist/lib/react/registry.d.ts",
+      "import": "./dist/lib/react/registry.js"
+    },
+    "./styles.css": "./dist/lib/react/styles.css"
+  },
+  "bin": {
+    "artifact-kit": "./dist/lib/cli/index.js"
+  },
+  "scripts": {
+    "artifact": "tsx src/cli/index.ts",
+    "artifact:dev": "tsx src/cli/index.ts dev artifact-docs/examples/decision-matrix.mdx",
+    "artifact:build": "tsx src/cli/index.ts build artifact-docs/examples/decision-matrix.mdx",
+    "artifact:validate": "tsx src/cli/index.ts validate artifact-docs/examples/decision-matrix.mdx",
+    "storybook": "storybook dev -p 6106 --no-open",
+    "typecheck": "tsc --noEmit",
+    "clean:lib": "rm -rf dist/lib",
+    "build:lib": "tsc -p tsconfig.build.json",
+    "build:styles": "cp src/react/styles.css dist/lib/react/styles.css",
+    "build:cli": "pnpm clean:lib && pnpm build:lib && pnpm build:styles"
+  },
+  "dependencies": {
+    "@mdx-js/rollup": "^3.1.0",
+    "@radix-ui/react-tabs": "^1.1.13",
+    "@tailwindcss/vite": "^4.1.17",
+    "@vitejs/plugin-react": "^5.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tailwindcss": "^4.1.17",
+    "vite": "^7.0.0"
+  },
+  "devDependencies": {
+    "@storybook/react-vite": "^10.3.6",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "storybook": "^10.3.6",
+    "tsx": "^4.20.0",
+    "typescript": "^5.8.0"
+  }
+}

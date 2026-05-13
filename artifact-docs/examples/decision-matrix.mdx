@@ -1,0 +1,72 @@
+import { DecisionMatrix, ExportPanel, OptionGrid } from "../../src/react";
+
+# Artifact Kit Stage One Decision
+
+<DecisionMatrix
+  question="Should stage one focus on a Vite single HTML artifact instead of starting with an Astro docs site?"
+  options={[
+    {
+      name: "Vite single HTML artifact",
+      summary: "Validate the shortest MDX-to-interactive-HTML loop first.",
+      pros: ["Shortest loop", "Direct interactive component debugging", "Fits one-off tool artifacts"],
+      cons: ["No docs-site navigation yet", "Weaker long-term archive experience"],
+      confidence: "high",
+      verdict: "Recommended for stage one"
+    },
+    {
+      name: "Astro docs site",
+      summary: "Turn the artifact-docs tree into a structured static docs site.",
+      pros: ["Better long-term reading experience", "File-based pages", "Good for archives"],
+      cons: ["Too heavy for stage one", "Mixes component protocol work with docs-site engineering"],
+      confidence: "medium",
+      verdict: "Add in stage two"
+    },
+    {
+      name: "Raw HTML",
+      summary: "Let agents generate complete HTML directly.",
+      pros: ["No toolchain", "Fast for very small throwaway pages"],
+      cons: ["Duplicated code", "Style drift", "Export behavior is hard to reuse"],
+      confidence: "low",
+      verdict: "Keep only as fallback"
+    }
+  ]}
+/>
+
+<OptionGrid
+  title="First component scope"
+  options={[
+    {
+      name: "DecisionMatrix",
+      intent: "Compare options",
+      tradeoffs: ["Stable structure", "Does not own complex interaction"]
+    },
+    {
+      name: "OptionGrid",
+      intent: "Show alternatives side by side",
+      tradeoffs: ["Easy to scan", "Can add selection later"]
+    },
+    {
+      name: "ExportPanel",
+      intent: "Return conclusions or edits to the workflow",
+      tradeoffs: ["Copy-only in v1", "Can add file download later"]
+    }
+  ]}
+/>
+
+<ExportPanel
+  title="Export recommendation"
+  formats={["markdown", "json"]}
+  value={{
+    recommendation: "Start with Vite + React + MDX to single HTML artifact.",
+    reasons: [
+      "Validate the high-level component protocol and exporter first.",
+      "Avoid binding the core to Astro docs-site structure too early.",
+      "The same MDX tree can still feed an Astro template later."
+    ],
+    nextSteps: [
+      "Keep CLI validate/build/dev reliable.",
+      "Ensure the example MDX outputs standalone HTML.",
+      "Design the Astro adapter after the component protocol stabilizes."
+    ]
+  }}
+/>
