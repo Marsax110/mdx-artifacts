@@ -1,16 +1,16 @@
 import {
   Callout,
   CommentableBlock,
-  CommentExport,
   CommentTarget,
   DecisionMatrix,
+  ExportPanel,
   MarkdownBody,
   OptionGrid,
 } from "../../src/react";
 
 # Commentable Artifact Feedback
 
-This example shows a local block-level comment loop. The author marks stable review targets with `CommentableBlock`, the reader adds comments in the browser, and `CommentExport` returns those comments to an agent.
+This example shows a local block-level comment loop. The author marks stable review targets with `CommentableBlock`, the reader adds comments in the browser, and `ExportPanel` returns the result plus comments to an agent.
 
 <DecisionMatrix
   question="Should comment targets be explicit blocks in v1?"
@@ -68,8 +68,8 @@ This example shows a local block-level comment loop. The author marks stable rev
       tradeoffs: ["Clear export context", "Authors choose the target boundary"]
     },
     {
-      name: "CommentExport",
-      intent: "Exports all comments as Markdown or JSON.",
+      name: "ExportPanel",
+      intent: "Exports the result and current comments from one dock.",
       tradeoffs: ["Agent-friendly handoff", "No persistence in v1"]
     }
   ]}
@@ -87,4 +87,11 @@ This example shows a local block-level comment loop. The author marks stable rev
   />
 </CommentTarget>
 
-<CommentExport title="Export artifact feedback" />
+<ExportPanel
+  title="Export artifact feedback"
+  value={{
+    recommendation: "Use explicit comment targets first, then evaluate implicit Markdown comments.",
+    reviewModel: "One comment per target",
+    nextStep: "Validate CommentableBlock around native MDX prose sections"
+  }}
+/>

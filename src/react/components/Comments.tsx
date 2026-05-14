@@ -694,6 +694,7 @@ function CommentReviewRail({ side }: { side: "left" | "right" }) {
 export function CommentExport({ title = "Export Comments", formats = ["markdown", "json"] }: CommentExportProps) {
   const layer = useCommentLayer("CommentExport");
   const [format, setFormat] = useState<CommentExportFormat>(formats[0] ?? "markdown");
+  const [isOpen, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const exportValue: CommentExportValue = { comments: layer.comments };
   const output = format === "json" ? JSON.stringify(exportValue, null, 2) : serializeCommentsToMarkdown(exportValue);
@@ -709,34 +710,49 @@ export function CommentExport({ title = "Export Comments", formats = ["markdown"
   }
 
   return (
-    <section className="ak-section ak-export-panel ak-comment-export">
-      <div className="ak-section-header ak-export-header">
-        <div>
-          <p className="ak-eyebrow">Comments</p>
-          <InlineText as="h2" text={title} variant="title" />
+    <aside className="ak-export-dock ak-comment-export" aria-label={title}>
+      <button className="ak-export-dock-trigger" onClick={() => setOpen((current) => !current)} type="button">
+        Comments
+      </button>
+      {isOpen ? (
+        <div className="ak-export-drawer ak-comment-export-drawer" role="dialog">
+          <div className="ak-section-header ak-export-header">
+            <div>
+              <p className="ak-eyebrow">Comments</p>
+              <InlineText as="h2" text={title} variant="title" />
+            </div>
+            <button className="ak-button ak-comment-export-close" onClick={() => setOpen(false)} type="button">
+              Close
+            </button>
+          </div>
+          <div className="ak-export-toolbar">
+            <Tabs.Root
+              className="ak-format-tabs"
+              onValueChange={(value) => setFormat(value as CommentExportFormat)}
+              value={format}
+            >
+              <Tabs.List aria-label="Comment export format" className="ak-format-tabs-list">
+                {formats.map((item) => (
+                  <Tabs.Trigger className="ak-format-trigger" key={item} value={item}>
+                    {item}
+                  </Tabs.Trigger>
+                ))}
+              </Tabs.List>
+            </Tabs.Root>
+            <button className="ak-button ak-button-primary" onClick={copyOutput} type="button">
+              {copied ? "Copied" : "Copy"}
+            </button>
+          </div>
+          <pre className="ak-export-output">{output}</pre>
         </div>
-        <div className="ak-actions">
-          <Tabs.Root
-            className="ak-format-tabs"
-            onValueChange={(value) => setFormat(value as CommentExportFormat)}
-            value={format}
-          >
-            <Tabs.List aria-label="Comment export format" className="ak-format-tabs-list">
-              {formats.map((item) => (
-                <Tabs.Trigger className="ak-format-trigger" key={item} value={item}>
-                  {item}
-                </Tabs.Trigger>
-              ))}
-            </Tabs.List>
-          </Tabs.Root>
-          <button className="ak-button ak-button-primary" onClick={copyOutput} type="button">
-            {copied ? "Copied" : "Copy"}
-          </button>
-        </div>
-      </div>
-      <pre className="ak-export-output">{output}</pre>
-    </section>
+      ) : null}
+    </aside>
   );
+}
+
+export function useOptionalCommentExportValue(): CommentExportValue | undefined {
+  const layer = useOptionalCommentLayer();
+  return layer ? { comments: layer.comments } : undefined;
 }
 
 export function serializeCommentsToMarkdown(value: CommentExportValue) {

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { CommentExport, CommentLayer } from "./Comments";
+import { CommentLayer } from "./Comments";
 import { DecisionMatrix } from "./DecisionMatrix";
+import { ExportPanel } from "./ExportPanel";
 import { OptionGrid } from "./OptionGrid";
 
 const meta = {
@@ -48,14 +49,20 @@ export const BlockComments: Story = {
             intent: "Mark one stable review target."
           },
           {
-            name: "CommentExport",
-            intent: "Copy comments back to an agent."
+            name: "ExportPanel",
+            intent: "Copy the result and current comments back to an agent."
           }
         ]}
         title="Comment workflow components"
       />
 
-      <CommentExport title="Export artifact feedback" />
+      <ExportPanel
+        title="Export artifact feedback"
+        value={{
+          recommendation: "Use explicit targets first.",
+          nextStep: "Validate commentable prose blocks."
+        }}
+      />
     </>
   )
 };

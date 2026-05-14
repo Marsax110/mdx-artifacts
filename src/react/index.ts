@@ -6,7 +6,14 @@ export { ComparisonSet } from "./components/ComparisonSet";
 export type { ComparisonSetItemProps, ComparisonSetProps } from "./components/ComparisonSet";
 export { CodeBlock } from "./components/CodeBlock";
 export type { CodeBlockProps } from "./components/CodeBlock";
-export { CommentableBlock, CommentExport, CommentLayer, CommentTarget, serializeCommentsToMarkdown } from "./components/Comments";
+export {
+  CommentableBlock,
+  CommentExport,
+  CommentLayer,
+  CommentTarget,
+  serializeCommentsToMarkdown,
+  useOptionalCommentExportValue
+} from "./components/Comments";
 export type {
   ArtifactComment,
   CommentableBlockProps,

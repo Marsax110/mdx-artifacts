@@ -69,7 +69,7 @@ describe("Comment components", () => {
     expect(html).toContain('data-comment-target-id="option:comment-workflow-pieces:1:commentlayer"');
   });
 
-  it("adds targets to semantic, code, diff, and export blocks inside a layer", () => {
+  it("adds targets to semantic, code, and diff blocks inside a layer", () => {
     const html = renderToStaticMarkup(
       <CommentLayer>
         <Callout body="Check the export path." title="Review focus" tone="warning" />
@@ -101,7 +101,8 @@ describe("Comment components", () => {
     expect(html).toContain('data-comment-target-id="diff:example-diff"');
     expect(html).toContain('data-comment-target-id="annotated-code:setup-ts"');
     expect(html).toContain('data-comment-target-id="annotation:setup-ts:1:important-line"');
-    expect(html).toContain('data-comment-target-id="export:export-review-result"');
+    expect(html).toContain("ak-export-dock");
+    expect(html).not.toContain('data-comment-target-id="export:export-review-result"');
   });
 
   it("renders an empty comment export inside a layer", () => {
@@ -111,8 +112,8 @@ describe("Comment components", () => {
       </CommentLayer>
     );
 
-    expect(html).toContain("Export Comments");
-    expect(html).toContain("No comments yet.");
+    expect(html).toContain("Comments");
+    expect(html).toContain("ak-export-dock-trigger");
   });
 
   it("creates trimmed comment records and skips empty input", () => {

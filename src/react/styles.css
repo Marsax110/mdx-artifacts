@@ -1041,10 +1041,58 @@ body {
   padding: 16px;
 }
 
+.ak-export-dock {
+  position: fixed;
+  z-index: 20;
+  right: 24px;
+  bottom: 24px;
+  display: grid;
+  justify-items: end;
+  gap: 10px;
+}
+
+.ak-comment-export {
+  right: 112px;
+}
+
+.ak-export-dock-trigger {
+  border: 1px solid var(--ak-primary);
+  border-radius: 999px;
+  background: var(--ak-primary);
+  color: var(--ak-primary-foreground);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 10px 14px;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 18%);
+}
+
+.ak-export-drawer {
+  display: grid;
+  gap: 14px;
+  width: min(720px, calc(100vw - 32px));
+  max-height: min(620px, calc(100vh - 112px));
+  overflow: auto;
+  border: 1px solid var(--ak-border);
+  border-radius: 12px 12px 8px 8px;
+  background: var(--ak-surface);
+  padding: 16px;
+  box-shadow: 0 20px 60px rgb(0 0 0 / 22%);
+}
+
 .ak-export-header {
   grid-template-columns: 1fr auto;
   align-items: center;
   gap: 16px;
+}
+
+.ak-export-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: space-between;
 }
 
 .ak-actions {
@@ -1179,6 +1227,20 @@ body {
   .ak-shell {
     width: min(100% - 20px, 1120px);
     padding-top: 20px;
+  }
+
+  .ak-export-dock {
+    right: 10px;
+    bottom: 10px;
+  }
+
+  .ak-comment-export {
+    right: 96px;
+  }
+
+  .ak-export-drawer {
+    width: calc(100vw - 20px);
+    max-height: calc(100vh - 86px);
   }
 
   .ak-export-header {

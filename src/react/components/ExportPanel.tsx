@@ -1,6 +1,6 @@
 import * as Tabs from "@radix-ui/react-tabs";
 import { useMemo, useState } from "react";
-import { CommentTarget } from "./Comments";
+import { serializeCommentsToMarkdown, useOptionalCommentExportValue } from "./Comments";
 import { InlineText } from "./InlineText";
 
 export type ExportFormat = "markdown" | "json";
@@ -11,11 +11,24 @@ export type ExportPanelProps = {
   value: unknown;
 };
 
+type ExportSource = "result" | "comments";
+
 export function ExportPanel({ title = "Export Result", formats = ["markdown", "json"], value }: ExportPanelProps) {
   const [format, setFormat] = useState<ExportFormat>(formats[0] ?? "markdown");
+  const [source, setSource] = useState<ExportSource>("result");
+  const [isOpen, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const comments = useOptionalCommentExportValue();
+  const hasCommentsSource = Boolean(comments);
+  const resolvedSource = source === "comments" && !hasCommentsSource ? "result" : source;
 
-  const output = useMemo(() => serialize(value, format), [format, value]);
+  const output = useMemo(() => {
+    if (resolvedSource === "comments" && comments) {
+      return format === "json" ? JSON.stringify(comments, null, 2) : serializeCommentsToMarkdown(comments);
+    }
+
+    return serialize(value, format);
+  }, [comments, format, resolvedSource, value]);
 
   async function copyOutput() {
     if (navigator.clipboard?.writeText) {
@@ -27,25 +40,46 @@ export function ExportPanel({ title = "Export Result", formats = ["markdown", "j
     window.setTimeout(() => setCopied(false), 1200);
   }
 
+  function updateSource(value: string) {
+    setSource(value as ExportSource);
+    setCopied(false);
+  }
+
+  function updateFormat(value: string) {
+    setFormat(value as ExportFormat);
+    setCopied(false);
+  }
+
   return (
-    <CommentTarget
-      className="ak-comment-target-section"
-      description="ExportPanel component"
-      targetId={`export:${slugify(title)}`}
-      title={title}
-    >
-      <section className="ak-section ak-export-panel">
-        <div className="ak-section-header ak-export-header">
-          <div>
-            <p className="ak-eyebrow">Export</p>
-            <InlineText as="h2" text={title} variant="title" />
+    <aside className="ak-export-dock" aria-label={title}>
+      <button className="ak-export-dock-trigger" onClick={() => setOpen((current) => !current)} type="button">
+        Export
+      </button>
+      {isOpen ? (
+        <div className="ak-export-drawer" role="dialog">
+          <div className="ak-section-header ak-export-header">
+            <div>
+              <p className="ak-eyebrow">Export</p>
+              <InlineText as="h2" text={title} variant="title" />
+            </div>
+            <button className="ak-button" onClick={() => setOpen(false)} type="button">
+              Close
+            </button>
           </div>
-          <div className="ak-actions">
-            <Tabs.Root
-              className="ak-format-tabs"
-              onValueChange={(value) => setFormat(value as ExportFormat)}
-              value={format}
-            >
+          <div className="ak-export-toolbar">
+            <Tabs.Root className="ak-format-tabs" onValueChange={updateSource} value={resolvedSource}>
+              <Tabs.List aria-label="Export source" className="ak-format-tabs-list">
+                <Tabs.Trigger className="ak-format-trigger" value="result">
+                  Result
+                </Tabs.Trigger>
+                {hasCommentsSource ? (
+                  <Tabs.Trigger className="ak-format-trigger" value="comments">
+                    Comments
+                  </Tabs.Trigger>
+                ) : null}
+              </Tabs.List>
+            </Tabs.Root>
+            <Tabs.Root className="ak-format-tabs" onValueChange={updateFormat} value={format}>
               <Tabs.List aria-label="Export format" className="ak-format-tabs-list">
                 {formats.map((item) => (
                   <Tabs.Trigger className="ak-format-trigger" key={item} value={item}>
@@ -58,10 +92,10 @@ export function ExportPanel({ title = "Export Result", formats = ["markdown", "j
               {copied ? "Copied" : "Copy"}
             </button>
           </div>
+          <pre className="ak-export-output">{output}</pre>
         </div>
-        <pre className="ak-export-output">{output}</pre>
-      </section>
-    </CommentTarget>
+      ) : null}
+    </aside>
   );
 }
 
@@ -116,15 +150,4 @@ function toMarkdown(value: unknown, depth = 0): string {
   }
 
   return String(value);
-}
-
-function slugify(value: string) {
-  const slug = value
-    .toLowerCase()
-    .replace(/[`*_~[\]()]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 64);
-
-  return slug || "item";
 }

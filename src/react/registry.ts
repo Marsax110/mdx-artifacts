@@ -611,14 +611,14 @@ export const componentRegistry: ComponentMeta[] = [
     name: "CommentExport",
     category: "artifact",
     stability: "stable",
-    description: "Exports all comments from the nearest CommentLayer as Markdown or JSON.",
-    useWhen: ["Returning artifact feedback to an agent", "Copying review comments", "Comment handoff"],
+    description: "Compatibility dock for exporting comments from the nearest CommentLayer. Prefer ExportPanel when an artifact also has result output.",
+    useWhen: ["Comments-only artifacts", "Legacy comment handoff", "Copying review comments without a result export"],
     props: [
       {
         name: "title",
         type: "string",
         contentType: "inlineMarkdown",
-        description: "Export section title. Defaults to Export Comments."
+        description: "Comment export drawer title. Defaults to Export Comments."
       },
       {
         name: "formats",
@@ -887,14 +887,14 @@ export const componentRegistry: ComponentMeta[] = [
     name: "ExportPanel",
     category: "artifact",
     stability: "stable",
-    description: "Exports conclusions, configuration, or user-edited state as Markdown or JSON.",
-    useWhen: ["Exporting decisions", "Copying state back to an agent", "Issue or PR handoff", "Configuration handoff"],
+    description: "Shows a floating export dock for artifact results and, when comments are available, review comments.",
+    useWhen: ["Exporting decisions", "Copying state back to an agent", "Issue or PR handoff", "Configuration handoff", "Exporting comments with artifact results"],
     props: [
       {
         name: "title",
         type: "string",
         contentType: "inlineMarkdown",
-        description: "Export section title. Defaults to Export Result."
+        description: "Export drawer title. Defaults to Export Result."
       },
       {
         name: "formats",
