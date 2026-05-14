@@ -3,6 +3,7 @@ import path from "node:path";
 import { buildCommand } from "./build";
 import { componentsCommand } from "./components";
 import { devCommand } from "./dev";
+import { reviewCommand } from "./review";
 import { initProject } from "./scaffold";
 import { printValidationResult, validateMdx } from "./validate";
 
@@ -25,6 +26,11 @@ async function main() {
     const json = args.includes("--json");
     const name = args.find((arg) => arg !== "--json");
     componentsCommand(name, { json });
+    return;
+  }
+
+  if (command === "review") {
+    await reviewCommand(projectRoot, process.argv.slice(3));
     return;
   }
 
@@ -61,6 +67,7 @@ Usage:
   artifact-kit init
   artifact-kit components [ComponentName] [--json]
   artifact-kit validate <file.mdx>
+  artifact-kit review context <file.mdx>
   artifact-kit dev <file.mdx>
   artifact-kit build <file.mdx>
 `);
