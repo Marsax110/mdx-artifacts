@@ -3,7 +3,6 @@ import {
   CommentTarget,
   DecisionMatrix,
   ExportPanel,
-  MarkdownBody,
   OptionGrid,
   Section,
 } from "../../src/react";
@@ -43,20 +42,16 @@ This example shows a local block-level comment loop. The author marks stable rev
   title="Prose guidance"
   level={2}
 >
-  <Callout
-    id="callout.prose-blocks"
-    tone="info"
-    title="Why blocks come first"
-    body="A block target gives the export enough context for the next agent turn without requiring text selection or component internals."
-  />
-  <MarkdownBody
-    body={`Use block comments when feedback should attach to a visible region:
 
-- a decision matrix
-- an option grid
-- a prose explanation
-- a custom composed section`}
-  />
+A section target gives the exported state enough context for the next agent turn without requiring text selection or component internals.
+
+Use section comments when feedback should attach to a visible native MDX region:
+
+- a short prose explanation
+- a paragraph plus a list
+- a decision summary before a component
+- a custom composed section boundary
+
 </Section>
 
 <OptionGrid

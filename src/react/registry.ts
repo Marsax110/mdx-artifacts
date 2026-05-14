@@ -60,7 +60,7 @@ export const componentRegistry: ComponentMeta[] = [
     category: "content",
     stability: "stable",
     description: "Renders controlled multi-line Markdown for component body copy.",
-    useWhen: ["Body explanations", "Short artifact notes", "Controlled lists", "Component-local prose"],
+    useWhen: ["Component body explanations", "Controlled lists inside components", "Component-local prose"],
     props: [
       {
         name: "body",
@@ -68,7 +68,7 @@ export const componentRegistry: ComponentMeta[] = [
         contentType: "blockMarkdown",
         required: true,
         description:
-          "Multi-line Markdown. Supports headings, paragraphs, lists, blockquotes, bold, emphasis, strikethrough, inline code, and links. Prefer component title props for main artifact structure."
+          "Multi-line Markdown. Supports headings, paragraphs, lists, blockquotes, bold, emphasis, strikethrough, inline code, and links. Use native MDX children inside Section for document-level prose."
       },
       {
         name: "variant",
@@ -567,7 +567,7 @@ export const componentRegistry: ComponentMeta[] = [
     category: "artifact",
     stability: "stable",
     description: "Defines a stable reviewable document section for native MDX prose.",
-    useWhen: ["Reviewable prose sections", "Stable Markdown anchors", "Document structure", "Block-level feedback"],
+    useWhen: ["Reviewable native MDX prose", "Stable Markdown anchors", "Document structure", "Block-level feedback"],
     props: [
       {
         name: "id",
@@ -598,7 +598,7 @@ export const componentRegistry: ComponentMeta[] = [
         name: "children",
         type: "ReactNode",
         required: true,
-        description: "Native MDX prose or composed content that belongs to this section."
+        description: "Native MDX prose or composed content that belongs to this section. Do not wrap normal section prose in MarkdownBody."
       }
     ],
     example: `<Section id="context" title="Context" level={2}>
