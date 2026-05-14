@@ -249,9 +249,11 @@ artifact-kit review reply artifact-docs/examples/decision-matrix.mdx \
   --thread thr_decision_stage_one \
   --body "Updated the decision copy." \
   --status resolved
+
+artifact-kit review validate artifact-docs/examples/decision-matrix.mdx
 ```
 
-`review add` creates one open thread for an existing anchor. `review reply` appends assistant messages to existing threads and may update status. Neither command edits MDX.
+`review add` creates one open thread for an existing anchor. `review reply` appends assistant messages to existing threads and may update status. `review validate` reports state threads whose `anchorId` no longer exists in the current MDX. None of these commands edits MDX.
 
 Do not introduce multi-thread-per-anchor UI until the single-thread message model is stable. Multiple independent threads for one anchor are a later review-system feature, not the first artifact review protocol.
 

@@ -104,9 +104,11 @@ pnpm exec artifact-kit review reply artifact-docs/examples/hello.mdx \
   --thread thr_decision_stage_one \
   --body "Updated the decision copy." \
   --status resolved
+
+pnpm exec artifact-kit review validate artifact-docs/examples/hello.mdx
 ```
 
-Review commands read and write the sibling `.state.json` file for the source MDX. They do not edit the MDX source.
+Review commands read and write the sibling `.state.json` file for the source MDX. They do not edit the MDX source. `review validate` checks whether saved review threads still point at anchors that exist in the current MDX.
 
 ## Repository Development
 

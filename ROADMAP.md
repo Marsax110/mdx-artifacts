@@ -151,7 +151,7 @@ Current direction:
 Next validation step:
 
 - Keep validating `Section id="..."` as the explicit prose boundary in `docs/local/streamlit-style-mixed.zh-CN.local.mdx`.
-- Add `artifact-kit review validate <file.mdx>` so agents can detect state threads whose `anchorId` no longer exists in the current MDX.
+- Keep expanding `artifact-kit review validate <file.mdx>` so agents can detect state threads whose `anchorId` no longer exists in the current MDX, including more derived component child anchors as components are added.
 - Verify the minimal loop: user creates a thread, agent edits MDX, agent replies through the CLI, and the page shows the assistant reply without a manual state export.
 
 Deferred:

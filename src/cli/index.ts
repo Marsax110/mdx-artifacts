@@ -69,6 +69,7 @@ Usage:
   artifact-kit validate <file.mdx>
   artifact-kit review add <file.mdx> --anchor <anchorId> --body <message> [--title <title>]
   artifact-kit review reply <file.mdx> --thread <threadId> --body <message> [...repeat] [--status <status>]
+  artifact-kit review validate <file.mdx>
   artifact-kit dev <file.mdx>
   artifact-kit build <file.mdx>
 `);

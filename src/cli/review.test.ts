@@ -2,7 +2,7 @@ import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { addReviewThread, replyToReviewThread, replyToReviewThreads } from "./review";
+import { addReviewThread, replyToReviewThread, replyToReviewThreads, validateReviewState } from "./review";
 
 describe("review reply", () => {
   it("adds a review thread for an existing anchor", async () => {
@@ -203,4 +203,92 @@ describe("review reply", () => {
     ).rejects.toThrow("Review thread not found: thr_missing");
   });
 
+  it("validates review state anchors including component child anchors", async () => {
+    const projectRoot = await mkdtemp(path.join(tmpdir(), "mdx-artifacts-review-"));
+    const docsDir = path.join(projectRoot, "artifact-docs");
+    const mdxPath = path.join(docsDir, "feedback.mdx");
+    const statePath = path.join(docsDir, "feedback.state.json");
+
+    await mkdir(docsDir, { recursive: true });
+    await writeFile(
+      mdxPath,
+      `<DecisionMatrix
+  id="decision.text-model"
+  question="Choose a text model"
+  options={[
+    {
+      id: "native-mdx",
+      name: "Native MDX"
+    }
+  ]}
+/>
+<Section id="section.context">
+
+## Context
+
+</Section>`,
+      "utf8"
+    );
+    await writeFile(
+      statePath,
+      JSON.stringify({
+        version: 1,
+        source: "artifact-docs/feedback.mdx",
+        threads: [
+          { id: "thr_001", anchorId: "section.context", status: "open", messages: [] },
+          { id: "thr_002", anchorId: "decision.text-model.native-mdx", status: "open", messages: [] }
+        ],
+        interactions: {}
+      }),
+      "utf8"
+    );
+
+    const result = await validateReviewState(projectRoot, "artifact-docs/feedback.mdx");
+
+    expect(result.missingThreads).toEqual([]);
+    expect(result.output).toContain("review validate ok");
+    expect(result.output).toContain("threads: 2");
+  });
+
+  it("reports review state threads whose anchors are missing from MDX", async () => {
+    const projectRoot = await mkdtemp(path.join(tmpdir(), "mdx-artifacts-review-"));
+    const docsDir = path.join(projectRoot, "artifact-docs");
+    const mdxPath = path.join(docsDir, "feedback.mdx");
+    const statePath = path.join(docsDir, "feedback.state.json");
+
+    await mkdir(docsDir, { recursive: true });
+    await writeFile(mdxPath, `<Section id="section.context">\n\n## Context\n\n</Section>`, "utf8");
+    await writeFile(
+      statePath,
+      JSON.stringify({
+        version: 1,
+        source: "artifact-docs/feedback.mdx",
+        threads: [
+          {
+            id: "thr_missing",
+            anchorId: "comparison.removed",
+            status: "open",
+            title: "Removed comparison",
+            messages: []
+          }
+        ],
+        interactions: {}
+      }),
+      "utf8"
+    );
+
+    const result = await validateReviewState(projectRoot, "artifact-docs/feedback.mdx");
+
+    expect(result.missingThreads).toEqual([
+      {
+        threadId: "thr_missing",
+        anchorId: "comparison.removed",
+        status: "open",
+        title: "Removed comparison"
+      }
+    ]);
+    expect(result.output).toContain("review validate failed");
+    expect(result.output).toContain("missing: 1");
+    expect(result.output).toContain("thread: thr_missing anchorId: comparison.removed");
+  });
 });

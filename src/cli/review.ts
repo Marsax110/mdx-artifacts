@@ -30,6 +30,20 @@ type ParsedReviewReplyArgs = ReviewReplyOptions & {
   input: string;
 };
 
+export type ReviewValidationResult = {
+  anchorCount: number;
+  missingThreads: ReviewMissingThread[];
+  output: string;
+  threadCount: number;
+};
+
+export type ReviewMissingThread = {
+  anchorId: string;
+  threadId: string;
+  title?: string;
+  status?: string;
+};
+
 export async function reviewCommand(projectRoot: string, args: string[]) {
   const [subcommand] = args;
 
@@ -45,14 +59,24 @@ export async function reviewCommand(projectRoot: string, args: string[]) {
     return;
   }
 
-  throw new Error("review requires a subcommand. Use `artifact-kit review add <file.mdx>` or `artifact-kit review reply <file.mdx>`.");
+  if (subcommand === "validate") {
+    const input = parseReviewValidateArgs(args.slice(1));
+    const result = await validateReviewState(projectRoot, input);
+    console.log(result.output);
+    if (result.missingThreads.length > 0) {
+      process.exitCode = 1;
+    }
+    return;
+  }
+
+  throw new Error("review requires a subcommand. Use `artifact-kit review add <file.mdx>`, `artifact-kit review reply <file.mdx>`, or `artifact-kit review validate <file.mdx>`.");
 }
 
 export async function addReviewThread(projectRoot: string, input: string, options: ReviewAddOptions) {
   const artifact = await createArtifactFromInput(projectRoot, input);
   const state = await readArtifactState(artifact);
   const source = await readFile(artifact.sourcePath, "utf8");
-  const anchorIds = extractDirectAnchorIds(source);
+  const anchorIds = extractReviewAnchorIds(source);
 
   if (!anchorIds.has(options.anchorId)) {
     throw new Error(`Review anchor not found: ${options.anchorId}`);
@@ -139,6 +163,61 @@ export async function replyToReviewThreads(projectRoot: string, input: string, o
   ].join("\n");
 }
 
+export async function validateReviewState(projectRoot: string, input: string): Promise<ReviewValidationResult> {
+  const artifact = await createArtifactFromInput(projectRoot, input);
+  const state = await readArtifactState(artifact);
+  const source = await readFile(artifact.sourcePath, "utf8");
+  const anchorIds = extractReviewAnchorIds(source);
+  const threads = state.threads.filter(isRecord);
+  const missingThreads = threads.flatMap<ReviewMissingThread>((thread) => {
+    if (!isString(thread.anchorId) || anchorIds.has(thread.anchorId)) {
+      return [];
+    }
+
+    return [
+      {
+        anchorId: thread.anchorId,
+        threadId: isString(thread.id) ? thread.id : "(missing thread id)",
+        title: isString(thread.title) ? thread.title : undefined,
+        status: isString(thread.status) ? thread.status : undefined
+      }
+    ];
+  });
+
+  const output =
+    missingThreads.length === 0
+      ? [
+          `review validate ok`,
+          `state: ${artifact.stateRelativePath}`,
+          `anchors: ${anchorIds.size}`,
+          `threads: ${threads.length}`
+        ].join("\n")
+      : [
+          `review validate failed`,
+          `state: ${artifact.stateRelativePath}`,
+          `anchors: ${anchorIds.size}`,
+          `threads: ${threads.length}`,
+          `missing: ${missingThreads.length}`,
+          ...missingThreads.map((thread) =>
+            [
+              `- thread: ${thread.threadId}`,
+              `anchorId: ${thread.anchorId}`,
+              thread.status ? `status: ${thread.status}` : undefined,
+              thread.title ? `title: ${thread.title}` : undefined
+            ]
+              .filter(Boolean)
+              .join(" ")
+          )
+        ].join("\n");
+
+  return {
+    anchorCount: anchorIds.size,
+    missingThreads,
+    output,
+    threadCount: threads.length
+  };
+}
+
 async function createArtifactFromInput(projectRoot: string, input: string): Promise<ArtifactRoute> {
   const config = await loadConfig(projectRoot);
   const mdxPath = path.resolve(projectRoot, input);
@@ -159,6 +238,20 @@ function parseReviewReplyArgs(args: string[]): ParsedReviewReplyArgs {
     replies,
     ...(status ? { status } : {})
   };
+}
+
+function parseReviewValidateArgs(args: string[]) {
+  const [input, ...rest] = args;
+
+  if (!input) {
+    throw new Error("review validate requires a .mdx file path.");
+  }
+
+  if (rest.length > 0) {
+    throw new Error(`Unexpected review validate argument: ${rest[0]}`);
+  }
+
+  return input;
 }
 
 function parseReviewAddArgs(args: string[]) {
@@ -313,7 +406,7 @@ function createThreadId(anchorId: string, threads: unknown[]) {
   return `thr_${compactId(anchorId)}_${Date.now().toString(36)}`;
 }
 
-function extractDirectAnchorIds(source: string) {
+function extractReviewAnchorIds(source: string) {
   const anchorIds = new Set<string>();
 
   for (const match of source.matchAll(/<([A-Z][A-Za-z0-9.]*)\b[^>]*(?:\sid|\stargetId)\s*=\s*["']([^"']+)["']/g)) {
@@ -322,7 +415,92 @@ function extractDirectAnchorIds(source: string) {
     }
   }
 
+  addArrayChildAnchors(source, anchorIds, "DecisionMatrix", "options");
+  addArrayChildAnchors(source, anchorIds, "OptionGrid", "options");
+  addArrayChildAnchors(source, anchorIds, "AnnotatedCode", "annotations", { addCodeChild: true });
+  addComparisonSetChildAnchors(source, anchorIds);
+
   return anchorIds;
+}
+
+function addArrayChildAnchors(
+  source: string,
+  anchorIds: Set<string>,
+  componentName: string,
+  arrayPropName: string,
+  options: { addCodeChild?: boolean } = {}
+) {
+  const componentPattern = new RegExp(`<${componentName}\\b[\\s\\S]*?\\/>`, "g");
+
+  for (const match of source.matchAll(componentPattern)) {
+    const componentSource = match[0];
+    const parentId = extractJsxStringProp(componentSource, "id");
+    if (!parentId) {
+      continue;
+    }
+
+    if (options.addCodeChild) {
+      anchorIds.add(`${parentId}.code`);
+    }
+
+    const arraySource = extractJsxArrayProp(componentSource, arrayPropName);
+    if (!arraySource) {
+      continue;
+    }
+
+    for (const itemId of extractObjectIds(arraySource)) {
+      anchorIds.add(`${parentId}.${itemId}`);
+    }
+  }
+}
+
+function addComparisonSetChildAnchors(source: string, anchorIds: Set<string>) {
+  for (const match of source.matchAll(/<ComparisonSet\b[\s\S]*?<\/ComparisonSet>/g)) {
+    const componentSource = match[0];
+    const parentId = extractJsxStringProp(componentSource, "id");
+    if (!parentId) {
+      continue;
+    }
+
+    for (const itemMatch of componentSource.matchAll(/<ComparisonSet\.Item\b[^>]*\sid\s*=\s*["']([^"']+)["'][^>]*>/g)) {
+      if (itemMatch[1]) {
+        anchorIds.add(`${parentId}.${itemMatch[1]}`);
+      }
+    }
+  }
+}
+
+function extractJsxStringProp(source: string, propName: string) {
+  const pattern = new RegExp(`\\b${propName}\\s*=\\s*["']([^"']+)["']`);
+  return source.match(pattern)?.[1];
+}
+
+function extractJsxArrayProp(source: string, propName: string) {
+  const propStart = source.search(new RegExp(`\\b${propName}\\s*=\\s*\\{\\s*\\[`));
+  if (propStart < 0) {
+    return undefined;
+  }
+
+  const arrayStart = source.indexOf("[", propStart);
+  let depth = 0;
+
+  for (let index = arrayStart; index < source.length; index += 1) {
+    const char = source[index];
+    if (char === "[") {
+      depth += 1;
+    } else if (char === "]") {
+      depth -= 1;
+      if (depth === 0) {
+        return source.slice(arrayStart, index + 1);
+      }
+    }
+  }
+
+  return undefined;
+}
+
+function extractObjectIds(source: string) {
+  return Array.from(source.matchAll(/\bid\s*:\s*["']([^"']+)["']/g), (match) => match[1]).filter(Boolean);
 }
 
 function compactId(value: string) {
