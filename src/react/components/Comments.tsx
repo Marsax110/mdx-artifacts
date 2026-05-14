@@ -70,6 +70,7 @@ type CommentLayerValue = {
   closeTarget: () => void;
   getActiveTarget: () => CommentTargetAnchor | undefined;
   getPanels: () => CommentReviewPanel[];
+  getUnplacedPanels: () => CommentReviewPanel[];
   getTargetNumber: (targetId: string) => number | undefined;
   openTarget: (input: OpenCommentTargetInput) => void;
   registerTarget: (input: RegisterCommentTargetInput) => void;
@@ -120,6 +121,7 @@ export function CommentLayer({ children }: CommentLayerProps) {
   const pendingPersistThreads = useRef<ArtifactReviewThread[] | undefined>(undefined);
   const didHydrateState = useRef(false);
   const panels = createReviewPanels(activeTargetId, threads, openTargetIds, targetIds, targets);
+  const unplacedPanels = createUnplacedReviewPanels(threads, targetIds, targets);
 
   useEffect(() => {
     if (didHydrateState.current || !artifactState?.state) {
@@ -179,6 +181,9 @@ export function CommentLayer({ children }: CommentLayerProps) {
       getPanels() {
         return panels;
       },
+      getUnplacedPanels() {
+        return unplacedPanels;
+      },
       getTargetNumber(targetId) {
         const index = targetIds.indexOf(targetId);
         return index >= 0 ? index + 1 : undefined;
@@ -218,10 +223,12 @@ export function CommentLayer({ children }: CommentLayerProps) {
         setThreads(nextThreads);
       }
     }),
-    [activeTargetId, panels, targetIds, targets, threads]
+    [activeTargetId, panels, targetIds, targets, threads, unplacedPanels]
   );
 
-  const isReviewLayoutActive = activeTargetId !== undefined || openTargetIds.length > 0;
+  const isReviewLayoutActive =
+    (activeTargetId !== undefined && targets[activeTargetId] !== undefined) ||
+    openTargetIds.some((targetId) => targets[targetId] !== undefined);
 
   return (
     <CommentContext.Provider value={value}>
@@ -235,6 +242,7 @@ export function CommentLayer({ children }: CommentLayerProps) {
         <div className="ak-review-content">{children}</div>
         <CommentReviewRail side="right" />
       </div>
+      <UnplacedReviewDock />
     </CommentContext.Provider>
   );
 }
@@ -744,6 +752,84 @@ function CommentReviewRail({ side }: { side: "left" | "right" }) {
   );
 }
 
+function UnplacedReviewDock() {
+  const context = useCommentLayer("UnplacedReviewDock");
+  const panels = context.getUnplacedPanels();
+  const [isOpen, setOpen] = useState(false);
+  const [editingCommentId, setEditingCommentId] = useState<string | undefined>();
+  const [editingDraft, setEditingDraft] = useState("");
+
+  useEffect(() => {
+    if (panels.length === 0) {
+      setOpen(false);
+    }
+  }, [panels.length]);
+
+  if (panels.length === 0) {
+    return null;
+  }
+
+  function beginEdit(message: ArtifactReviewMessage) {
+    setEditingCommentId(message.id);
+    setEditingDraft(message.body);
+  }
+
+  function cancelEdit() {
+    setEditingCommentId(undefined);
+    setEditingDraft("");
+  }
+
+  function submitEdit(event: FormEvent<HTMLFormElement>, commentId: string) {
+    event.preventDefault();
+    context.updateComment(commentId, editingDraft);
+    cancelEdit();
+  }
+
+  return (
+    <aside className="ak-unplaced-review-dock" aria-label="Unplaced comments">
+      <button className="ak-unplaced-review-trigger" onClick={() => setOpen((current) => !current)} type="button">
+        Unplaced · {panels.length}
+      </button>
+      {isOpen ? (
+        <div className="ak-unplaced-review-sheet" role="dialog">
+          <div className="ak-section-header ak-unplaced-review-header">
+            <div>
+              <p className="ak-eyebrow">Review</p>
+              <InlineText as="h2" text="Unplaced comments" variant="title" />
+            </div>
+            <button className="ak-button" onClick={() => setOpen(false)} type="button">
+              Close
+            </button>
+          </div>
+          <div className="ak-unplaced-review-list">
+            {panels.map((panel) => (
+              <section className="ak-unplaced-review-card" key={panel.targetId}>
+                <div className="ak-comment-form-header">
+                  <span className="ak-comment-target-label">#{panel.number}</span>
+                  <InlineText as="span" text={panel.title} variant="label" />
+                </div>
+                <p className="ak-unplaced-review-anchor">Missing anchor: {panel.targetId}</p>
+                {panel.thread ? (
+                  <ThreadMessageList
+                    editingCommentId={editingCommentId}
+                    editingDraft={editingDraft}
+                    number={panel.number}
+                    onBeginEdit={beginEdit}
+                    onCancelEdit={cancelEdit}
+                    onEditingDraftChange={setEditingDraft}
+                    onSubmitEdit={submitEdit}
+                    thread={panel.thread}
+                  />
+                ) : null}
+              </section>
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </aside>
+  );
+}
+
 export function CommentExport({ title = "Export Comments", formats = ["markdown", "json"] }: CommentExportProps) {
   const layer = useCommentLayer("CommentExport");
   const [format, setFormat] = useState<CommentExportFormat>(formats[0] ?? "markdown");
@@ -954,15 +1040,19 @@ function createReviewPanels(
       continue;
     }
 
-    const number = targetIds.indexOf(thread.blockId) + 1 || panelMap.size + 1;
     const target = targets[thread.blockId];
+    if (!target) {
+      continue;
+    }
+
+    const number = targetIds.indexOf(thread.blockId) + 1 || panelMap.size + 1;
     panelMap.set(thread.blockId, {
       number,
-      side: panelMap.get(thread.blockId)?.side ?? target?.side ?? "right",
+      side: panelMap.get(thread.blockId)?.side ?? target.side,
       targetId: thread.blockId,
       thread,
       title: thread.blockTitle,
-      top: panelMap.get(thread.blockId)?.top ?? target?.top ?? 16,
+      top: panelMap.get(thread.blockId)?.top ?? target.top,
       isActive: activeTargetId === thread.blockId
     });
   }
@@ -982,6 +1072,34 @@ function createReviewPanels(
   }
 
   return Array.from(panelMap.values());
+}
+
+function createUnplacedReviewPanels(
+  threads: ArtifactReviewThread[],
+  targetIds: string[],
+  targets: Record<string, CommentTargetAnchor>
+) {
+  const placedThreadIds = new Set(targetIds);
+  const placedCount = targetIds.length;
+  let unplacedCount = 0;
+
+  return threads.flatMap<CommentReviewPanel>((thread) => {
+    if (targets[thread.blockId] || placedThreadIds.has(thread.blockId)) {
+      return [];
+    }
+
+    unplacedCount += 1;
+    return [
+      {
+        number: placedCount + unplacedCount,
+        side: "right",
+        targetId: thread.blockId,
+        thread,
+        title: thread.blockTitle,
+        top: 0
+      }
+    ];
+  });
 }
 
 function positionReviewPanels<T extends CommentReviewPanel>(

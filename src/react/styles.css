@@ -893,6 +893,74 @@ body {
   border-color: var(--ak-comment-accent);
 }
 
+.ak-unplaced-review-dock {
+  position: fixed;
+  z-index: 22;
+  right: 24px;
+  bottom: 78px;
+  display: grid;
+  justify-items: end;
+  gap: 10px;
+}
+
+.ak-unplaced-review-trigger {
+  border: 1px solid var(--ak-warn);
+  border-radius: 999px;
+  background: var(--ak-warn);
+  color: var(--ak-primary-foreground);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 8px 12px;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 18%);
+}
+
+.ak-unplaced-review-sheet {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 16px;
+  width: min(640px, calc(100vw - 32px));
+  border-left: 1px solid var(--ak-border);
+  background: var(--ak-surface);
+  padding: 20px;
+  box-shadow: -20px 0 60px rgb(0 0 0 / 18%);
+}
+
+.ak-unplaced-review-header {
+  align-items: start;
+}
+
+.ak-unplaced-review-list {
+  columns: 260px 2;
+  column-gap: 12px;
+  overflow: auto;
+}
+
+.ak-unplaced-review-card {
+  display: inline-grid;
+  width: 100%;
+  break-inside: avoid;
+  gap: 10px;
+  margin: 0 0 12px;
+  border: 1px solid var(--ak-border);
+  border-radius: 8px;
+  background: var(--ak-surface-subtle);
+  padding: 12px;
+}
+
+.ak-unplaced-review-anchor {
+  margin: 0;
+  color: var(--ak-muted);
+  font-size: 12px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
 .ak-comment-form {
   display: grid;
   gap: 8px;
