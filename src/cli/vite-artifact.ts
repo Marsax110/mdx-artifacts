@@ -4,6 +4,7 @@ import react from "@vitejs/plugin-react";
 import { randomUUID } from "node:crypto";
 import { access, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import type { IncomingMessage, ServerResponse } from "node:http";
+import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createServer, build as viteBuild } from "vite";
@@ -40,7 +41,9 @@ export async function createArtifactProject(
   const entryPath = path.join(srcDir, "entry.tsx");
   const mdxImport = toRelativeImport(entryPath, mdxPath);
   const styleImports = createStyleImports(projectRoot, entryPath, config);
-  const reactEntryImport = toRelativeImport(entryPath, await resolveReactEntryPath());
+  const reactEntryPath = await resolveReactEntryPath();
+  const reactEntryImport = toRelativeImport(entryPath, reactEntryPath);
+  const reactAliases = resolveReactAliases(projectRoot);
 
   await mkdir(srcDir, { recursive: true });
   await writeFile(
@@ -89,6 +92,17 @@ createRoot(document.getElementById("root")!).render(<App />);
     root: tmpDir,
     logLevel: "warn",
     plugins: [artifactStatePlugin(projectRoot, artifact), react(), mdx(), tailwindcss()],
+    resolve: {
+      alias: [
+        ...reactAliases,
+        { find: /^mdx-artifacts\/react$/, replacement: reactEntryPath },
+        { find: /^mdx-artifacts$/, replacement: reactEntryPath }
+      ],
+      dedupe: ["react", "react-dom"]
+    },
+    optimizeDeps: {
+      exclude: ["mdx-artifacts", "mdx-artifacts/react"]
+    },
     server: {
       port: config.port,
       fs: {
@@ -216,6 +230,18 @@ async function resolveReactEntryPath() {
   } catch {
     return sourceEntryPath;
   }
+}
+
+function resolveReactAliases(projectRoot: string): Array<{ find: RegExp; replacement: string }> {
+  const projectRequire = createRequire(path.join(projectRoot, "package.json"));
+
+  return [
+    { find: /^react$/, replacement: projectRequire.resolve("react") },
+    { find: /^react\/jsx-runtime$/, replacement: projectRequire.resolve("react/jsx-runtime") },
+    { find: /^react\/jsx-dev-runtime$/, replacement: projectRequire.resolve("react/jsx-dev-runtime") },
+    { find: /^react-dom$/, replacement: projectRequire.resolve("react-dom") },
+    { find: /^react-dom\/client$/, replacement: projectRequire.resolve("react-dom/client") }
+  ];
 }
 
 export async function startDevServer(project: ArtifactProject): Promise<ViteDevServer> {
