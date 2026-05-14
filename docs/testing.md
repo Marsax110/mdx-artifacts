@@ -45,10 +45,18 @@ The smoke test creates an npm tarball, installs it into a temporary project, and
 - `artifact-kit init`
 - `artifact-kit validate artifact-docs/examples/hello.mdx`
 - `artifact-kit build artifact-docs/examples/hello.mdx`
+- `artifact-kit dev artifact-docs/examples/hello.mdx`
+- `artifact-kit review validate`
+- `artifact-kit review add`
+- `artifact-kit review reply`
 
-It also checks that the tarball does not include `src/`, `docs/local/`, `.state.json`, or `.local.*` files.
+It also checks that:
 
-This smoke test is intentionally narrow. It proves that the published package can be installed, imported, initialized, validated, and built. It does not yet cover the dev server, browser review UI, review state writes, or multi-artifact workspaces.
+- the tarball does not include `src/`, `docs/local/`, `.state.json`, or `.local.*` files
+- the temporary project can install only the `mdx-artifacts` tarball without explicitly adding `react` or `react-dom`
+- dev server MDX imports and the generated artifact shell resolve `mdx-artifacts/react` to the same package entry, so comment context is not split by dependency prebundling
+
+This smoke test proves that the published package can be installed, imported, initialized, validated, built, served in dev mode, and used with review-state commands. It does not yet cover a real browser click-through of the review UI or multi-artifact workspaces.
 
 ## When Adding a Component
 

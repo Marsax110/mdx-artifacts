@@ -5,7 +5,7 @@
 目标不是让模型每次生成一整份裸 HTML，而是让模型写较稳定的 MDX：
 
 ```mdx
-import { DecisionMatrix, ExportPanel } from "../../src/react";
+import { DecisionMatrix, ExportPanel } from "mdx-artifacts/react";
 
 <DecisionMatrix
   question="是否先用 Vite 跑通单 HTML artifact？"
@@ -40,6 +40,53 @@ import { DecisionMatrix, ExportPanel } from "../../src/react";
 6. `InlineText` / `MarkdownBody` 提供受控的文本渲染边界。
 
 暂不把核心绑定到 Astro。Astro 后续只作为“结构化文档站 adapter”加入。
+
+## 安装
+
+在需要生成本地 artifacts 的项目中安装：
+
+```bash
+pnpm add -D mdx-artifacts
+```
+
+如果是在 pnpm workspace root 安装，需要显式加 `-w`：
+
+```bash
+pnpm add -Dw mdx-artifacts
+```
+
+React 和 React DOM 是 peer dependencies。现代包管理器通常会为这个开发工具链自动安装它们；如果你的项目关闭了 peer dependency 自动安装，再显式补上：
+
+```bash
+pnpm add -D mdx-artifacts react react-dom
+```
+
+初始化工作区：
+
+```bash
+pnpm exec artifact-kit init
+```
+
+这会创建：
+
+```text
+artifact-kit.config.mjs
+artifact-docs/examples/hello.mdx
+agents/AGENTS.snippet.md
+```
+
+验证和构建示例：
+
+```bash
+pnpm exec artifact-kit validate artifact-docs/examples/hello.mdx
+pnpm exec artifact-kit build artifact-docs/examples/hello.mdx
+```
+
+开发服务模式：
+
+```bash
+pnpm exec artifact-kit dev artifact-docs/examples/hello.mdx
+```
 
 ## 命令
 
@@ -93,10 +140,9 @@ pnpm artifact:validate
 
 默认情况下，Artifact Kit 会注入内置样式。使用者可以在 `artifact-kit.config.ts` 里追加自己的品牌 CSS：
 
-```ts
-import type { ArtifactKitConfig } from "./src/cli/types";
-
-const config: ArtifactKitConfig = {
+```js
+/** @type {import("mdx-artifacts").ArtifactKitConfig} */
+const config = {
   docsDir: "artifact-docs",
   outDir: "dist/artifacts",
   includeDefaultStyles: true,
