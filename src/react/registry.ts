@@ -679,6 +679,12 @@ export const componentRegistry: ComponentMeta[] = [
     useWhen: ["Architecture decisions", "Product tradeoffs", "Implementation planning", "Open-source roadmap"],
     props: [
       {
+        name: "id",
+        type: "string",
+        contentType: "plainText",
+        description: "Optional stable anchor id for comments and state. Prefer short semantic ids such as decision.comment-targets."
+      },
+      {
         name: "question",
         type: "string",
         contentType: "inlineMarkdown",
@@ -697,6 +703,12 @@ export const componentRegistry: ComponentMeta[] = [
         name: "DecisionMatrixOption",
         description: "One option in a decision comparison.",
         fields: [
+          {
+            name: "id",
+            type: "string",
+            contentType: "plainText",
+            description: "Optional stable child anchor id. When the parent has id, child anchors become parentId.optionId."
+          },
           {
             name: "name",
             type: "string",
@@ -743,9 +755,11 @@ export const componentRegistry: ComponentMeta[] = [
       }
     ],
     example: `<DecisionMatrix
+  id="decision.stage-one"
   question="Should the first stage focus on a Vite single HTML artifact?"
   options={[
     {
+      id: "vite",
       name: "Vite single HTML artifact",
       pros: ["Short feedback loop", "Direct component debugging"],
       cons: ["No docs-site navigation yet"],
@@ -826,6 +840,12 @@ export const componentRegistry: ComponentMeta[] = [
     useWhen: ["Option exploration", "Component scope", "Prototype comparison"],
     props: [
       {
+        name: "id",
+        type: "string",
+        contentType: "plainText",
+        description: "Optional stable anchor id for comments and state. Prefer short semantic ids such as option.comment-flow."
+      },
+      {
         name: "title",
         type: "string",
         contentType: "inlineMarkdown",
@@ -844,6 +864,12 @@ export const componentRegistry: ComponentMeta[] = [
         name: "OptionGridItem",
         description: "One option in an OptionGrid.",
         fields: [
+          {
+            name: "id",
+            type: "string",
+            contentType: "plainText",
+            description: "Optional stable child anchor id. When the parent has id, child anchors become parentId.itemId."
+          },
           {
             name: "name",
             type: "string",
@@ -873,9 +899,11 @@ export const componentRegistry: ComponentMeta[] = [
       }
     ],
     example: `<OptionGrid
+  id="option.first-components"
   title="First component scope"
   options={[
     {
+      id: "export",
       name: "ExportPanel",
       intent: "Return human edits to the workflow",
       tradeoffs: ["Copy-only in v1", "Can add downloads later"]

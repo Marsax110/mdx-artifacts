@@ -1,5 +1,20 @@
 export { AnnotatedCode } from "./components/AnnotatedCode";
 export type { AnnotatedCodeProps, CodeAnnotation } from "./components/AnnotatedCode";
+export {
+  ArtifactStateProvider,
+  createArtifactCommentsFromState,
+  createArtifactStateFromComments,
+  useOptionalArtifactState
+} from "./components/ArtifactState";
+export type {
+  ArtifactStateComment,
+  ArtifactStateMessage,
+  ArtifactStateMeta,
+  ArtifactStateProviderProps,
+  ArtifactStateStatus,
+  ArtifactStateThread,
+  ArtifactStateValue
+} from "./components/ArtifactState";
 export { Callout } from "./components/Callout";
 export type { CalloutProps, CalloutTone } from "./components/Callout";
 export { ComparisonSet } from "./components/ComparisonSet";

@@ -3,16 +3,25 @@ import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { randomUUID } from "node:crypto";
 import { access, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import type { IncomingMessage, ServerResponse } from "node:http";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createServer, build as viteBuild } from "vite";
-import type { InlineConfig, ViteDevServer } from "vite";
+import type { InlineConfig, Plugin, ViteDevServer } from "vite";
+import {
+  createArtifactMeta,
+  createArtifactRoute,
+  readArtifactState,
+  writeArtifactState,
+  type ArtifactRoute
+} from "./artifact-state";
 import type { ArtifactKitConfig } from "./types";
 
 const packageCliDir = path.dirname(fileURLToPath(import.meta.url));
 const defaultStylesPath = path.resolve(packageCliDir, "../react/styles.css");
 
 export type ArtifactProject = {
+  artifact: ArtifactRoute;
   tmpDir: string;
   distDir: string;
   config: InlineConfig;
@@ -25,6 +34,7 @@ export async function createArtifactProject(
   config: Required<ArtifactKitConfig>
 ): Promise<ArtifactProject> {
   const tmpDir = path.join(projectRoot, ".artifact-kit", "tmp", randomUUID());
+  const artifact = createArtifactRoute(projectRoot, mdxPath, config.docsDir);
   const srcDir = path.join(tmpDir, "src");
   const distDir = path.join(tmpDir, "dist");
   const entryPath = path.join(srcDir, "entry.tsx");
@@ -53,7 +63,7 @@ export async function createArtifactProject(
     entryPath,
     `import React from "react";
 import { createRoot } from "react-dom/client";
-import { CommentLayer } from "${reactEntryImport}";
+import { ArtifactStateProvider, CommentLayer } from "${reactEntryImport}";
 import Doc from "${mdxImport}";
 ${styleImports}
 
@@ -61,9 +71,11 @@ function App() {
   return (
     <main className="ak-shell">
       <article className="ak-document">
-        <CommentLayer>
-          <Doc />
-        </CommentLayer>
+        <ArtifactStateProvider>
+          <CommentLayer>
+            <Doc />
+          </CommentLayer>
+        </ArtifactStateProvider>
       </article>
     </main>
   );
@@ -76,7 +88,7 @@ createRoot(document.getElementById("root")!).render(<App />);
   const viteConfig: InlineConfig = {
     root: tmpDir,
     logLevel: "warn",
-    plugins: [react(), mdx(), tailwindcss()],
+    plugins: [artifactStatePlugin(projectRoot, artifact), react(), mdx(), tailwindcss()],
     server: {
       port: config.port,
       fs: {
@@ -95,11 +107,103 @@ createRoot(document.getElementById("root")!).render(<App />);
   };
 
   return {
+    artifact,
     tmpDir,
     distDir,
     config: viteConfig,
     cleanup: () => rm(tmpDir, { recursive: true, force: true })
   };
+}
+
+function artifactStatePlugin(projectRoot: string, artifact: ArtifactRoute): Plugin {
+  return {
+    name: "artifact-kit-state",
+    configureServer(server) {
+      server.middlewares.use(async (request, response, next) => {
+        const requestUrl = new URL(request.url ?? "/", "http://localhost");
+
+        try {
+          if (requestUrl.pathname === "/__artifact/meta") {
+            await handleArtifactMeta(projectRoot, artifact, request, response);
+            return;
+          }
+
+          if (requestUrl.pathname === "/__artifact/state") {
+            await handleArtifactState(projectRoot, artifact, request, response);
+            return;
+          }
+        } catch (error) {
+          sendJson(response, 500, {
+            error: error instanceof Error ? error.message : String(error)
+          });
+          return;
+        }
+
+        next();
+      });
+    }
+  };
+}
+
+async function handleArtifactMeta(
+  projectRoot: string,
+  artifact: ArtifactRoute,
+  request: IncomingMessage,
+  response: ServerResponse
+) {
+  if (request.method !== "GET") {
+    sendJson(response, 405, { error: "Method not allowed." });
+    return;
+  }
+
+  sendJson(response, 200, await createArtifactMeta(projectRoot, artifact));
+}
+
+async function handleArtifactState(
+  projectRoot: string,
+  artifact: ArtifactRoute,
+  request: IncomingMessage,
+  response: ServerResponse
+) {
+  if (request.method === "GET") {
+    sendJson(response, 200, await readArtifactState(artifact));
+    return;
+  }
+
+  if (request.method === "POST") {
+    let value: unknown;
+    try {
+      value = JSON.parse(await readRequestBody(request));
+    } catch {
+      sendJson(response, 400, { error: "Request body must be valid JSON." });
+      return;
+    }
+
+    const state = await writeArtifactState(projectRoot, artifact, value);
+    sendJson(response, 200, { ok: true, state });
+    return;
+  }
+
+  sendJson(response, 405, { error: "Method not allowed." });
+}
+
+function readRequestBody(request: IncomingMessage) {
+  return new Promise<string>((resolve, reject) => {
+    let body = "";
+
+    request.setEncoding("utf8");
+    request.on("data", (chunk) => {
+      body += chunk;
+    });
+    request.on("end", () => resolve(body));
+    request.on("error", reject);
+  });
+}
+
+function sendJson(response: ServerResponse, statusCode: number, value: unknown) {
+  response.statusCode = statusCode;
+  response.setHeader("content-type", "application/json; charset=utf-8");
+  response.end(JSON.stringify(value, null, 2));
 }
 
 async function resolveReactEntryPath() {

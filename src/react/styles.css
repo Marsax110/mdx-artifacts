@@ -1149,6 +1149,15 @@ body {
   border-color: var(--ak-primary);
 }
 
+.ak-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.ak-button:disabled:hover {
+  border-color: var(--ak-border);
+}
+
 .ak-button-active {
   background: var(--ak-primary-subtle);
   color: var(--ak-primary-dark);

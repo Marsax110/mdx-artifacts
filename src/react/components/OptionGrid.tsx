@@ -2,6 +2,7 @@ import { CommentTarget } from "./Comments";
 import { InlineText } from "./InlineText";
 
 export type OptionGridItem = {
+  id?: string;
   name: string;
   intent?: string;
   description?: string;
@@ -9,16 +10,19 @@ export type OptionGridItem = {
 };
 
 export type OptionGridProps = {
+  id?: string;
   title: string;
   options: OptionGridItem[];
 };
 
-export function OptionGrid({ title, options }: OptionGridProps) {
+export function OptionGrid({ id, title, options }: OptionGridProps) {
+  const targetId = id ?? `option:${slugify(title)}`;
+
   return (
     <CommentTarget
       className="ak-comment-target-section"
       description="OptionGrid component"
-      targetId={`option:${slugify(title)}`}
+      targetId={targetId}
       title={title}
     >
       <section className="ak-section">
@@ -28,13 +32,15 @@ export function OptionGrid({ title, options }: OptionGridProps) {
         </div>
         <div className="ak-option-grid">
           {options.map((option, index) => {
-            const targetId = `option:${slugify(title)}:${index + 1}:${slugify(option.name)}`;
+            const optionTargetId = id
+              ? `${id}.${option.id ?? `${index + 1}`}`
+              : `option:${slugify(title)}:${index + 1}:${slugify(option.name)}`;
             return (
               <CommentTarget
                 className="ak-comment-target-card"
                 description={`OptionGrid item in ${title}`}
                 key={option.name}
-                targetId={targetId}
+                targetId={optionTargetId}
                 title={option.name}
               >
                 <article className="ak-card">

@@ -6,8 +6,10 @@ import {
   CommentLayer,
   CommentTarget,
   createArtifactComment,
+  createArtifactCommentsFromState,
   serializeCommentsToMarkdown
 } from "./Comments";
+import { createArtifactStateFromComments } from "./ArtifactState";
 import { AnnotatedCode } from "./AnnotatedCode";
 import { Callout } from "./Callout";
 import { CodeBlock } from "./CodeBlock";
@@ -67,6 +69,39 @@ describe("Comment components", () => {
 
     expect(html).toContain('data-comment-target-id="decision:comment-target-scope:1:explicit-blocks"');
     expect(html).toContain('data-comment-target-id="option:comment-workflow-pieces:1:commentlayer"');
+  });
+
+  it("uses explicit ids for shorter anchor targets when provided", () => {
+    const html = renderToStaticMarkup(
+      <CommentLayer>
+        <DecisionMatrix
+          id="decision.comment-targets"
+          options={[
+            {
+              id: "explicit",
+              name: "Explicit blocks"
+            }
+          ]}
+          question="Comment target scope"
+        />
+        <OptionGrid
+          id="option.comment-flow"
+          options={[
+            {
+              id: "layer",
+              name: "CommentLayer"
+            }
+          ]}
+          title="Comment workflow pieces"
+        />
+      </CommentLayer>
+    );
+
+    expect(html).toContain('data-comment-target-id="decision.comment-targets"');
+    expect(html).toContain('data-anchor-id="decision.comment-targets"');
+    expect(html).toContain('data-comment-target-id="decision.comment-targets.explicit"');
+    expect(html).toContain('data-comment-target-id="option.comment-flow"');
+    expect(html).toContain('data-comment-target-id="option.comment-flow.layer"');
   });
 
   it("adds targets to semantic, code, and diff blocks inside a layer", () => {
@@ -178,5 +213,148 @@ describe("Comment components", () => {
     expect(markdown).toContain("- comment: Prefer the smaller API.");
     expect(markdown).toContain("## Component menu");
     expect(markdown).toContain("- comment: Add one more example.");
+  });
+
+  it("serializes comments into artifact state threads", () => {
+    const state = createArtifactStateFromComments(
+      [
+        {
+          id: "comment-1",
+          blockId: "risks",
+          blockTitle: "Risks",
+          blockDescription: "Risk section",
+          comment: "Add the fallback path.",
+          createdAt: "2026-05-14T10:20:00.000Z"
+        }
+      ],
+      {
+        version: 1,
+        source: "old.mdx",
+        threads: [
+          {
+            id: "thr-risks",
+            anchorId: "risks",
+            status: "open",
+            messages: [
+              {
+                id: "msg-existing",
+                role: "user",
+                body: "Old body",
+                createdAt: "2026-05-14T10:00:00.000Z"
+              },
+              {
+                id: "msg-assistant",
+                role: "assistant",
+                body: "I will update this."
+              }
+            ]
+          }
+        ],
+        interactions: {
+          decision: {
+            selected: true
+          }
+        }
+      },
+      "artifact-docs/auth-strategy.mdx"
+    );
+
+    expect(state).toEqual({
+      version: 1,
+      source: "artifact-docs/auth-strategy.mdx",
+      threads: [
+        {
+          id: "thr-risks",
+          anchorId: "risks",
+          status: "open",
+          description: "Risk section",
+          title: "Risks",
+          messages: [
+            {
+              id: "msg-existing",
+              role: "user",
+              body: "Add the fallback path.",
+              createdAt: "2026-05-14T10:00:00.000Z"
+            },
+            {
+              id: "msg-assistant",
+              role: "assistant",
+              body: "I will update this."
+            }
+          ]
+        }
+      ],
+      interactions: {
+        decision: {
+          selected: true
+        }
+      }
+    });
+  });
+
+  it("uses compact thread ids for new comment state threads", () => {
+    const state = createArtifactStateFromComments(
+      [
+        {
+          id: "comment-1",
+          blockId: "decision:should-comment-targets-be-explicit-blocks-in-v1:1:explicit-comment-blocks",
+          blockTitle: "Explicit comment blocks",
+          comment: "This should use a compact thread id.",
+          createdAt: "2026-05-14T10:20:00.000Z"
+        }
+      ],
+      {},
+      "artifact-docs/commentable-feedback.mdx"
+    );
+
+    expect(state.threads[0]?.id).toMatch(/^thr_[a-z0-9]+$/);
+    expect(state.threads[0]?.id.length).toBeLessThan(16);
+    expect(state.threads[0]?.anchorId).toBe(
+      "decision:should-comment-targets-be-explicit-blocks-in-v1:1:explicit-comment-blocks"
+    );
+  });
+
+  it("hydrates saved artifact state into local comments", () => {
+    const comments = createArtifactCommentsFromState({
+      threads: [
+        {
+          id: "thr-risks",
+          anchorId: "risks",
+          status: "open",
+          title: "Risks",
+          description: "Risk section",
+          messages: [
+            {
+              id: "msg-user",
+              role: "user",
+              body: "Add the fallback path.",
+              createdAt: "2026-05-14T10:20:00.000Z"
+            },
+            {
+              id: "msg-assistant",
+              role: "assistant",
+              body: "I will update this."
+            }
+          ]
+        },
+        {
+          id: "thr-empty",
+          anchorId: "empty",
+          status: "open",
+          messages: []
+        }
+      ]
+    });
+
+    expect(comments).toEqual([
+      {
+        id: "msg-user",
+        blockId: "risks",
+        blockTitle: "Risks",
+        blockDescription: "Risk section",
+        comment: "Add the fallback path.",
+        createdAt: "2026-05-14T10:20:00.000Z"
+      }
+    ]);
   });
 });

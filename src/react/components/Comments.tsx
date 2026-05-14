@@ -1,7 +1,13 @@
 import type { CSSProperties, FormEvent, ReactNode } from "react";
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
+import {
+  createArtifactCommentsFromState as createCommentsFromState,
+  useOptionalArtifactState
+} from "./ArtifactState";
 import { InlineText } from "./InlineText";
+
+export { createArtifactCommentsFromState } from "./ArtifactState";
 
 export type ArtifactComment = {
   id: string;
@@ -98,13 +104,42 @@ type CommentReviewPanel = {
 const CommentContext = createContext<CommentLayerValue | null>(null);
 
 export function CommentLayer({ children }: CommentLayerProps) {
+  const artifactState = useOptionalArtifactState();
   const [activeTargetId, setActiveTargetId] = useState<string | undefined>();
   const [comments, setComments] = useState<ArtifactComment[]>([]);
   const [openTargetIds, setOpenTargetIds] = useState<string[]>([]);
   const [targets, setTargets] = useState<Record<string, CommentTargetAnchor>>({});
   const [targetIds, setTargetIds] = useState<string[]>([]);
   const nextId = useRef(1);
+  const pendingPersistComments = useRef<ArtifactComment[] | undefined>(undefined);
+  const didHydrateState = useRef(false);
   const panels = createReviewPanels(activeTargetId, comments, openTargetIds, targetIds, targets);
+
+  useEffect(() => {
+    if (didHydrateState.current || !artifactState?.state) {
+      return;
+    }
+
+    didHydrateState.current = true;
+    const savedComments = createCommentsFromState(artifactState.state);
+    if (savedComments.length === 0) {
+      return;
+    }
+
+    setComments((current) => (current.length > 0 ? current : savedComments));
+    setOpenTargetIds((current) =>
+      current.length > 0 ? current : uniqueValues(savedComments.map((comment) => comment.blockId))
+    );
+  }, [artifactState?.state]);
+
+  useEffect(() => {
+    if (!artifactState || pendingPersistComments.current !== comments) {
+      return;
+    }
+
+    pendingPersistComments.current = undefined;
+    void artifactState.actions.saveComments(comments);
+  }, [artifactState, comments]);
 
   const value = useMemo<CommentLayerValue>(
     () => ({
@@ -116,12 +151,13 @@ export function CommentLayer({ children }: CommentLayerProps) {
           return;
         }
 
+        const nextComments = comments.some((item) => item.blockId === comment.blockId)
+          ? comments.map((item) => (item.blockId === comment.blockId ? { ...item, comment: comment.comment } : item))
+          : [...comments, comment];
+
         nextId.current += 1;
-        setComments((current) =>
-          current.some((item) => item.blockId === comment.blockId)
-            ? current.map((item) => (item.blockId === comment.blockId ? { ...item, comment: comment.comment } : item))
-            : [...current, comment]
-        );
+        pendingPersistComments.current = nextComments;
+        setComments(nextComments);
         setOpenTargetIds((current) => (current.includes(comment.blockId) ? current : [...current, comment.blockId]));
       },
       closePanel(targetId) {
@@ -166,9 +202,9 @@ export function CommentLayer({ children }: CommentLayerProps) {
           return;
         }
 
-        setComments((current) =>
-          current.map((item) => (item.id === commentId ? { ...item, comment: normalized } : item))
-        );
+        const nextComments = comments.map((item) => (item.id === commentId ? { ...item, comment: normalized } : item));
+        pendingPersistComments.current = nextComments;
+        setComments(nextComments);
       }
     }),
     [activeTargetId, comments, panels, targetIds, targets]
@@ -343,6 +379,7 @@ export function CommentTarget({ targetId, title, description, children, classNam
         className
       )}
       data-comment-target-id={targetId}
+      data-anchor-id={targetId}
       ref={targetRef}
     >
       <div className="ak-comment-target-content">{children}</div>
@@ -943,4 +980,8 @@ function commentPanelStyle(top: number) {
 
 function classNames(...values: Array<string | undefined>) {
   return values.filter(Boolean).join(" ");
+}
+
+function uniqueValues(values: string[]) {
+  return Array.from(new Set(values));
 }

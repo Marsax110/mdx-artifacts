@@ -13,9 +13,11 @@ import {
 This example shows a local block-level comment loop. The author marks stable review targets with `CommentableBlock`, the reader adds comments in the browser, and `ExportPanel` returns the result plus comments to an agent.
 
 <DecisionMatrix
+  id="decision.comment-targets"
   question="Should comment targets be explicit blocks in v1?"
   options={[
     {
+      id: "explicit",
       name: "Explicit comment blocks",
       summary: "Authors wrap reviewable sections with a stable block id and title.",
       pros: ["Stable export target", "Works for prose and components", "Does not change existing component props"],
@@ -24,6 +26,7 @@ This example shows a local block-level comment loop. The author marks stable rev
       verdict: "Recommended for v1"
     },
     {
+      id: "implicit",
       name: "Implicit component comments",
       summary: "Every artifact component becomes commentable by default.",
       pros: ["Less explicit authoring syntax"],
@@ -55,19 +58,23 @@ This example shows a local block-level comment loop. The author marks stable rev
 </CommentableBlock>
 
 <OptionGrid
+  id="option.comment-flow"
   title="Comment workflow pieces"
   options={[
     {
+      id: "layer",
       name: "CommentLayer",
       intent: "The artifact shell now provides this review context automatically.",
       tradeoffs: ["No backend", "Refresh clears comments"]
     },
     {
+      id: "block",
       name: "CommentableBlock",
       intent: "Marks one stable review target with a blockId and title.",
       tradeoffs: ["Clear export context", "Authors choose the target boundary"]
     },
     {
+      id: "export",
       name: "ExportPanel",
       intent: "Exports the result and current comments from one dock.",
       tradeoffs: ["Agent-friendly handoff", "No persistence in v1"]

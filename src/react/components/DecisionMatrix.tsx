@@ -2,6 +2,7 @@ import { CommentTarget } from "./Comments";
 import { InlineText } from "./InlineText";
 
 export type DecisionMatrixOption = {
+  id?: string;
   name: string;
   summary?: string;
   pros?: string[];
@@ -12,16 +13,19 @@ export type DecisionMatrixOption = {
 };
 
 export type DecisionMatrixProps = {
+  id?: string;
   question: string;
   options: DecisionMatrixOption[];
 };
 
-export function DecisionMatrix({ question, options }: DecisionMatrixProps) {
+export function DecisionMatrix({ id, question, options }: DecisionMatrixProps) {
+  const targetId = id ?? `decision:${slugify(question)}`;
+
   return (
     <CommentTarget
       className="ak-comment-target-section"
       description="DecisionMatrix component"
-      targetId={`decision:${slugify(question)}`}
+      targetId={targetId}
       title={question}
     >
       <section className="ak-section ak-decision-matrix">
@@ -31,13 +35,15 @@ export function DecisionMatrix({ question, options }: DecisionMatrixProps) {
         </div>
         <div className="ak-decision-grid">
           {options.map((option, index) => {
-            const targetId = `decision:${slugify(question)}:${index + 1}:${slugify(option.name)}`;
+            const optionTargetId = id
+              ? `${id}.${option.id ?? `${index + 1}`}`
+              : `decision:${slugify(question)}:${index + 1}:${slugify(option.name)}`;
             return (
               <CommentTarget
                 className="ak-comment-target-card"
                 description={`DecisionMatrix option in ${question}`}
                 key={option.name}
-                targetId={targetId}
+                targetId={optionTargetId}
                 title={option.name}
               >
                 <article className="ak-card">

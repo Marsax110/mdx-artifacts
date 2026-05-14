@@ -12,9 +12,11 @@ type Story = StoryObj<typeof meta>;
 
 export const Basic: Story = {
   args: {
+    id: "decision.stage-one",
     question: "Should stage one focus on a Vite single HTML artifact?",
     options: [
       {
+        id: "vite",
         name: "Vite single HTML artifact",
         summary: "Validate the shortest MDX-to-interactive-HTML loop first.",
         pros: ["Short feedback loop", "Direct interactive component debugging"],
@@ -23,6 +25,7 @@ export const Basic: Story = {
         verdict: "Recommended"
       },
       {
+        id: "astro",
         name: "Astro docs site",
         summary: "Host the long-lived documentation tree later.",
         pros: ["Complete reading experience", "File-based pages"],
@@ -36,9 +39,11 @@ export const Basic: Story = {
 
 export const LongText: Story = {
   args: {
+    id: "decision.adapter-boundary",
     question: "When option titles and descriptions are long, does the card still wrap cleanly and remain scannable?",
     options: [
       {
+        id: "core-astro-adapter",
         name: "Keep the core components independent from Astro and treat Astro as a long-lived docs-site adapter",
         summary:
           "This lets the same core components work in Vite artifacts, Astro docs, and future Claude artifact builders.",

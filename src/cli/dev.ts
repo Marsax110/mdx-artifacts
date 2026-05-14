@@ -9,7 +9,7 @@ export async function devCommand(projectRoot: string, input: string) {
   const server = await startDevServer(project);
 
   const urls = server.resolvedUrls?.local ?? [];
-  console.log(`dev server ready: ${urls[0] ?? `http://localhost:${config.port}/`}`);
+  console.log(`dev server ready: ${artifactUrl(urls[0] ?? `http://localhost:${config.port}/`, project.artifact.routePath)}`);
   console.log("press Ctrl+C to stop");
 
   const close = async () => {
@@ -20,4 +20,10 @@ export async function devCommand(projectRoot: string, input: string) {
 
   process.once("SIGINT", close);
   process.once("SIGTERM", close);
+}
+
+function artifactUrl(baseUrl: string, routePath: string) {
+  const url = new URL(baseUrl);
+  url.pathname = routePath;
+  return url.toString();
 }
