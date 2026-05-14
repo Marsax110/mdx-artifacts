@@ -254,14 +254,14 @@ body {
 }
 
 .ak-document > p,
-.ak-document > li,
 .ak-document > blockquote,
 .ak-review-content > p,
-.ak-review-content > li,
 .ak-review-content > blockquote,
 .ak-content-section > p,
-.ak-content-section > li,
-.ak-content-section > blockquote {
+.ak-content-section > blockquote,
+.ak-document li,
+.ak-review-content li,
+.ak-content-section li {
   line-height: 1.65;
 }
 
@@ -277,17 +277,21 @@ body {
 }
 
 .ak-document ul,
+.ak-review-content ul,
 .ak-content-section ul {
   list-style: disc outside;
 }
 
 .ak-document ol,
+.ak-review-content ol,
 .ak-content-section ol {
   list-style: decimal outside;
 }
 
 .ak-document li > ul,
 .ak-document li > ol,
+.ak-review-content li > ul,
+.ak-review-content li > ol,
 .ak-content-section li > ul,
 .ak-content-section li > ol {
   margin-top: 6px;
@@ -295,8 +299,27 @@ body {
 }
 
 .ak-document li > ul,
+.ak-review-content li > ul,
 .ak-content-section li > ul {
   list-style-type: circle;
+}
+
+.ak-document li > ul li > ul,
+.ak-review-content li > ul li > ul,
+.ak-content-section li > ul li > ul {
+  list-style-type: square;
+}
+
+.ak-document li > ol,
+.ak-review-content li > ol,
+.ak-content-section li > ol {
+  list-style-type: lower-alpha;
+}
+
+.ak-document li > ol li > ol,
+.ak-review-content li > ol li > ol,
+.ak-content-section li > ol li > ol {
+  list-style-type: lower-roman;
 }
 
 .ak-document > blockquote,
