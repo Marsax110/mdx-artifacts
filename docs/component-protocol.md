@@ -189,6 +189,72 @@ Content rendering primitives may grow beyond text and Markdown. Future candidate
 - Use when the artifact needs to return decisions, state, or configuration to the user or agent.
 - Interactive artifacts should include `ExportPanel` or an equivalent export path.
 
+## Review State Protocol
+
+Reviewable content should use stable anchors:
+
+- Native MDX prose uses `Section id="..."`.
+- Structured components use their own `id` prop.
+- Component sub-items may derive child anchors from the parent id and item id, such as `decision.stage-one.vite`.
+
+The source MDX remains the content truth. Review state lives in a sibling `.state.json` file and references anchors through `anchorId`.
+
+The first review model is:
+
+- one primary thread per `anchorId`
+- multiple messages per thread
+- `role: "user"` for reviewer comments
+- `role: "assistant"` for agent replies after the MDX has been updated
+
+Example state:
+
+```json
+{
+  "version": 1,
+  "source": "artifact-docs/examples/decision-matrix.mdx",
+  "threads": [
+    {
+      "id": "thr_decision_stage_one",
+      "anchorId": "decision.stage-one",
+      "status": "open",
+      "title": "Text model decision",
+      "messages": [
+        {
+          "id": "msg_user_001",
+          "role": "user",
+          "body": "Clarify why native MDX remains the default.",
+          "createdAt": "2026-05-14T08:00:00.000Z"
+        },
+        {
+          "id": "msg_assistant_001",
+          "role": "assistant",
+          "body": "Updated the decision copy and kept native MDX as the default path.",
+          "createdAt": "2026-05-14T08:10:00.000Z"
+        }
+      ]
+    }
+  ],
+  "interactions": {}
+}
+```
+
+Use narrow CLI writes for review state:
+
+```bash
+artifact-kit review add artifact-docs/examples/decision-matrix.mdx \
+  --anchor decision.stage-one \
+  --body "Clarify why native MDX remains the default."
+
+artifact-kit review reply artifact-docs/examples/decision-matrix.mdx \
+  --thread thr_decision_stage_one \
+  --body "Updated the decision copy." \
+  --status resolved
+```
+
+`review add` creates one open thread for an existing anchor. `review reply` appends assistant messages to existing threads and may update status. Neither command edits MDX.
+
+Do not introduce multi-thread-per-anchor UI until the single-thread message model is stable. Multiple independent threads for one anchor are a later review-system feature, not the first artifact review protocol.
+
 ## Styling
 
 Default CSS uses the `ak-*` prefix.

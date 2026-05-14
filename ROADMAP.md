@@ -138,24 +138,26 @@ Implemented components:
 
 Current direction:
 
-- Use explicit `CommentableBlock` and `CommentTarget` boundaries first.
-- Allow one comment per commentable target in the first review model.
+- Use explicit `Section`, component `id`, and `CommentTarget` boundaries first.
+- Use one primary review thread per `anchorId` in the first review model.
+- Render multiple thread messages so user comments and assistant replies remain distinct.
 - Provide `CommentLayer` automatically from the Storybook and artifact shells instead of requiring MDX authors to add it manually.
 - Show a side review rail on wide screens and click-open popovers on narrow screens.
-- Share the same comment item rendering between rails and popovers so editing behavior stays consistent.
-- Keep comment state local to the current page; no server persistence or collaboration layer yet.
+- Share the same thread/message rendering between rails and popovers so editing behavior stays consistent.
+- Persist local review state through sibling `.state.json` files when the local daemon is available.
+- Use `artifact-kit review add` and `artifact-kit review reply` for narrow state writes from agents.
 
 Next validation step:
 
-- Wrap several large native MDX prose sections in `docs/local/streamlit-style-mixed.zh-CN.local.mdx` with explicit `CommentableBlock`.
-- Verify that explicit prose comments preserve the linear MDX writing experience.
-- Decide whether implicit native Markdown block comments are worth adding after the explicit-block flow stabilizes.
+- Keep validating `Section id="..."` as the explicit prose boundary in `docs/local/streamlit-style-mixed.zh-CN.local.mdx`.
+- Update the comment UI from a flat `ArtifactComment[]` model to a thread/message model.
+- Verify the minimal loop: user creates a thread, agent edits MDX, agent replies through the CLI, and the page shows the assistant reply after reload.
 
 Deferred:
 
 - Automatic wrapping of every native Markdown block.
 - Text selection comments.
-- Multi-comment threads per target.
+- Multiple independent threads per target.
 - Server-side persistence.
 - Realtime collaboration.
 

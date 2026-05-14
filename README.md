@@ -36,7 +36,7 @@ The first stage focuses on the smallest useful loop:
 
 1. `artifact-docs/**/*.mdx` is the source format.
 2. `src/react` provides high-level artifact components.
-3. `src/cli` provides `init`, `components`, `validate`, `dev`, and `build`.
+3. `src/cli` provides `init`, `components`, `validate`, `dev`, `build`, and narrow review-state commands.
 4. `components` exposes component props and examples for agents.
 5. `build` outputs a standalone HTML artifact.
 
@@ -85,6 +85,21 @@ pnpm storybook
 ```
 
 Storybook is only for component development. The artifact workflow is still verified through `artifact-kit validate/build`.
+
+Add and reply to local review threads:
+
+```bash
+pnpm artifact review add artifact-docs/examples/decision-matrix.mdx \
+  --anchor decision.stage-one \
+  --body "Clarify this decision."
+
+pnpm artifact review reply artifact-docs/examples/decision-matrix.mdx \
+  --thread thr_decision_stage_one \
+  --body "Updated the decision copy." \
+  --status resolved
+```
+
+Review commands read and write the sibling `.state.json` file for the source MDX. They do not edit the MDX source.
 
 Run the test baseline:
 

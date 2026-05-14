@@ -1,207 +1,344 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { createArtifactRoute, readArtifactState, type ArtifactState } from "./artifact-state";
+import { createArtifactRoute, readArtifactState, writeArtifactState, type ArtifactRoute } from "./artifact-state";
 import { loadConfig } from "./config";
 
-type ReviewContextAnchor = {
-  id: string;
-  component: string;
-  snippet: string;
-};
-
-type ReviewStateThread = {
-  id: string;
-  anchorId: string;
-  status?: string;
-  title?: string;
-  messages?: ReviewStateMessage[];
-};
-
 type ReviewStateMessage = {
+  id?: string;
   role?: string;
   body?: string;
   createdAt?: string;
 };
 
-const reviewableComponentNames = [
-  "Section",
-  "DecisionMatrix",
-  "OptionGrid",
-  "ComparisonSet",
-  "ComparisonSet.Item",
-  "AnnotatedCode",
-  "CodeBlock",
-  "DiffBlock",
-  "Callout",
-  "CommentTarget"
-];
+type ReviewReply = {
+  threadId: string;
+  body: string;
+};
+
+type ReviewAddOptions = {
+  anchorId: string;
+  body: string;
+  title?: string;
+};
+
+type ReviewReplyOptions = {
+  replies: ReviewReply[];
+  status?: string;
+};
+
+type ParsedReviewReplyArgs = ReviewReplyOptions & {
+  input: string;
+};
 
 export async function reviewCommand(projectRoot: string, args: string[]) {
-  const [subcommand, input] = args;
+  const [subcommand] = args;
 
-  if (subcommand !== "context") {
-    throw new Error("review requires a subcommand. Use `artifact-kit review context <file.mdx>`.");
+  if (subcommand === "add") {
+    const options = parseReviewAddArgs(args.slice(1));
+    console.log(await addReviewThread(projectRoot, options.input, options));
+    return;
   }
 
-  if (!input) {
-    throw new Error("review context requires a .mdx file path.");
+  if (subcommand === "reply") {
+    const options = parseReviewReplyArgs(args.slice(1));
+    console.log(await replyToReviewThreads(projectRoot, options.input, options));
+    return;
   }
 
-  console.log(await buildReviewContext(projectRoot, input));
+  throw new Error("review requires a subcommand. Use `artifact-kit review add <file.mdx>` or `artifact-kit review reply <file.mdx>`.");
 }
 
-export async function buildReviewContext(projectRoot: string, input: string) {
-  const config = await loadConfig(projectRoot);
-  const mdxPath = path.resolve(projectRoot, input);
-  const artifact = createArtifactRoute(projectRoot, mdxPath, config.docsDir);
-  const [source, state] = await Promise.all([readFile(artifact.sourcePath, "utf8"), readArtifactState(artifact)]);
-  const anchors = extractReviewAnchors(source);
-  const threads = normalizeThreads(state);
+export async function addReviewThread(projectRoot: string, input: string, options: ReviewAddOptions) {
+  const artifact = await createArtifactFromInput(projectRoot, input);
+  const state = await readArtifactState(artifact);
+  const source = await readFile(artifact.sourcePath, "utf8");
+  const anchorIds = extractDirectAnchorIds(source);
 
-  return [
-    "# Artifact Review Context",
-    "",
-    `source: ${artifact.sourceRelativePath}`,
-    `state: ${artifact.stateRelativePath}`,
-    `threads: ${threads.length}`,
-    "",
-    threads.length > 0 ? formatThreads(threads, anchors) : "No review threads."
-  ].join("\n").trimEnd();
-}
-
-export function extractReviewAnchors(source: string) {
-  const anchors = new Map<string, ReviewContextAnchor>();
-
-  for (const componentName of reviewableComponentNames) {
-    for (const block of findComponentBlocks(source, componentName)) {
-      const id = getComponentAnchorId(block.snippet, componentName);
-      if (!id || anchors.has(id)) {
-        continue;
-      }
-
-      anchors.set(id, {
-        id,
-        component: componentName,
-        snippet: block.snippet.trim()
-      });
-
-      for (const childId of getChildAnchorIds(block.snippet, componentName, id)) {
-        anchors.set(childId, {
-          id: childId,
-          component: componentName,
-          snippet: block.snippet.trim()
-        });
-      }
-    }
+  if (!anchorIds.has(options.anchorId)) {
+    throw new Error(`Review anchor not found: ${options.anchorId}`);
   }
 
-  return anchors;
-}
-
-function formatThreads(threads: ReviewStateThread[], anchors: Map<string, ReviewContextAnchor>) {
-  return threads.map((thread) => formatThread(thread, anchors)).join("\n\n");
-}
-
-function formatThread(thread: ReviewStateThread, anchors: Map<string, ReviewContextAnchor>) {
-  const anchor = anchors.get(thread.anchorId);
-  const lines = [
-    `## Thread ${thread.id}`,
-    "",
-    `- anchorId: ${thread.anchorId}`,
-    `- status: ${thread.status ?? "open"}`,
-    `- title: ${thread.title ?? anchor?.id ?? thread.anchorId}`,
-    `- anchor: ${anchor ? `${anchor.component} found` : "missing"}`,
-    "",
-    "### Current MDX",
-    "",
-    "```mdx",
-    anchor?.snippet ?? `Anchor not found for ${thread.anchorId}.`,
-    "```",
-    "",
-    "### Messages",
-    "",
-    ...formatMessages(thread.messages ?? [])
-  ];
-
-  return lines.join("\n").trimEnd();
-}
-
-function formatMessages(messages: ReviewStateMessage[]) {
-  if (messages.length === 0) {
-    return ["No messages."];
+  if (state.threads.some((thread) => isRecord(thread) && thread.anchorId === options.anchorId)) {
+    throw new Error(`Review thread already exists for anchor: ${options.anchorId}`);
   }
 
-  return messages.map((message) => {
-    const role = typeof message.role === "string" ? message.role : "unknown";
-    const createdAt = typeof message.createdAt === "string" ? ` (${message.createdAt})` : "";
-    const body = typeof message.body === "string" && message.body.trim() ? message.body.trim() : "(empty)";
-    return `- ${role}${createdAt}: ${body}`;
+  const threadId = createThreadId(options.anchorId, state.threads);
+  const message = createUserMessage(options.body);
+  const thread = {
+    id: threadId,
+    anchorId: options.anchorId,
+    status: "open",
+    ...(options.title ? { title: options.title } : {}),
+    messages: [message]
+  };
+
+  await writeArtifactState(projectRoot, artifact, {
+    ...state,
+    threads: [...state.threads, thread]
+  });
+
+  return [`review add ok`, `state: ${artifact.stateRelativePath}`, `thread: ${threadId}`, `anchorId: ${options.anchorId}`].join("\n");
+}
+
+export async function replyToReviewThread(
+  projectRoot: string,
+  input: string,
+  options: ReviewReply & { status?: string }
+) {
+  return replyToReviewThreads(projectRoot, input, {
+    replies: [{ threadId: options.threadId, body: options.body }],
+    ...(options.status ? { status: options.status } : {})
   });
 }
 
-function normalizeThreads(state: ArtifactState): ReviewStateThread[] {
-  return state.threads.filter(isReviewStateThread);
-}
+export async function replyToReviewThreads(projectRoot: string, input: string, options: ReviewReplyOptions) {
+  const artifact = await createArtifactFromInput(projectRoot, input);
+  const state = await readArtifactState(artifact);
+  const repliesByThread = groupRepliesByThread(options.replies);
+  const threadIds = new Set(state.threads.filter(isRecord).map((thread) => thread.id).filter(isString));
+  const missingThreadIds = Array.from(repliesByThread.keys()).filter((threadId) => !threadIds.has(threadId));
 
-function isReviewStateThread(value: unknown): value is ReviewStateThread {
-  if (!isRecord(value)) {
-    return false;
+  if (missingThreadIds.length > 0) {
+    throw new Error(`Review thread not found: ${missingThreadIds.join(", ")}`);
   }
 
-  return typeof value.id === "string" && typeof value.anchorId === "string";
+  const messageRecords: Array<{ threadId: string; messageId: string }> = [];
+  const threads = state.threads.map((thread) => {
+    if (!isRecord(thread) || !isString(thread.id)) {
+      return thread;
+    }
+
+    const replies = repliesByThread.get(thread.id);
+    if (!replies) {
+      return thread;
+    }
+
+    const messages = Array.isArray(thread.messages) ? thread.messages : [];
+    const nextMessages = replies.map((reply, index) => createAssistantMessage(reply.body, messageRecords.length + index));
+    for (const message of nextMessages) {
+      messageRecords.push({ threadId: thread.id, messageId: message.id });
+    }
+
+    return {
+      ...thread,
+      ...(options.status ? { status: options.status } : {}),
+      messages: [...messages, ...nextMessages]
+    };
+  });
+
+  await writeArtifactState(projectRoot, artifact, {
+    ...state,
+    threads
+  });
+
+  return [
+    `review reply ok`,
+    `state: ${artifact.stateRelativePath}`,
+    `messages: ${messageRecords.length}`,
+    ...messageRecords.map((record) => `- thread: ${record.threadId} message: ${record.messageId}`)
+  ].join("\n");
 }
 
-function findComponentBlocks(source: string, componentName: string) {
-  const escapedName = escapeRegExp(componentName);
-  const pattern = new RegExp(`<${escapedName}(?=[\\s>])[\\s\\S]*?(?:/>|</${escapedName}>)`, "g");
-  return Array.from(source.matchAll(pattern)).map((match) => ({
-    index: match.index ?? 0,
-    snippet: match[0]
-  }));
+async function createArtifactFromInput(projectRoot: string, input: string): Promise<ArtifactRoute> {
+  const config = await loadConfig(projectRoot);
+  const mdxPath = path.resolve(projectRoot, input);
+  return createArtifactRoute(projectRoot, mdxPath, config.docsDir);
 }
 
-function getComponentAnchorId(snippet: string, componentName: string) {
-  const tagEnd = snippet.indexOf(">");
-  const openingTag = tagEnd >= 0 ? snippet.slice(0, tagEnd + 1) : snippet;
-  const propName = componentName === "CommentTarget" ? "targetId" : "id";
-  return getStringProp(openingTag, propName);
-}
+function parseReviewReplyArgs(args: string[]): ParsedReviewReplyArgs {
+  const [input, ...rest] = args;
 
-function getChildAnchorIds(snippet: string, componentName: string, parentId: string) {
-  if (componentName === "DecisionMatrix" || componentName === "OptionGrid") {
-    return getObjectIds(snippet).map((id) => `${parentId}.${id}`);
+  if (!input) {
+    throw new Error("review reply requires a .mdx file path.");
   }
 
-  if (componentName === "AnnotatedCode") {
-    return [`${parentId}.code`, ...getObjectIds(snippet).map((id) => `${parentId}.${id}`)];
+  const { replies, status } = parseReviewReplyOptions(rest);
+
+  return {
+    input,
+    replies,
+    ...(status ? { status } : {})
+  };
+}
+
+function parseReviewAddArgs(args: string[]) {
+  const [input, ...rest] = args;
+
+  if (!input) {
+    throw new Error("review add requires a .mdx file path.");
   }
 
-  if (componentName === "ComparisonSet") {
-    return getComparisonSetItemIds(snippet).map((id) => `${parentId}.${id}`);
+  const options = parseKeyValueOptions(rest, ["anchor", "body", "title"]);
+  const anchorId = options.get("anchor");
+  const body = options.get("body");
+  const title = options.get("title");
+
+  if (!anchorId) {
+    throw new Error("review add requires --anchor <anchorId>.");
   }
 
-  return [];
+  if (!body || !body.trim()) {
+    throw new Error("review add requires --body <message>.");
+  }
+
+  return {
+    input,
+    anchorId,
+    body: body.trim(),
+    ...(title ? { title } : {})
+  };
 }
 
-function getStringProp(source: string, propName: string) {
-  const propPattern = new RegExp(`\\s${propName}\\s*=\\s*["']([^"']+)["']`);
-  return propPattern.exec(source)?.[1];
+function parseKeyValueOptions(args: string[], allowedKeys: string[]) {
+  const options = new Map<string, string>();
+
+  for (let index = 0; index < args.length; index += 1) {
+    const name = args[index];
+    if (!name?.startsWith("--")) {
+      throw new Error(`Unexpected review argument: ${name}`);
+    }
+
+    const key = name.slice(2);
+    const value = args[index + 1];
+    if (!allowedKeys.includes(key)) {
+      throw new Error(`Unknown review option: --${key}.`);
+    }
+    if (!value || value.startsWith("--")) {
+      throw new Error(`Missing value for --${key}.`);
+    }
+
+    options.set(key, value);
+    index += 1;
+  }
+
+  return options;
 }
 
-function getObjectIds(source: string) {
-  return Array.from(source.matchAll(/\bid\s*:\s*["']([^"']+)["']/g)).map((match) => match[1]);
+function parseReviewReplyOptions(args: string[]) {
+  const replies: ReviewReply[] = [];
+  let status: string | undefined;
+  let threadId: string | undefined;
+
+  for (let index = 0; index < args.length; index += 1) {
+    const name = args[index];
+    if (!name?.startsWith("--")) {
+      throw new Error(`Unexpected review reply argument: ${name}`);
+    }
+
+    const key = name.slice(2);
+    const value = args[index + 1];
+    if (!value || value.startsWith("--")) {
+      throw new Error(`Missing value for --${key}.`);
+    }
+
+    if (key === "thread") {
+      if (threadId) {
+        throw new Error(`Missing --body for --thread ${threadId}.`);
+      }
+      threadId = value;
+    } else if (key === "body") {
+      if (!threadId) {
+        throw new Error("review reply requires --thread before --body.");
+      }
+      if (!value.trim()) {
+        throw new Error("review reply requires --body <message>.");
+      }
+      replies.push({ threadId, body: value.trim() });
+      threadId = undefined;
+    } else if (key === "status") {
+      status = value;
+    } else {
+      throw new Error(`Unknown review reply option: --${key}.`);
+    }
+
+    index += 1;
+  }
+
+  if (threadId) {
+    throw new Error(`Missing --body for --thread ${threadId}.`);
+  }
+
+  if (replies.length === 0) {
+    throw new Error("review reply requires at least one --thread <threadId> --body <message> pair.");
+  }
+
+  return { replies, status };
 }
 
-function getComparisonSetItemIds(source: string) {
-  return Array.from(source.matchAll(/<ComparisonSet\.Item(?=[\s>])[\s\S]*?>/g))
-    .map((match) => getStringProp(match[0], "id"))
-    .filter((id): id is string => Boolean(id));
+function groupRepliesByThread(replies: ReviewReply[]) {
+  const repliesByThread = new Map<string, ReviewReply[]>();
+
+  for (const reply of replies) {
+    const threadReplies = repliesByThread.get(reply.threadId) ?? [];
+    threadReplies.push(reply);
+    repliesByThread.set(reply.threadId, threadReplies);
+  }
+
+  return repliesByThread;
 }
 
-function escapeRegExp(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+function createAssistantMessage(body: string, index = 0): Required<Pick<ReviewStateMessage, "id" | "role" | "body" | "createdAt">> {
+  return {
+    id: `msg_${Date.now().toString(36)}_${index.toString(36)}`,
+    role: "assistant",
+    body,
+    createdAt: new Date().toISOString()
+  };
+}
+
+function createUserMessage(body: string): Required<Pick<ReviewStateMessage, "id" | "role" | "body" | "createdAt">> {
+  return {
+    id: `msg_${Date.now().toString(36)}_0`,
+    role: "user",
+    body,
+    createdAt: new Date().toISOString()
+  };
+}
+
+function createThreadId(anchorId: string, threads: unknown[]) {
+  const existingIds = new Set(threads.filter(isRecord).map((thread) => thread.id).filter(isString));
+  const base = `thr_${compactId(anchorId)}`;
+
+  if (!existingIds.has(base)) {
+    return base;
+  }
+
+  for (let index = 2; index < 100; index += 1) {
+    const candidate = `${base}_${index}`;
+    if (!existingIds.has(candidate)) {
+      return candidate;
+    }
+  }
+
+  return `thr_${compactId(anchorId)}_${Date.now().toString(36)}`;
+}
+
+function extractDirectAnchorIds(source: string) {
+  const anchorIds = new Set<string>();
+
+  for (const match of source.matchAll(/<([A-Z][A-Za-z0-9.]*)\b[^>]*(?:\sid|\stargetId)\s*=\s*["']([^"']+)["']/g)) {
+    if (match[2]) {
+      anchorIds.add(match[2]);
+    }
+  }
+
+  return anchorIds;
+}
+
+function compactId(value: string) {
+  const compact = value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .slice(0, 32);
+
+  return compact || "thread";
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isString(value: unknown): value is string {
+  return typeof value === "string";
 }

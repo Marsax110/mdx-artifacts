@@ -67,7 +67,8 @@ Usage:
   artifact-kit init
   artifact-kit components [ComponentName] [--json]
   artifact-kit validate <file.mdx>
-  artifact-kit review context <file.mdx>
+  artifact-kit review add <file.mdx> --anchor <anchorId> --body <message> [--title <title>]
+  artifact-kit review reply <file.mdx> --thread <threadId> --body <message> [...repeat] [--status <status>]
   artifact-kit dev <file.mdx>
   artifact-kit build <file.mdx>
 `);
