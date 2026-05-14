@@ -234,14 +234,36 @@ async function resolveReactEntryPath() {
 
 function resolveReactAliases(projectRoot: string): Array<{ find: RegExp; replacement: string }> {
   const projectRequire = createRequire(path.join(projectRoot, "package.json"));
+  const packageRequire = createRequire(import.meta.url);
 
   return [
-    { find: /^react$/, replacement: projectRequire.resolve("react") },
-    { find: /^react\/jsx-runtime$/, replacement: projectRequire.resolve("react/jsx-runtime") },
-    { find: /^react\/jsx-dev-runtime$/, replacement: projectRequire.resolve("react/jsx-dev-runtime") },
-    { find: /^react-dom$/, replacement: projectRequire.resolve("react-dom") },
-    { find: /^react-dom\/client$/, replacement: projectRequire.resolve("react-dom/client") }
+    { find: /^react$/, replacement: resolveFromProjectOrPackage(projectRequire, packageRequire, "react") },
+    {
+      find: /^react\/jsx-runtime$/,
+      replacement: resolveFromProjectOrPackage(projectRequire, packageRequire, "react/jsx-runtime")
+    },
+    {
+      find: /^react\/jsx-dev-runtime$/,
+      replacement: resolveFromProjectOrPackage(projectRequire, packageRequire, "react/jsx-dev-runtime")
+    },
+    { find: /^react-dom$/, replacement: resolveFromProjectOrPackage(projectRequire, packageRequire, "react-dom") },
+    {
+      find: /^react-dom\/client$/,
+      replacement: resolveFromProjectOrPackage(projectRequire, packageRequire, "react-dom/client")
+    }
   ];
+}
+
+function resolveFromProjectOrPackage(
+  projectRequire: NodeJS.Require,
+  packageRequire: NodeJS.Require,
+  specifier: string
+) {
+  try {
+    return projectRequire.resolve(specifier);
+  } catch {
+    return packageRequire.resolve(specifier);
+  }
 }
 
 export async function startDevServer(project: ArtifactProject): Promise<ViteDevServer> {

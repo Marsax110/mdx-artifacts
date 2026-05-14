@@ -47,7 +47,19 @@ Astro is intentionally not part of the core yet. It can become a later adapter f
 Install in a project that should build local artifacts:
 
 ```bash
-pnpm add mdx-artifacts react react-dom
+pnpm add -D mdx-artifacts
+```
+
+In a pnpm workspace root, make the workspace-root install explicit:
+
+```bash
+pnpm add -Dw mdx-artifacts
+```
+
+React and React DOM are peer dependencies. Modern package managers usually install them automatically for this dev-tool workflow. If peer dependency auto-install is disabled in your project, install them explicitly:
+
+```bash
+pnpm add -D mdx-artifacts react react-dom
 ```
 
 Initialize a workspace:
