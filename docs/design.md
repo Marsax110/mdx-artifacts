@@ -103,9 +103,10 @@ Second target: Astro docs site
 
 Artifact Kit provides default CSS, but the default theme is not part of the core artifact contract.
 
-Users can inject brand styles through `artifact-kit.config.ts`:
+Users can inject brand styles through `artifact-kit.config.mjs`:
 
-```ts
+```js
+/** @type {import("mdx-artifacts").ArtifactKitConfig} */
 const config = {
   docsDir: "artifact-docs",
   outDir: "dist/artifacts",

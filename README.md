@@ -93,7 +93,42 @@ Build one MDX file:
 pnpm exec artifact-kit build artifact-docs/examples/hello.mdx
 ```
 
-Add and reply to local review threads:
+## Review State
+
+Artifact Kit can keep local review threads beside an MDX file while the dev server is running. Review state is stored in a sibling `.state.json` file:
+
+```text
+artifact-docs/examples/hello.mdx
+artifact-docs/examples/hello.state.json
+```
+
+Use stable anchors in MDX so review threads can survive edits:
+
+```mdx
+import { DecisionMatrix, Section } from "mdx-artifacts/react";
+
+<Section id="section.context">
+
+## Context
+
+Native MDX prose can be reviewed through the section anchor.
+
+</Section>
+
+<DecisionMatrix
+  id="decision.stage-one"
+  question="Should this artifact use stable anchors?"
+  options={[
+    {
+      id: "yes",
+      name: "Use stable anchors",
+      verdict: "Recommended"
+    }
+  ]}
+/>
+```
+
+Agents can add a user thread, append an assistant reply, and validate that saved threads still point at anchors in the current MDX:
 
 ```bash
 pnpm exec artifact-kit review add artifact-docs/examples/hello.mdx \
@@ -109,6 +144,16 @@ pnpm exec artifact-kit review validate artifact-docs/examples/hello.mdx
 ```
 
 Review commands read and write the sibling `.state.json` file for the source MDX. They do not edit the MDX source. `review validate` checks whether saved review threads still point at anchors that exist in the current MDX.
+
+When an anchor is removed from MDX, the browser review layer keeps the thread visible as an unplaced comment instead of deleting it. The CLI reports the same problem:
+
+```text
+review validate failed
+missing: 1
+- thread: thr_removed anchorId: comparison.removed status: open title: Removed comparison
+```
+
+Resolve missing anchors by restoring the old id, migrating the thread to a new anchor, or marking the thread resolved with an assistant reply that explains the structural change.
 
 ## Repository Development
 
@@ -150,12 +195,11 @@ pnpm pack:smoke
 
 ## Style Injection
 
-Artifact Kit injects default styles by default. Users can add brand styles through `artifact-kit.config.ts`:
+Artifact Kit injects default styles by default. Users can add brand styles through `artifact-kit.config.mjs`:
 
-```ts
-import type { ArtifactKitConfig } from "mdx-artifacts";
-
-const config: ArtifactKitConfig = {
+```js
+/** @type {import("mdx-artifacts").ArtifactKitConfig} */
+const config = {
   docsDir: "artifact-docs",
   outDir: "dist/artifacts",
   includeDefaultStyles: true,

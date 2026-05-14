@@ -30,6 +30,41 @@ run("pnpm", ["exec", "artifact-kit", "components"], projectDir);
 run("pnpm", ["exec", "artifact-kit", "init"], projectDir);
 run("pnpm", ["exec", "artifact-kit", "validate", "artifact-docs/examples/hello.mdx"], projectDir);
 run("pnpm", ["exec", "artifact-kit", "build", "artifact-docs/examples/hello.mdx"], projectDir);
+run("pnpm", ["exec", "artifact-kit", "review", "validate", "artifact-docs/examples/hello.mdx"], projectDir);
+const reviewAddOutput = run(
+  "pnpm",
+  [
+    "exec",
+    "artifact-kit",
+    "review",
+    "add",
+    "artifact-docs/examples/hello.mdx",
+    "--anchor",
+    "decision.initialized",
+    "--body",
+    "Clarify the initialized decision."
+  ],
+  projectDir
+);
+const threadId = extractThreadId(reviewAddOutput);
+run(
+  "pnpm",
+  [
+    "exec",
+    "artifact-kit",
+    "review",
+    "reply",
+    "artifact-docs/examples/hello.mdx",
+    "--thread",
+    threadId,
+    "--body",
+    "Updated the initialized decision.",
+    "--status",
+    "resolved"
+  ],
+  projectDir
+);
+run("pnpm", ["exec", "artifact-kit", "review", "validate", "artifact-docs/examples/hello.mdx"], projectDir);
 
 console.log(`pack smoke ok: ${tarballPath}`);
 
@@ -59,4 +94,13 @@ function parsePackJson(output) {
   const start = output.lastIndexOf("\n[");
   const json = output.slice(start >= 0 ? start + 1 : output.indexOf("[")).trim();
   return JSON.parse(json);
+}
+
+function extractThreadId(output) {
+  const threadId = output.match(/^thread:\s+(.+)$/m)?.[1]?.trim();
+  if (!threadId) {
+    throw new Error(`Could not find review thread id in output:\n${output}`);
+  }
+
+  return threadId;
 }
