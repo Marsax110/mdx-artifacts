@@ -64,7 +64,7 @@ export type { MarkdownBodyProps, MarkdownBodyVariant } from "./components/Markdo
 export { OptionGrid } from "./components/OptionGrid";
 export type { OptionGridItem, OptionGridProps } from "./components/OptionGrid";
 export { Section } from "./components/Section";
-export type { SectionLevel, SectionProps } from "./components/Section";
+export type { SectionProps } from "./components/Section";
 export { SeverityBadge } from "./components/SeverityBadge";
 export type { SeverityBadgeProps, SeverityLevel } from "./components/SeverityBadge";
 export { componentRegistry, findComponentMeta } from "./registry";

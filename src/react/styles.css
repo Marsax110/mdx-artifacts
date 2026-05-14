@@ -182,7 +182,17 @@ body {
 .ak-review-content > p,
 .ak-review-content > ul,
 .ak-review-content > ol,
-.ak-review-content > blockquote {
+.ak-review-content > blockquote,
+.ak-content-section > h1,
+.ak-content-section > h2,
+.ak-content-section > h3,
+.ak-content-section > h4,
+.ak-content-section > h5,
+.ak-content-section > h6,
+.ak-content-section > p,
+.ak-content-section > ul,
+.ak-content-section > ol,
+.ak-content-section > blockquote {
   margin: 0;
 }
 
@@ -197,36 +207,48 @@ body {
 .ak-review-content > h3,
 .ak-review-content > h4,
 .ak-review-content > h5,
-.ak-review-content > h6 {
+.ak-review-content > h6,
+.ak-content-section > h1,
+.ak-content-section > h2,
+.ak-content-section > h3,
+.ak-content-section > h4,
+.ak-content-section > h5,
+.ak-content-section > h6 {
   line-height: 1.25;
 }
 
 .ak-document > h1,
-.ak-review-content > h1 {
+.ak-review-content > h1,
+.ak-content-section > h1 {
   margin: 0 0 4px;
   font-size: 32px;
   line-height: 1.15;
 }
 
 .ak-document > h2,
-.ak-review-content > h2 {
+.ak-review-content > h2,
+.ak-content-section > h2 {
   font-size: 24px;
 }
 
 .ak-document > h3,
-.ak-review-content > h3 {
+.ak-review-content > h3,
+.ak-content-section > h3 {
   font-size: 20px;
 }
 
 .ak-document > h4,
-.ak-review-content > h4 {
+.ak-review-content > h4,
+.ak-content-section > h4 {
   font-size: 17px;
 }
 
 .ak-document > h5,
 .ak-document > h6,
 .ak-review-content > h5,
-.ak-review-content > h6 {
+.ak-review-content > h6,
+.ak-content-section > h5,
+.ak-content-section > h6 {
   color: var(--ak-muted);
   font-size: 15px;
 }
@@ -236,39 +258,50 @@ body {
 .ak-document > blockquote,
 .ak-review-content > p,
 .ak-review-content > li,
-.ak-review-content > blockquote {
+.ak-review-content > blockquote,
+.ak-content-section > p,
+.ak-content-section > li,
+.ak-content-section > blockquote {
   line-height: 1.65;
 }
 
 .ak-document > ul,
 .ak-document > ol,
 .ak-review-content > ul,
-.ak-review-content > ol {
+.ak-review-content > ol,
+.ak-content-section > ul,
+.ak-content-section > ol {
   display: grid;
   gap: 6px;
   padding-left: 22px;
 }
 
-.ak-document ul {
+.ak-document ul,
+.ak-content-section ul {
   list-style: disc outside;
 }
 
-.ak-document ol {
+.ak-document ol,
+.ak-content-section ol {
   list-style: decimal outside;
 }
 
 .ak-document li > ul,
-.ak-document li > ol {
+.ak-document li > ol,
+.ak-content-section li > ul,
+.ak-content-section li > ol {
   margin-top: 6px;
   padding-left: 22px;
 }
 
-.ak-document li > ul {
+.ak-document li > ul,
+.ak-content-section li > ul {
   list-style-type: circle;
 }
 
 .ak-document > blockquote,
-.ak-review-content > blockquote {
+.ak-review-content > blockquote,
+.ak-content-section > blockquote {
   border-left: 3px solid var(--ak-border);
   color: var(--ak-muted);
   padding-left: 14px;

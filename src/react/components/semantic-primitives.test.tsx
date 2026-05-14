@@ -19,10 +19,11 @@ describe("Callout", () => {
 });
 
 describe("Section", () => {
-  it("renders a stable comment anchor with generated heading", () => {
+  it("renders a stable comment anchor around native MDX heading content", () => {
     const html = renderToStaticMarkup(
       <CommentLayer>
-        <Section id="section.context" title="Context" level={3}>
+        <Section id="section.context">
+          <h2>Context</h2>
           <p>Native MDX prose.</p>
           <ul>
             <li>Stable anchor</li>
@@ -33,7 +34,7 @@ describe("Section", () => {
 
     expect(html).toContain('id="section.context"');
     expect(html).toContain('data-anchor-id="section.context"');
-    expect(html).toContain("<h3");
+    expect(html).toContain("<h2");
     expect(html).toContain("Context");
     expect(html).toContain("<li>Stable anchor</li>");
   });

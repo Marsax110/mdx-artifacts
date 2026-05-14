@@ -14,16 +14,15 @@ type Story = StoryObj<typeof meta>;
 export const Basic: Story = {
   args: {
     id: "section.context",
-    title: "Context",
-    level: 2,
     children: null
   },
   render: () => (
     <CommentLayer>
-      <Section id="section.context" title="Context" level={2}>
+      <Section id="section.context">
+        <h2>Context</h2>
         <p>This section keeps native MDX prose under one stable review anchor.</p>
         <ul>
-          <li>Generated heading from the title prop</li>
+          <li>Native heading authored inside the section</li>
           <li>Stable id for comment state</li>
           <li>Native prose remains authored as MDX children</li>
         </ul>

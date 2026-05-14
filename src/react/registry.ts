@@ -577,36 +577,23 @@ export const componentRegistry: ComponentMeta[] = [
         description: "Stable unique anchor id for this section within one artifact."
       },
       {
-        name: "title",
-        type: "string",
-        contentType: "inlineMarkdown",
-        required: true,
-        description: "Section heading text. Section renders this as the heading; do not repeat it inside children."
-      },
-      {
-        name: "level",
-        type: "1 | 2 | 3 | 4 | 5 | 6",
-        description: "Heading level to render. Defaults to 2."
-      },
-      {
-        name: "description",
-        type: "string",
-        contentType: "plainText",
-        description: "Optional section context exported with comments."
-      },
-      {
         name: "children",
         type: "ReactNode",
         required: true,
-        description: "Native MDX prose or composed content that belongs to this section. Do not wrap normal section prose in MarkdownBody."
+        description:
+          "Native MDX prose or composed content that belongs to this section. Put the native Markdown heading inside the Section."
       }
     ],
-    example: `<Section id="context" title="Context" level={2}>
-  This section can contain native MDX paragraphs, lists, and code fences.
+    example: `<Section id="context">
 
-  - Stable review anchor
-  - Generated heading
-  - One comment thread per section
+## Context
+
+This section can contain native MDX paragraphs, lists, and code fences.
+
+- Stable review anchor
+- Native Markdown heading
+- One comment thread per section
+
 </Section>`
   },
   {
