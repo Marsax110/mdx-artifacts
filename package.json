@@ -4,6 +4,10 @@
   "description": "Build interactive MDX artifacts with reusable React components and a local CLI.",
   "type": "module",
   "license": "MIT",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=20"
+  },
   "homepage": "https://github.com/Marsax110/mdx-artifacts#readme",
   "bugs": {
     "url": "https://github.com/Marsax110/mdx-artifacts/issues"
@@ -15,8 +19,8 @@
   "files": [
     "dist/lib",
     "agents",
-    "artifact-docs/examples",
-    "docs",
+    "artifact-docs/examples/*.mdx",
+    "docs/*.md",
     "README.md",
     "README.zh-CN.md",
     "LICENSE"
@@ -51,26 +55,33 @@
     "typecheck": "tsc --noEmit",
     "clean:lib": "rm -rf dist/lib",
     "build:lib": "tsc -p tsconfig.build.json",
+    "build:esm": "node scripts/fix-dist-esm.mjs",
     "build:styles": "cp src/react/styles.css dist/lib/react/styles.css",
-    "build:cli": "pnpm clean:lib && pnpm build:lib && pnpm build:styles"
+    "build:cli": "pnpm clean:lib && pnpm build:lib && pnpm build:esm && pnpm build:styles",
+    "pack:smoke": "node scripts/pack-smoke.mjs",
+    "prepack": "pnpm build:cli"
   },
   "dependencies": {
     "@mdx-js/rollup": "^3.1.0",
     "@radix-ui/react-tabs": "^1.1.13",
     "@tailwindcss/vite": "^4.1.17",
     "@vitejs/plugin-react": "^5.0.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
     "tailwindcss": "^4.1.17",
     "vite": "^7.0.0"
+  },
+  "peerDependencies": {
+    "react": ">=18.3.0 <20",
+    "react-dom": ">=18.3.0 <20"
   },
   "devDependencies": {
     "@storybook/react-vite": "^10.3.6",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "storybook": "^10.3.6",
     "tsx": "^4.20.0",
     "typescript": "^5.8.0",

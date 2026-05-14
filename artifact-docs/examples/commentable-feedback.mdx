@@ -18,21 +18,29 @@ This example shows a local block-level comment loop. The author marks stable rev
     {
       id: "explicit",
       name: "Explicit comment blocks",
-      summary: "Authors wrap reviewable sections with a stable block id and title.",
-      pros: ["Stable export target", "Works for prose and components", "Does not change existing component props"],
+      summary:
+        "Authors wrap reviewable sections with a stable block id and title.",
+      pros: [
+        "Stable export target",
+        "Works for prose and components",
+        "Does not change existing component props",
+      ],
       cons: ["Adds one wrapper around reviewable regions"],
       confidence: "high",
-      verdict: "Recommended for v1"
+      verdict: "Recommended for v1",
     },
     {
       id: "implicit",
       name: "Implicit component comments",
       summary: "Every artifact component becomes commentable by default.",
       pros: ["Less explicit authoring syntax"],
-      cons: ["Cannot naturally target prose", "Requires changing many component APIs"],
+      cons: [
+        "Cannot naturally target prose",
+        "Requires changing many component APIs",
+      ],
       confidence: "medium",
-      verdict: "Defer until block comments prove useful"
-    }
+      verdict: "Defer until block comments prove useful",
+    },
   ]}
 />
 
@@ -45,9 +53,16 @@ A section target gives the exported state enough context for the next agent turn
 Use section comments when feedback should attach to a visible native MDX region:
 
 - a short prose explanation
+  - a nested supporting point
+    - a deeper supporting point
 - a paragraph plus a list
 - a decision summary before a component
 - a custom composed section boundary
+
+1. First ordered list item
+   1. Nested ordered list item
+   2. Another nested ordered item
+2. Second ordered list item
 
 </Section>
 
@@ -58,21 +73,32 @@ Use section comments when feedback should attach to a visible native MDX region:
     {
       id: "layer",
       name: "CommentLayer",
-      intent: "The artifact shell now provides this review context automatically.",
-      tradeoffs: ["No production backend", "Local dev persists to sidecar state"]
+      intent:
+        "The artifact shell now provides this review context automatically.",
+      tradeoffs: [
+        "No production backend",
+        "Local dev persists to sidecar state",
+      ],
     },
     {
       id: "section",
       name: "Section",
-      intent: "Marks native MDX prose with a stable anchor id and generated heading.",
-      tradeoffs: ["Clear review context", "Authors choose the section boundary"]
+      intent:
+        "Marks native MDX prose with a stable anchor id while keeping native headings in the section body.",
+      tradeoffs: [
+        "Clear review context",
+        "Authors choose the section boundary",
+      ],
     },
     {
       id: "export",
       name: "ExportPanel",
       intent: "Exports the artifact result when a static handoff is needed.",
-      tradeoffs: ["Agent-friendly handoff", "State is handled by the local dev shell"]
-    }
+      tradeoffs: [
+        "Agent-friendly handoff",
+        "State is handled by the local dev shell",
+      ],
+    },
   ]}
 />
 
@@ -92,8 +118,9 @@ Use section comments when feedback should attach to a visible native MDX region:
 <ExportPanel
   title="Export artifact feedback"
   value={{
-    recommendation: "Use explicit comment targets first, then evaluate implicit Markdown comments.",
+    recommendation:
+      "Use explicit comment targets first, then evaluate implicit Markdown comments.",
     reviewModel: "One comment per target",
-    nextStep: "Validate Section around native MDX prose blocks"
+    nextStep: "Validate Section around native MDX prose blocks and unplaced comments",
   }}
 />

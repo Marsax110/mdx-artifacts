@@ -119,22 +119,20 @@ export function CommentLayer({ children }: CommentLayerProps) {
   const [targetIds, setTargetIds] = useState<string[]>([]);
   const nextId = useRef(1);
   const pendingPersistThreads = useRef<ArtifactReviewThread[] | undefined>(undefined);
-  const didHydrateState = useRef(false);
   const panels = createReviewPanels(activeTargetId, threads, openTargetIds, targetIds, targets);
   const unplacedPanels = createUnplacedReviewPanels(threads, targetIds, targets);
 
   useEffect(() => {
-    if (didHydrateState.current || !artifactState?.state) {
+    if (!artifactState?.state) {
       return;
     }
 
-    didHydrateState.current = true;
     const savedThreads = createThreadsFromState(artifactState.state);
     if (savedThreads.length === 0) {
       return;
     }
 
-    setThreads((current) => (current.length > 0 ? current : savedThreads));
+    setThreads((current) => (sameReviewThreads(current, savedThreads) ? current : savedThreads));
     setOpenTargetIds((current) =>
       current.length > 0 ? current : uniqueValues(savedThreads.map((thread) => thread.blockId))
     );
@@ -1148,6 +1146,10 @@ function samePanelHeights(first: Record<string, number>, second: Record<string, 
   }
 
   return firstKeys.every((key) => Math.round(first[key] ?? 0) === Math.round(second[key] ?? 0));
+}
+
+function sameReviewThreads(first: ArtifactReviewThread[], second: ArtifactReviewThread[]) {
+  return JSON.stringify(first) === JSON.stringify(second);
 }
 
 function isCompactReviewLayout() {

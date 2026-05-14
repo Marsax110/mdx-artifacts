@@ -30,6 +30,26 @@ Current test files:
 - `src/cli/components.test.ts`
 - `src/cli/validate.test.ts`
 
+## Package Smoke Test
+
+Run the package smoke test before publishing or after changes to package metadata, CLI output, config loading, generated scaffold files, dependency boundaries, or build output:
+
+```bash
+pnpm pack:smoke
+```
+
+The smoke test creates an npm tarball, installs it into a temporary project, and verifies:
+
+- `import("mdx-artifacts/react")`
+- `artifact-kit components`
+- `artifact-kit init`
+- `artifact-kit validate artifact-docs/examples/hello.mdx`
+- `artifact-kit build artifact-docs/examples/hello.mdx`
+
+It also checks that the tarball does not include `src/`, `docs/local/`, `.state.json`, or `.local.*` files.
+
+This smoke test is intentionally narrow. It proves that the published package can be installed, imported, initialized, validated, and built. It does not yet cover the dev server, browser review UI, review state writes, or multi-artifact workspaces.
+
 ## When Adding a Component
 
 Add tests at the same layer as the new behavior.
@@ -94,7 +114,6 @@ These checks are not part of the current default baseline:
 - visual regression
 - Storybook test runner
 - Astro adapter tests
-- package tarball installation smoke tests
 - `artifact:build`
 - `npm pack --dry-run`
 

@@ -121,6 +121,32 @@ export function ArtifactStateProvider({ children }: ArtifactStateProviderProps) 
     };
   }, []);
 
+  useEffect(() => {
+    if (!daemonMeta || typeof window === "undefined" || typeof fetch !== "function") {
+      return;
+    }
+
+    const interval = window.setInterval(async () => {
+      if (status === "saving") {
+        return;
+      }
+
+      try {
+        const response = await fetch("/__artifact/state", { headers: { accept: "application/json" } });
+        if (!response.ok) {
+          return;
+        }
+
+        const nextState = normalizeArtifactState(await response.json(), daemonMeta.sourcePath);
+        setState((current) => (sameArtifactState(current, nextState) ? current : nextState));
+      } catch {
+        // Keep the current in-page state when the local daemon is temporarily unavailable.
+      }
+    }, 2000);
+
+    return () => window.clearInterval(interval);
+  }, [daemonMeta, status]);
+
   const value = useMemo<ArtifactStateContextValue>(
     () => ({
       state,
@@ -258,6 +284,10 @@ function normalizeArtifactState(value: unknown, sourcePath: string): ArtifactSta
     threads: normalizeThreads(value.threads),
     interactions: isRecord(value.interactions) ? value.interactions : {}
   };
+}
+
+function sameArtifactState(first: ArtifactStateValue | undefined, second: ArtifactStateValue) {
+  return JSON.stringify(first) === JSON.stringify(second);
 }
 
 function createEmptyArtifactState(sourcePath: string): ArtifactStateValue {

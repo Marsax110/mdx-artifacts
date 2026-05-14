@@ -4,7 +4,7 @@ When creating an interactive report, option comparison, temporary tool, or visua
 
 1. Do not generate raw HTML unless explicitly requested.
 2. Create `.mdx` files under `artifact-docs/`.
-3. Prefer high-level components from `@artifact-kit/react` or this repository's `src/react`.
+3. Prefer high-level components from `mdx-artifacts/react`.
 4. Interactive artifacts must include `ExportPanel` or an equivalent export path.
 5. Do not inline bulky data in JSX props. Prefer adjacent `.json` files.
 6. Run `artifact-kit components <ComponentName>` when component props are unclear.

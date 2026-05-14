@@ -42,7 +42,73 @@ The first stage focuses on the smallest useful loop:
 
 Astro is intentionally not part of the core yet. It can become a later adapter for long-lived docs sites.
 
-## Commands
+## Install
+
+Install in a project that should build local artifacts:
+
+```bash
+pnpm add mdx-artifacts react react-dom
+```
+
+Initialize a workspace:
+
+```bash
+pnpm exec artifact-kit init
+```
+
+This creates:
+
+```text
+artifact-kit.config.mjs
+artifact-docs/examples/hello.mdx
+agents/AGENTS.snippet.md
+```
+
+Build the initialized example:
+
+```bash
+pnpm exec artifact-kit validate artifact-docs/examples/hello.mdx
+pnpm exec artifact-kit build artifact-docs/examples/hello.mdx
+```
+
+Default output:
+
+```text
+dist/artifacts/examples/hello.html
+```
+
+## CLI
+
+Inspect available components:
+
+```bash
+pnpm exec artifact-kit components
+pnpm exec artifact-kit components ExportPanel
+pnpm exec artifact-kit components --json
+```
+
+Build one MDX file:
+
+```bash
+pnpm exec artifact-kit build artifact-docs/examples/hello.mdx
+```
+
+Add and reply to local review threads:
+
+```bash
+pnpm exec artifact-kit review add artifact-docs/examples/hello.mdx \
+  --anchor decision.stage-one \
+  --body "Clarify this decision."
+
+pnpm exec artifact-kit review reply artifact-docs/examples/hello.mdx \
+  --thread thr_decision_stage_one \
+  --body "Updated the decision copy." \
+  --status resolved
+```
+
+Review commands read and write the sibling `.state.json` file for the source MDX. They do not edit the MDX source.
+
+## Repository Development
 
 Install dependencies:
 
@@ -50,32 +116,12 @@ Install dependencies:
 pnpm install
 ```
 
-Validate and build the example artifact:
+Validate and build the repository example artifact:
 
 ```bash
 pnpm check
 pnpm artifact:validate
 pnpm artifact:build
-```
-
-Inspect available components:
-
-```bash
-pnpm artifact components
-pnpm artifact components ExportPanel
-pnpm artifact components --json
-```
-
-Build one MDX file:
-
-```bash
-pnpm artifact build artifact-docs/examples/decision-matrix.mdx
-```
-
-Default output:
-
-```text
-dist/artifacts/examples/decision-matrix.html
 ```
 
 Develop components in Storybook:
@@ -86,27 +132,18 @@ pnpm storybook
 
 Storybook is only for component development. The artifact workflow is still verified through `artifact-kit validate/build`.
 
-Add and reply to local review threads:
-
-```bash
-pnpm artifact review add artifact-docs/examples/decision-matrix.mdx \
-  --anchor decision.stage-one \
-  --body "Clarify this decision."
-
-pnpm artifact review reply artifact-docs/examples/decision-matrix.mdx \
-  --thread thr_decision_stage_one \
-  --body "Updated the decision copy." \
-  --status resolved
-```
-
-Review commands read and write the sibling `.state.json` file for the source MDX. They do not edit the MDX source.
-
 Run the test baseline:
 
 ```bash
 pnpm test
 pnpm typecheck
 pnpm artifact:validate
+```
+
+Run the package smoke test before publishing:
+
+```bash
+pnpm pack:smoke
 ```
 
 ## Style Injection

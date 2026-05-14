@@ -924,7 +924,7 @@ body {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   gap: 16px;
-  width: min(640px, calc(100vw - 32px));
+  width: min(480px, calc(100vw - 32px));
   border-left: 1px solid var(--ak-border);
   background: var(--ak-surface);
   padding: 20px;
@@ -936,17 +936,18 @@ body {
 }
 
 .ak-unplaced-review-list {
-  columns: 260px 2;
-  column-gap: 12px;
+  display: grid;
+  align-content: start;
+  align-items: start;
+  gap: 12px;
   overflow: auto;
 }
 
 .ak-unplaced-review-card {
-  display: inline-grid;
+  display: grid;
+  align-self: start;
   width: 100%;
-  break-inside: avoid;
   gap: 10px;
-  margin: 0 0 12px;
   border: 1px solid var(--ak-border);
   border-radius: 8px;
   background: var(--ak-surface-subtle);

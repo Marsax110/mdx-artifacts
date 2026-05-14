@@ -9,10 +9,9 @@ export async function initProject(projectRoot: string) {
   await mkdir(agentsDir, { recursive: true });
 
   await writeFile(
-    path.join(projectRoot, "artifact-kit.config.ts"),
-    `import type { ArtifactKitConfig } from "./src/cli/types";
-
-const config: ArtifactKitConfig = {
+    path.join(projectRoot, "artifact-kit.config.mjs"),
+    `/** @type {import("mdx-artifacts").ArtifactKitConfig} */
+const config = {
   docsDir: "artifact-docs",
   outDir: "dist/artifacts",
   includeDefaultStyles: true,
@@ -40,11 +39,12 @@ export default config;
 
   await writeFile(
     path.join(docsDir, "hello.mdx"),
-    `import { DecisionMatrix, ExportPanel } from "../../src/react";
+    `import { DecisionMatrix, ExportPanel } from "mdx-artifacts/react";
 
 # Hello Artifact
 
 <DecisionMatrix
+  id="decision.initialized"
   question="Has Artifact Kit been initialized?"
   options={[
     {

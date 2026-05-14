@@ -8,3 +8,4 @@ coverage/
 storybook-static/
 docs/local/
 *.local.md
+artifact-docs/examples/*.state.json

@@ -12,11 +12,9 @@ const defaultConfig: Required<ArtifactKitConfig> = {
 };
 
 export async function loadConfig(projectRoot: string): Promise<Required<ArtifactKitConfig>> {
-  const configPath = path.join(projectRoot, "artifact-kit.config.ts");
+  const configPath = await findConfigPath(projectRoot);
 
-  try {
-    await access(configPath);
-  } catch {
+  if (!configPath) {
     return defaultConfig;
   }
 
@@ -24,6 +22,20 @@ export async function loadConfig(projectRoot: string): Promise<Required<Artifact
     const imported = (await import(pathToFileURL(configPath).href)) as { default?: ArtifactKitConfig };
     return { ...defaultConfig, ...(imported.default ?? {}) };
   } catch (error) {
-    throw new Error(`Failed to read artifact-kit.config.ts: ${String(error)}`);
+    throw new Error(`Failed to read ${path.basename(configPath)}: ${String(error)}`);
   }
+}
+
+async function findConfigPath(projectRoot: string) {
+  for (const filename of ["artifact-kit.config.mjs", "artifact-kit.config.js", "artifact-kit.config.ts"]) {
+    const configPath = path.join(projectRoot, filename);
+    try {
+      await access(configPath);
+      return configPath;
+    } catch {
+      // Try the next supported config filename.
+    }
+  }
+
+  return undefined;
 }

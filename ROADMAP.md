@@ -141,17 +141,18 @@ Current direction:
 - Use explicit `Section`, component `id`, and `CommentTarget` boundaries first.
 - Use one primary review thread per `anchorId` in the first review model.
 - Render multiple thread messages so user comments and assistant replies remain distinct.
+- Keep threads whose anchors disappear from the current MDX in a separate unplaced comments sheet instead of dropping them or forcing them into the content flow.
 - Provide `CommentLayer` automatically from the Storybook and artifact shells instead of requiring MDX authors to add it manually.
 - Show a side review rail on wide screens and click-open popovers on narrow screens.
 - Share the same thread/message rendering between rails and popovers so editing behavior stays consistent.
-- Persist local review state through sibling `.state.json` files when the local daemon is available.
+- Persist local review state through sibling `.state.json` files when the local daemon is available, and keep open pages synchronized with external state writes from agents.
 - Use `artifact-kit review add` and `artifact-kit review reply` for narrow state writes from agents.
 
 Next validation step:
 
 - Keep validating `Section id="..."` as the explicit prose boundary in `docs/local/streamlit-style-mixed.zh-CN.local.mdx`.
-- Update the comment UI from a flat `ArtifactComment[]` model to a thread/message model.
-- Verify the minimal loop: user creates a thread, agent edits MDX, agent replies through the CLI, and the page shows the assistant reply after reload.
+- Add `artifact-kit review validate <file.mdx>` so agents can detect state threads whose `anchorId` no longer exists in the current MDX.
+- Verify the minimal loop: user creates a thread, agent edits MDX, agent replies through the CLI, and the page shows the assistant reply without a manual state export.
 
 Deferred:
 
@@ -160,6 +161,26 @@ Deferred:
 - Multiple independent threads per target.
 - Server-side persistence.
 - Realtime collaboration.
+
+## Phase 2.5: Package Readiness
+
+Goal:
+
+- Make the npm package installable and smoke-testable from a clean temporary project.
+- Keep published examples and generated scaffolds aligned with package imports instead of repository-internal source paths.
+
+Current direction:
+
+- Build publishable output into `dist/lib`.
+- Run a post-build ESM rewrite so TypeScript output uses Node-compatible `.js` relative imports.
+- Generate `artifact-kit.config.mjs` from `artifact-kit init` for npm users.
+- Treat `react` and `react-dom` as peer dependencies while keeping them as repository dev dependencies.
+- Use `pnpm pack:smoke` to verify import, CLI lookup, init, validate, build, and package file boundaries.
+
+Next validation step:
+
+- Convert published MDX examples to package imports such as `mdx-artifacts/react`, or remove examples from the npm tarball until their import boundary is publish-safe.
+- Add CI coverage for `pnpm check`, `pnpm build:cli`, and `pnpm pack:smoke`.
 
 ## Phase 3: Docs Site Adapter
 
