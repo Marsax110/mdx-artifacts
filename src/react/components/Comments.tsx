@@ -2,12 +2,14 @@ import type { CSSProperties, FormEvent, ReactNode } from "react";
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import {
-  createArtifactCommentsFromState as createCommentsFromState,
+  createArtifactThreadsFromState as createThreadsFromState,
+  type ArtifactStateMessage,
+  type ArtifactStateReviewThread,
   useOptionalArtifactState
 } from "./ArtifactState";
 import { InlineText } from "./InlineText";
 
-export { createArtifactCommentsFromState } from "./ArtifactState";
+export { createArtifactCommentsFromState, createArtifactThreadsFromState } from "./ArtifactState";
 
 export type ArtifactComment = {
   id: string;
@@ -19,8 +21,12 @@ export type ArtifactComment = {
 };
 
 export type CommentExportValue = {
-  comments: ArtifactComment[];
+  comments?: ArtifactComment[];
+  threads?: ArtifactReviewThread[];
 };
+
+export type ArtifactReviewMessage = ArtifactStateMessage;
+export type ArtifactReviewThread = ArtifactStateReviewThread;
 
 export type CommentLayerProps = {
   children: ReactNode;
@@ -58,7 +64,7 @@ export type AddCommentInput = {
 
 type CommentLayerValue = {
   activeTargetId?: string;
-  comments: ArtifactComment[];
+  threads: ArtifactReviewThread[];
   addComment: (input: AddCommentInput) => void;
   closePanel: (targetId: string) => void;
   closeTarget: () => void;
@@ -92,11 +98,11 @@ type CommentTargetAnchor = {
 };
 
 type CommentReviewPanel = {
-  comments: ArtifactComment[];
   isActive?: boolean;
   number: number;
   side: "left" | "right";
   targetId: string;
+  thread?: ArtifactReviewThread;
   title: string;
   top: number;
 };
@@ -106,14 +112,14 @@ const CommentContext = createContext<CommentLayerValue | null>(null);
 export function CommentLayer({ children }: CommentLayerProps) {
   const artifactState = useOptionalArtifactState();
   const [activeTargetId, setActiveTargetId] = useState<string | undefined>();
-  const [comments, setComments] = useState<ArtifactComment[]>([]);
+  const [threads, setThreads] = useState<ArtifactReviewThread[]>([]);
   const [openTargetIds, setOpenTargetIds] = useState<string[]>([]);
   const [targets, setTargets] = useState<Record<string, CommentTargetAnchor>>({});
   const [targetIds, setTargetIds] = useState<string[]>([]);
   const nextId = useRef(1);
-  const pendingPersistComments = useRef<ArtifactComment[] | undefined>(undefined);
+  const pendingPersistThreads = useRef<ArtifactReviewThread[] | undefined>(undefined);
   const didHydrateState = useRef(false);
-  const panels = createReviewPanels(activeTargetId, comments, openTargetIds, targetIds, targets);
+  const panels = createReviewPanels(activeTargetId, threads, openTargetIds, targetIds, targets);
 
   useEffect(() => {
     if (didHydrateState.current || !artifactState?.state) {
@@ -121,44 +127,44 @@ export function CommentLayer({ children }: CommentLayerProps) {
     }
 
     didHydrateState.current = true;
-    const savedComments = createCommentsFromState(artifactState.state);
-    if (savedComments.length === 0) {
+    const savedThreads = createThreadsFromState(artifactState.state);
+    if (savedThreads.length === 0) {
       return;
     }
 
-    setComments((current) => (current.length > 0 ? current : savedComments));
+    setThreads((current) => (current.length > 0 ? current : savedThreads));
     setOpenTargetIds((current) =>
-      current.length > 0 ? current : uniqueValues(savedComments.map((comment) => comment.blockId))
+      current.length > 0 ? current : uniqueValues(savedThreads.map((thread) => thread.blockId))
     );
   }, [artifactState?.state]);
 
   useEffect(() => {
-    if (!artifactState || pendingPersistComments.current !== comments) {
+    if (!artifactState || pendingPersistThreads.current !== threads) {
       return;
     }
 
-    pendingPersistComments.current = undefined;
-    void artifactState.actions.saveComments(comments);
-  }, [artifactState, comments]);
+    pendingPersistThreads.current = undefined;
+    void artifactState.actions.saveThreads(threads);
+  }, [artifactState, threads]);
 
   const value = useMemo<CommentLayerValue>(
     () => ({
       activeTargetId,
-      comments,
+      threads,
       addComment(input) {
-        const comment = createArtifactComment(input, `comment-${nextId.current}`, new Date().toISOString());
-        if (!comment) {
+        const thread = createArtifactThread(input, `thread-${nextId.current}`, `comment-${nextId.current}`, new Date().toISOString());
+        if (!thread) {
           return;
         }
 
-        const nextComments = comments.some((item) => item.blockId === comment.blockId)
-          ? comments.map((item) => (item.blockId === comment.blockId ? { ...item, comment: comment.comment } : item))
-          : [...comments, comment];
+        const nextThreads = threads.some((item) => item.blockId === thread.blockId)
+          ? threads.map((item) => (item.blockId === thread.blockId ? replaceUserMessage(item, thread.messages[0]) : item))
+          : [...threads, thread];
 
         nextId.current += 1;
-        pendingPersistComments.current = nextComments;
-        setComments(nextComments);
-        setOpenTargetIds((current) => (current.includes(comment.blockId) ? current : [...current, comment.blockId]));
+        pendingPersistThreads.current = nextThreads;
+        setThreads(nextThreads);
+        setOpenTargetIds((current) => (current.includes(thread.blockId) ? current : [...current, thread.blockId]));
       },
       closePanel(targetId) {
         setOpenTargetIds((current) => current.filter((item) => item !== targetId));
@@ -202,12 +208,17 @@ export function CommentLayer({ children }: CommentLayerProps) {
           return;
         }
 
-        const nextComments = comments.map((item) => (item.id === commentId ? { ...item, comment: normalized } : item));
-        pendingPersistComments.current = nextComments;
-        setComments(nextComments);
+        const nextThreads = threads.map((thread) => ({
+          ...thread,
+          messages: thread.messages.map((message) =>
+            message.id === commentId && message.role === "user" ? { ...message, body: normalized } : message
+          )
+        }));
+        pendingPersistThreads.current = nextThreads;
+        setThreads(nextThreads);
       }
     }),
-    [activeTargetId, comments, panels, targetIds, targets]
+    [activeTargetId, panels, targetIds, targets, threads]
   );
 
   const isReviewLayoutActive = activeTargetId !== undefined || openTargetIds.length > 0;
@@ -244,7 +255,8 @@ export function CommentTarget({ targetId, title, description, children, classNam
   const [compactDraft, setCompactDraft] = useState("");
   const [compactEditingCommentId, setCompactEditingCommentId] = useState<string | undefined>();
   const [compactEditingDraft, setCompactEditingDraft] = useState("");
-  const blockComments = layer?.comments.filter((comment) => comment.blockId === targetId) ?? [];
+  const blockThread = layer?.threads.find((thread) => thread.blockId === targetId);
+  const blockMessageCount = blockThread?.messages.length ?? 0;
   const targetNumber = layer?.getTargetNumber(targetId);
   const isOpen = layer?.activeTargetId === targetId;
 
@@ -348,9 +360,9 @@ export function CommentTarget({ targetId, title, description, children, classNam
     setCompactComposerOpen(false);
   }
 
-  function beginCompactEdit(comment: ArtifactComment) {
-    setCompactEditingCommentId(comment.id);
-    setCompactEditingDraft(comment.comment);
+  function beginCompactEdit(message: ArtifactReviewMessage) {
+    setCompactEditingCommentId(message.id);
+    setCompactEditingDraft(message.body);
   }
 
   function cancelCompactEdit() {
@@ -372,7 +384,7 @@ export function CommentTarget({ targetId, title, description, children, classNam
     <section
       className={classNames(
         "ak-comment-target-block",
-        blockComments.length > 0 ? "ak-comment-target-has-comments" : undefined,
+        blockThread ? "ak-comment-target-has-comments" : undefined,
         isOpen ? "ak-comment-target-selected" : undefined,
         isCompactPopoverOpen ? "ak-comment-target-popover-open" : undefined,
         isCompactComposerOpen ? "ak-comment-target-composer-open" : undefined,
@@ -384,7 +396,7 @@ export function CommentTarget({ targetId, title, description, children, classNam
       ref={targetRef}
     >
       <div className="ak-comment-target-content">{children}</div>
-      {blockComments.length > 0 ? (
+      {blockThread ? (
         <span className="ak-comment-marker-anchor">
           <button
             aria-label={`Show comments on ${title}`}
@@ -392,10 +404,9 @@ export function CommentTarget({ targetId, title, description, children, classNam
             onClick={handleMarkerClick}
             type="button"
           >
-            #{targetNumber ?? "?"} · {blockComments.length}
+            #{targetNumber ?? "?"} · {blockMessageCount}
           </button>
           <CommentTargetPopover
-            comments={blockComments}
             editingCommentId={compactEditingCommentId}
             editingDraft={compactEditingDraft}
             number={targetNumber}
@@ -404,11 +415,12 @@ export function CommentTarget({ targetId, title, description, children, classNam
             onClose={closeCompactPopover}
             onEditingDraftChange={setCompactEditingDraft}
             onSubmitEdit={submitCompactEdit}
+            thread={blockThread}
             title={title}
           />
         </span>
       ) : null}
-      {blockComments.length === 0 ? (
+      {!blockThread ? (
         <span className="ak-comment-affordance-anchor">
           <button
             aria-label={`Comment on ${title}`}
@@ -471,7 +483,6 @@ function CommentTargetComposer({
 }
 
 function CommentTargetPopover({
-  comments,
   editingCommentId,
   editingDraft,
   number,
@@ -480,17 +491,18 @@ function CommentTargetPopover({
   onClose,
   onEditingDraftChange,
   onSubmitEdit,
+  thread,
   title
 }: {
-  comments: ArtifactComment[];
   editingCommentId: string | undefined;
   editingDraft: string;
   number: number | undefined;
-  onBeginEdit: (comment: ArtifactComment) => void;
+  onBeginEdit: (message: ArtifactReviewMessage) => void;
   onCancelEdit: () => void;
   onClose: () => void;
   onEditingDraftChange: (value: string) => void;
   onSubmitEdit: (event: FormEvent<HTMLFormElement>, commentId: string) => void;
+  thread: ArtifactReviewThread;
   title: string;
 }) {
   return (
@@ -502,8 +514,7 @@ function CommentTargetPopover({
           Close
         </button>
       </div>
-      <CommentList
-        comments={comments}
+      <ThreadMessageList
         editingCommentId={editingCommentId}
         editingDraft={editingDraft}
         number={number}
@@ -511,37 +522,39 @@ function CommentTargetPopover({
         onCancelEdit={onCancelEdit}
         onEditingDraftChange={onEditingDraftChange}
         onSubmitEdit={onSubmitEdit}
+        thread={thread}
       />
     </aside>
   );
 }
 
-function CommentList({
-  comments,
+function ThreadMessageList({
   editingCommentId,
   editingDraft,
   number,
   onBeginEdit,
   onCancelEdit,
   onEditingDraftChange,
-  onSubmitEdit
+  onSubmitEdit,
+  thread
 }: {
-  comments: ArtifactComment[];
   editingCommentId: string | undefined;
   editingDraft: string;
   number: number | undefined;
-  onBeginEdit: (comment: ArtifactComment) => void;
+  onBeginEdit: (message: ArtifactReviewMessage) => void;
   onCancelEdit: () => void;
   onEditingDraftChange: (value: string) => void;
   onSubmitEdit: (event: FormEvent<HTMLFormElement>, commentId: string) => void;
+  thread: ArtifactReviewThread;
 }) {
   return (
     <ul className="ak-comment-list">
-      {comments.map((comment, index) => (
-        <li className="ak-comment-item" key={comment.id}>
+      {thread.messages.map((message, index) => (
+        <li className={classNames("ak-comment-item", `ak-comment-item-${message.role}`)} key={message.id}>
           <span className="ak-comment-item-number">#{number ?? "?"}.{index + 1}</span>
-          {editingCommentId === comment.id ? (
-            <form className="ak-comment-edit-form" onSubmit={(event) => onSubmitEdit(event, comment.id)}>
+          <span className="ak-comment-role-label">{message.role === "assistant" ? "Agent" : "User"}</span>
+          {editingCommentId === message.id ? (
+            <form className="ak-comment-edit-form" onSubmit={(event) => onSubmitEdit(event, message.id)}>
               <textarea
                 aria-label={`Edit comment ${number ?? "?"}.${index + 1}`}
                 className="ak-comment-input ak-comment-edit-input"
@@ -559,12 +572,14 @@ function CommentList({
             </form>
           ) : (
             <>
-              <p>{comment.comment}</p>
+              <p>{message.body}</p>
               <div className="ak-comment-item-footer">
-                <time dateTime={comment.createdAt}>{comment.createdAt}</time>
-                <button className="ak-comment-edit-button" onClick={() => onBeginEdit(comment)} type="button">
-                  Edit
-                </button>
+                {message.createdAt ? <time dateTime={message.createdAt}>{message.createdAt}</time> : <span />}
+                {message.role === "user" ? (
+                  <button className="ak-comment-edit-button" onClick={() => onBeginEdit(message)} type="button">
+                    Edit
+                  </button>
+                ) : null}
               </div>
             </>
           )}
@@ -585,7 +600,7 @@ function CommentReviewRail({ side }: { side: "left" | "right" }) {
   const panels = context.getPanels().filter((panel) => panel.side === side);
   const positionedPanels = positionReviewPanels(panels, panelHeights, railTop);
   const panelSignature = panels
-    .map((panel) => `${panel.targetId}:${panel.comments.length}:${panel.isActive ? "active" : "idle"}`)
+    .map((panel) => `${panel.targetId}:${panel.thread?.messages.length ?? 0}:${panel.isActive ? "active" : "idle"}`)
     .join("|");
   const railRef = useRef<HTMLElement | null>(null);
   const panelRefs = useRef(new Map<string, HTMLElement>());
@@ -656,9 +671,9 @@ function CommentReviewRail({ side }: { side: "left" | "right" }) {
     context.closeTarget();
   }
 
-  function beginEdit(comment: ArtifactComment) {
-    setEditingCommentId(comment.id);
-    setEditingDraft(comment.comment);
+  function beginEdit(message: ArtifactReviewMessage) {
+    setEditingCommentId(message.id);
+    setEditingDraft(message.body);
   }
 
   function submitEdit(event: FormEvent<HTMLFormElement>, commentId: string) {
@@ -691,7 +706,7 @@ function CommentReviewRail({ side }: { side: "left" | "right" }) {
                 Close
               </button>
             </div>
-            {isActive && panel.comments.length === 0 ? (
+            {isActive && !panel.thread ? (
               <form className="ak-comment-form" onSubmit={submitComment}>
                 <textarea
                   aria-label={`Comment on ${panel.title}`}
@@ -707,9 +722,8 @@ function CommentReviewRail({ side }: { side: "left" | "right" }) {
                 </div>
               </form>
             ) : null}
-            {panel.comments.length > 0 ? (
-              <CommentList
-                comments={panel.comments}
+            {panel.thread ? (
+              <ThreadMessageList
                 editingCommentId={editingCommentId}
                 editingDraft={editingDraft}
                 number={panel.number}
@@ -720,6 +734,7 @@ function CommentReviewRail({ side }: { side: "left" | "right" }) {
                 }}
                 onEditingDraftChange={setEditingDraft}
                 onSubmitEdit={submitEdit}
+                thread={panel.thread}
               />
             ) : null}
           </section>
@@ -734,7 +749,7 @@ export function CommentExport({ title = "Export Comments", formats = ["markdown"
   const [format, setFormat] = useState<CommentExportFormat>(formats[0] ?? "markdown");
   const [isOpen, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-  const exportValue: CommentExportValue = { comments: layer.comments };
+  const exportValue: CommentExportValue = { comments: createCommentsFromThreads(layer.threads), threads: layer.threads };
   const output = format === "json" ? JSON.stringify(exportValue, null, 2) : serializeCommentsToMarkdown(exportValue);
 
   async function copyOutput() {
@@ -790,23 +805,30 @@ export function CommentExport({ title = "Export Comments", formats = ["markdown"
 
 export function useOptionalCommentExportValue(): CommentExportValue | undefined {
   const layer = useOptionalCommentLayer();
-  return layer ? { comments: layer.comments } : undefined;
+  return layer ? { comments: createCommentsFromThreads(layer.threads), threads: layer.threads } : undefined;
 }
 
 export function serializeCommentsToMarkdown(value: CommentExportValue) {
-  if (value.comments.length === 0) {
+  const threads = value.threads ?? createThreadsFromComments(value.comments ?? []);
+  if (threads.length === 0) {
     return "# Artifact comments\n\nNo comments yet.";
   }
 
   return [
     "# Artifact comments",
     "",
-    ...value.comments.flatMap((comment) => [
-      `## ${comment.blockTitle}`,
-      `- blockId: ${comment.blockId}`,
-      comment.blockDescription ? `- description: ${comment.blockDescription}` : undefined,
-      `- createdAt: ${comment.createdAt}`,
-      `- comment: ${comment.comment}`,
+    ...threads.flatMap((thread) => [
+      `## ${thread.blockTitle}`,
+      `- blockId: ${thread.blockId}`,
+      `- status: ${thread.status}`,
+      thread.blockDescription ? `- description: ${thread.blockDescription}` : undefined,
+      "",
+      "### Messages",
+      "",
+      ...thread.messages.map((message) => {
+        const createdAt = message.createdAt ? ` (${message.createdAt})` : "";
+        return `- ${message.role}${createdAt}: ${message.body}`;
+      }),
       ""
     ].filter(Boolean) as string[])
   ].join("\n").trimEnd();
@@ -828,9 +850,88 @@ export function createArtifactComment(input: AddCommentInput, id: string, create
   };
 }
 
+export function createArtifactThread(
+  input: AddCommentInput,
+  threadId: string,
+  messageId: string,
+  createdAt: string
+): ArtifactReviewThread | null {
+  const comment = createArtifactComment(input, messageId, createdAt);
+  if (!comment) {
+    return null;
+  }
+
+  return {
+    id: threadId,
+    blockId: comment.blockId,
+    blockTitle: comment.blockTitle,
+    blockDescription: comment.blockDescription,
+    status: "open",
+    messages: [
+      {
+        id: comment.id,
+        role: "user",
+        body: comment.comment,
+        createdAt: comment.createdAt
+      }
+    ]
+  };
+}
+
+function replaceUserMessage(thread: ArtifactReviewThread, message: ArtifactReviewMessage | undefined) {
+  if (!message) {
+    return thread;
+  }
+
+  const hasUserMessage = thread.messages.some((item) => item.role === "user");
+  return {
+    ...thread,
+    messages: hasUserMessage
+      ? thread.messages.map((item) => (item.role === "user" ? { ...item, body: message.body } : item))
+      : [message, ...thread.messages]
+  };
+}
+
+function createCommentsFromThreads(threads: ArtifactReviewThread[]): ArtifactComment[] {
+  return threads.flatMap((thread) => {
+    const userMessage = thread.messages.find((message) => message.role === "user");
+    if (!userMessage) {
+      return [];
+    }
+
+    return [
+      {
+        id: userMessage.id,
+        blockId: thread.blockId,
+        blockTitle: thread.blockTitle,
+        blockDescription: thread.blockDescription,
+        comment: userMessage.body,
+        createdAt: userMessage.createdAt ?? ""
+      }
+    ];
+  });
+}
+
+function createThreadsFromComments(comments: ArtifactComment[]): ArtifactReviewThread[] {
+  return comments.flatMap((comment) => {
+    const thread = createArtifactThread(
+      {
+        blockId: comment.blockId,
+        blockTitle: comment.blockTitle,
+        blockDescription: comment.blockDescription,
+        comment: comment.comment
+      },
+      `thread-${comment.id}`,
+      comment.id,
+      comment.createdAt
+    );
+    return thread ? [thread] : [];
+  });
+}
+
 function createReviewPanels(
   activeTargetId: string | undefined,
-  comments: ArtifactComment[],
+  threads: ArtifactReviewThread[],
   openTargetIds: string[],
   targetIds: string[],
   targets: Record<string, CommentTargetAnchor>
@@ -838,31 +939,31 @@ function createReviewPanels(
   const panelMap = new Map<
     string,
     {
-      comments: ArtifactComment[];
       number: number;
       side: "left" | "right";
       targetId: string;
+      thread?: ArtifactReviewThread;
       title: string;
       top: number;
       isActive?: boolean;
     }
   >();
 
-  for (const comment of comments) {
-    if (!openTargetIds.includes(comment.blockId) && activeTargetId !== comment.blockId) {
+  for (const thread of threads) {
+    if (!openTargetIds.includes(thread.blockId) && activeTargetId !== thread.blockId) {
       continue;
     }
 
-    const number = targetIds.indexOf(comment.blockId) + 1 || panelMap.size + 1;
-    const target = targets[comment.blockId];
-    panelMap.set(comment.blockId, {
-      comments: [...(panelMap.get(comment.blockId)?.comments ?? []), comment],
+    const number = targetIds.indexOf(thread.blockId) + 1 || panelMap.size + 1;
+    const target = targets[thread.blockId];
+    panelMap.set(thread.blockId, {
       number,
-      side: panelMap.get(comment.blockId)?.side ?? target?.side ?? "right",
-      targetId: comment.blockId,
-      title: comment.blockTitle,
-      top: panelMap.get(comment.blockId)?.top ?? target?.top ?? 16,
-      isActive: activeTargetId === comment.blockId
+      side: panelMap.get(thread.blockId)?.side ?? target?.side ?? "right",
+      targetId: thread.blockId,
+      thread,
+      title: thread.blockTitle,
+      top: panelMap.get(thread.blockId)?.top ?? target?.top ?? 16,
+      isActive: activeTargetId === thread.blockId
     });
   }
 
@@ -870,10 +971,10 @@ function createReviewPanels(
     const activeTarget = targets[activeTargetId];
     const current = panelMap.get(activeTargetId);
     panelMap.set(activeTargetId, {
-      comments: current?.comments ?? [],
       number: targetIds.indexOf(activeTargetId) + 1 || panelMap.size + 1,
       side: activeTarget.side,
       targetId: activeTargetId,
+      thread: current?.thread,
       title: activeTarget.title,
       top: activeTarget.top,
       isActive: true
@@ -897,8 +998,8 @@ function positionReviewPanels<T extends CommentReviewPanel>(
   });
 }
 
-function estimatePanelHeight(panel: { comments: ArtifactComment[]; isActive?: boolean }) {
-  return 54 + (panel.isActive ? 150 : 0) + panel.comments.length * 96;
+function estimatePanelHeight(panel: { thread?: ArtifactReviewThread; isActive?: boolean }) {
+  return 54 + (panel.isActive ? 150 : 0) + (panel.thread?.messages.length ?? 0) * 96;
 }
 
 function anchorFromRect(input: RegisterCommentTargetInput): CommentTargetAnchor {

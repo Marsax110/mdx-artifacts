@@ -968,6 +968,26 @@ body {
   font-weight: 700;
 }
 
+.ak-comment-role-label {
+  width: max-content;
+  border: 1px solid var(--ak-border);
+  border-radius: 999px;
+  color: var(--ak-muted);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 3px 7px;
+}
+
+.ak-comment-item-assistant {
+  background: var(--ak-surface);
+}
+
+.ak-comment-item-assistant .ak-comment-role-label {
+  border-color: var(--ak-comment-accent-subtle);
+  color: var(--ak-comment-accent);
+}
+
 .ak-comment-item p {
   margin: 0;
   line-height: 1.5;

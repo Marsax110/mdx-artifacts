@@ -7,6 +7,7 @@ import {
   CommentTarget,
   createArtifactComment,
   createArtifactCommentsFromState,
+  createArtifactThreadsFromState,
   serializeCommentsToMarkdown
 } from "./Comments";
 import { createArtifactStateFromComments } from "./ArtifactState";
@@ -254,10 +255,43 @@ describe("Comment components", () => {
     expect(markdown).toContain("# Artifact comments");
     expect(markdown).toContain("## Decision path");
     expect(markdown).toContain("- blockId: decision-path");
+    expect(markdown).toContain("- status: open");
     expect(markdown).toContain("- description: Main tradeoff");
-    expect(markdown).toContain("- comment: Prefer the smaller API.");
+    expect(markdown).toContain("### Messages");
+    expect(markdown).toContain("- user (2026-05-13T00:00:00.000Z): Prefer the smaller API.");
     expect(markdown).toContain("## Component menu");
-    expect(markdown).toContain("- comment: Add one more example.");
+    expect(markdown).toContain("- user (2026-05-13T00:01:00.000Z): Add one more example.");
+  });
+
+  it("serializes assistant replies in review thread markdown", () => {
+    const markdown = serializeCommentsToMarkdown({
+      threads: [
+        {
+          id: "thr-risks",
+          blockId: "risks",
+          blockTitle: "Risks",
+          status: "resolved",
+          messages: [
+            {
+              id: "msg-user",
+              role: "user",
+              body: "Add the fallback path.",
+              createdAt: "2026-05-14T10:20:00.000Z"
+            },
+            {
+              id: "msg-assistant",
+              role: "assistant",
+              body: "Added the fallback path.",
+              createdAt: "2026-05-14T10:28:00.000Z"
+            }
+          ]
+        }
+      ]
+    });
+
+    expect(markdown).toContain("- status: resolved");
+    expect(markdown).toContain("- user (2026-05-14T10:20:00.000Z): Add the fallback path.");
+    expect(markdown).toContain("- assistant (2026-05-14T10:28:00.000Z): Added the fallback path.");
   });
 
   it("serializes comments into artifact state threads", () => {
@@ -399,6 +433,58 @@ describe("Comment components", () => {
         blockDescription: "Risk section",
         comment: "Add the fallback path.",
         createdAt: "2026-05-14T10:20:00.000Z"
+      }
+    ]);
+  });
+
+  it("hydrates saved artifact state into review threads with assistant replies", () => {
+    const threads = createArtifactThreadsFromState({
+      threads: [
+        {
+          id: "thr-risks",
+          anchorId: "risks",
+          status: "open",
+          title: "Risks",
+          description: "Risk section",
+          messages: [
+            {
+              id: "msg-user",
+              role: "user",
+              body: "Add the fallback path.",
+              createdAt: "2026-05-14T10:20:00.000Z"
+            },
+            {
+              id: "msg-assistant",
+              role: "assistant",
+              body: "I updated this section.",
+              createdAt: "2026-05-14T10:30:00.000Z"
+            }
+          ]
+        }
+      ]
+    });
+
+    expect(threads).toEqual([
+      {
+        id: "thr-risks",
+        blockId: "risks",
+        blockTitle: "Risks",
+        blockDescription: "Risk section",
+        status: "open",
+        messages: [
+          {
+            id: "msg-user",
+            role: "user",
+            body: "Add the fallback path.",
+            createdAt: "2026-05-14T10:20:00.000Z"
+          },
+          {
+            id: "msg-assistant",
+            role: "assistant",
+            body: "I updated this section.",
+            createdAt: "2026-05-14T10:30:00.000Z"
+          }
+        ]
       }
     ]);
   });

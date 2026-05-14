@@ -46,12 +46,22 @@ export type ArtifactStateComment = {
   createdAt: string;
 };
 
+export type ArtifactStateReviewThread = {
+  id: string;
+  blockId: string;
+  blockTitle: string;
+  blockDescription?: string;
+  status: string;
+  messages: ArtifactStateMessage[];
+};
+
 export type ArtifactStateStatus = "loading" | "static" | "ready" | "saving" | "saved" | "error";
 
 type ArtifactStateContextValue = {
   state?: ArtifactStateValue;
   actions: {
     saveComments: (comments: ArtifactStateComment[]) => Promise<void>;
+    saveThreads: (threads: ArtifactStateReviewThread[]) => Promise<void>;
     saveState: (state: unknown) => Promise<void>;
   };
   meta: {
@@ -123,6 +133,14 @@ export function ArtifactStateProvider({ children }: ArtifactStateProviderProps) 
           const nextState = createArtifactStateFromComments(comments, state, daemonMeta.sourcePath);
           await saveArtifactState(nextState, daemonMeta, setStatus, setState);
         },
+        async saveThreads(threads) {
+          if (!daemonMeta) {
+            return;
+          }
+
+          const nextState = createArtifactStateFromThreads(threads, state, daemonMeta.sourcePath);
+          await saveArtifactState(nextState, daemonMeta, setStatus, setState);
+        },
         async saveState(nextState) {
           if (!daemonMeta) {
             return;
@@ -151,24 +169,52 @@ export function createArtifactStateFromComments(
   currentState: unknown,
   sourcePath: string
 ): ArtifactStateValue {
+  return createArtifactStateFromThreads(comments.map(createReviewThreadFromComment), currentState, sourcePath);
+}
+
+export function createArtifactStateFromThreads(
+  threads: ArtifactStateReviewThread[],
+  currentState: unknown,
+  sourcePath: string
+): ArtifactStateValue {
   const baseState = normalizeArtifactState(currentState, sourcePath);
-  const commentThreads = comments.map((comment) => createThreadFromComment(comment, baseState.threads));
-  const commentAnchorIds = new Set(commentThreads.map((thread) => thread.anchorId));
-  const retainedThreads = baseState.threads.filter((thread) => !commentAnchorIds.has(thread.anchorId));
+  const reviewThreads = threads.map((thread) => createStateThreadFromReviewThread(thread, baseState.threads));
+  const threadAnchorIds = new Set(reviewThreads.map((thread) => thread.anchorId));
+  const retainedThreads = baseState.threads.filter((thread) => !threadAnchorIds.has(thread.anchorId));
 
   return {
     ...baseState,
     source: sourcePath,
-    threads: [...retainedThreads, ...commentThreads]
+    threads: [...retainedThreads, ...reviewThreads]
   };
 }
 
 export function createArtifactCommentsFromState(value: unknown): ArtifactStateComment[] {
+  return createArtifactThreadsFromState(value).flatMap((thread) => {
+    const userMessage = thread.messages.find((message) => message.role === "user" && message.body.trim().length > 0);
+    if (!userMessage) {
+      return [];
+    }
+
+    return [
+      {
+        id: userMessage.id,
+        blockId: thread.blockId,
+        blockTitle: thread.blockTitle,
+        blockDescription: thread.blockDescription,
+        comment: userMessage.body.trim(),
+        createdAt: userMessage.createdAt ?? ""
+      }
+    ];
+  });
+}
+
+export function createArtifactThreadsFromState(value: unknown): ArtifactStateReviewThread[] {
   if (!isRecord(value) || !Array.isArray(value.threads)) {
     return [];
   }
 
-  return value.threads.flatMap((thread) => createArtifactCommentFromThread(thread));
+  return value.threads.flatMap((thread) => createArtifactThreadFromStateThread(thread));
 }
 
 async function saveArtifactState(
@@ -223,49 +269,77 @@ function createEmptyArtifactState(sourcePath: string): ArtifactStateValue {
   };
 }
 
-function createThreadFromComment(comment: ArtifactStateComment, currentThreads: ArtifactStateThread[]): ArtifactStateThread {
-  const currentThread = currentThreads.find((thread) => thread.anchorId === comment.blockId);
-  const currentMessages = currentThread?.messages ?? [];
-  const currentUserMessage = currentMessages.find((message) => message.role === "user");
-  const userMessage: ArtifactStateMessage = {
-    ...currentUserMessage,
-    id: currentUserMessage?.id ?? `msg-${comment.id}`,
-    role: "user",
-    body: comment.comment,
-    createdAt: currentUserMessage?.createdAt ?? comment.createdAt
-  };
-  const assistantMessages = currentMessages.filter((message) => message.role === "assistant");
-
+function createReviewThreadFromComment(comment: ArtifactStateComment): ArtifactStateReviewThread {
   return {
-    ...currentThread,
-    id: resolveThreadId(currentThread?.id, comment.blockId),
-    anchorId: comment.blockId,
-    status: currentThread?.status ?? "open",
-    title: comment.blockTitle,
-    description: comment.blockDescription,
-    messages: [userMessage, ...assistantMessages]
+    id: `thread-${comment.id}`,
+    blockId: comment.blockId,
+    blockTitle: comment.blockTitle,
+    blockDescription: comment.blockDescription,
+    status: "open",
+    messages: [
+      {
+        id: comment.id,
+        role: "user",
+        body: comment.comment,
+        createdAt: comment.createdAt
+      }
+    ]
   };
 }
 
-function createArtifactCommentFromThread(thread: unknown): ArtifactStateComment[] {
+function createStateThreadFromReviewThread(
+  thread: ArtifactStateReviewThread,
+  currentThreads: ArtifactStateThread[]
+): ArtifactStateThread {
+  const currentThread = currentThreads.find((item) => item.anchorId === thread.blockId);
+  const currentMessages = currentThread?.messages ?? [];
+  const messages = thread.messages.map((message) => {
+    const currentMessage =
+      currentMessages.find((item) => item.id === message.id) ??
+      (message.role === "user" ? currentMessages.find((item) => item.role === "user") : undefined);
+    return {
+      ...currentMessage,
+      id: currentMessage?.id ?? message.id,
+      role: message.role,
+      body: message.body,
+      createdAt: currentMessage?.createdAt ?? message.createdAt
+    };
+  });
+  const messageIds = new Set(messages.map((message) => message.id));
+  const retainedAssistantMessages = currentMessages.filter(
+    (message) => message.role === "assistant" && !messageIds.has(message.id)
+  );
+
+  return {
+    ...currentThread,
+    id: resolveThreadId(currentThread?.id, thread.blockId),
+    anchorId: thread.blockId,
+    status: thread.status,
+    title: thread.blockTitle,
+    description: thread.blockDescription,
+    messages: [...messages, ...retainedAssistantMessages]
+  };
+}
+
+function createArtifactThreadFromStateThread(thread: unknown): ArtifactStateReviewThread[] {
   if (!isRecord(thread) || typeof thread.anchorId !== "string" || !Array.isArray(thread.messages)) {
     return [];
   }
 
   const typedThread = thread as ArtifactStateThread & { anchorId: string };
-  const userMessage = thread.messages.find(isUserStateMessage);
-  if (!userMessage) {
+  const messages = thread.messages.filter(isStateMessage);
+  if (messages.length === 0) {
     return [];
   }
 
   return [
     {
-      id: typeof userMessage.id === "string" ? userMessage.id : `comment-${typedThread.anchorId}`,
+      id: typedThread.id,
       blockId: typedThread.anchorId,
       blockTitle: typeof typedThread.title === "string" ? typedThread.title : typedThread.anchorId,
       blockDescription: typeof typedThread.description === "string" ? typedThread.description : undefined,
-      comment: userMessage.body.trim(),
-      createdAt: typeof userMessage.createdAt === "string" ? userMessage.createdAt : ""
+      status: typeof typedThread.status === "string" ? typedThread.status : "open",
+      messages
     }
   ];
 }
@@ -286,8 +360,14 @@ function isArtifactStateThread(value: unknown): value is ArtifactStateThread {
   return typeof value.id === "string" && typeof value.anchorId === "string" && Array.isArray(value.messages);
 }
 
-function isUserStateMessage(value: unknown): value is ArtifactStateMessage & { body: string } {
-  return isRecord(value) && value.role === "user" && typeof value.body === "string" && value.body.trim().length > 0;
+function isStateMessage(value: unknown): value is ArtifactStateMessage {
+  return (
+    isRecord(value) &&
+    typeof value.id === "string" &&
+    (value.role === "user" || value.role === "assistant") &&
+    typeof value.body === "string" &&
+    value.body.trim().length > 0
+  );
 }
 
 function isArtifactStateMeta(value: unknown): value is ArtifactStateMeta {
@@ -300,7 +380,7 @@ function isArtifactStateMeta(value: unknown): value is ArtifactStateMeta {
 }
 
 function resolveThreadId(currentId: string | undefined, anchorId: string) {
-  if (currentId && currentId.length <= 32) {
+  if (currentId && currentId.startsWith("thr") && currentId.length <= 32) {
     return currentId;
   }
 
