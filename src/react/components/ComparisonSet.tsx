@@ -1,9 +1,10 @@
-import type { ReactNode } from "react";
+import { createContext, useContext, type ReactNode } from "react";
 import { Grid, type AkCollapseAt, type AkGap } from "./Layout";
 import { InlineText } from "./InlineText";
 import { CommentTarget } from "./Comments";
 
 export type ComparisonSetProps = {
+  id?: string;
   title: string;
   children: ReactNode;
   columns?: 2 | 3 | 4;
@@ -13,18 +14,31 @@ export type ComparisonSetProps = {
 };
 
 export type ComparisonSetItemProps = {
+  id?: string;
   title: string;
   children: ReactNode;
   value?: string;
   className?: string;
 };
 
-function ComparisonSetRoot({ title, children, columns = 2, gap = "md", collapseAt = "md", className }: ComparisonSetProps) {
+const ComparisonSetIdContext = createContext<string | undefined>(undefined);
+
+function ComparisonSetRoot({
+  id,
+  title,
+  children,
+  columns = 2,
+  gap = "md",
+  collapseAt = "md",
+  className
+}: ComparisonSetProps) {
+  const targetId = id ?? `comparison:${slugify(title)}`;
+
   return (
     <CommentTarget
       className={classNames("ak-comment-target-section", className)}
       description="ComparisonSet component"
-      targetId={`comparison:${slugify(title)}`}
+      targetId={targetId}
       title={title}
     >
       <section className="ak-section ak-comparison-set">
@@ -32,16 +46,19 @@ function ComparisonSetRoot({ title, children, columns = 2, gap = "md", collapseA
           <p className="ak-eyebrow">Comparison Set</p>
           <InlineText as="h2" text={title} variant="title" />
         </div>
-        <Grid collapseAt={collapseAt} columns={columns} gap={gap}>
-          {children}
-        </Grid>
+        <ComparisonSetIdContext.Provider value={id}>
+          <Grid collapseAt={collapseAt} columns={columns} gap={gap}>
+            {children}
+          </Grid>
+        </ComparisonSetIdContext.Provider>
       </section>
     </CommentTarget>
   );
 }
 
-function ComparisonSetItem({ title, children, value, className }: ComparisonSetItemProps) {
-  const targetId = `comparison:${slugify(value ?? title)}`;
+function ComparisonSetItem({ id, title, children, value, className }: ComparisonSetItemProps) {
+  const comparisonSetId = useContext(ComparisonSetIdContext);
+  const targetId = comparisonSetId && id ? `${comparisonSetId}.${id}` : id ?? `comparison:${slugify(value ?? title)}`;
 
   return (
     <CommentTarget

@@ -5,6 +5,7 @@ import { MarkdownBody } from "./MarkdownBody";
 import { SeverityBadge, type SeverityLevel } from "./SeverityBadge";
 
 export type CodeAnnotation = {
+  id?: string;
   line: number;
   body: string;
   title?: string;
@@ -12,6 +13,7 @@ export type CodeAnnotation = {
 };
 
 export type AnnotatedCodeProps = {
+  id?: string;
   code: string;
   annotations: CodeAnnotation[];
   language?: string;
@@ -22,6 +24,7 @@ export type AnnotatedCodeProps = {
 };
 
 export function AnnotatedCode({
+  id,
   code,
   annotations,
   language,
@@ -33,12 +36,13 @@ export function AnnotatedCode({
   const annotationLines = annotations.map((annotation) => annotation.line);
   const highlighted = Array.from(new Set([...highlightLines, ...annotationLines])).sort((a, b) => a - b);
   const title = filename ?? (language ? `${language} annotated code` : "Annotated code");
+  const targetId = id ?? `annotated-code:${slugify(filename ?? language ?? code)}`;
 
   return (
     <CommentTarget
       className={classNames("ak-comment-target-section", className)}
       description="AnnotatedCode component"
-      targetId={`annotated-code:${slugify(filename ?? language ?? code)}`}
+      targetId={targetId}
       title={title}
     >
       <section className="ak-annotated-code">
@@ -46,29 +50,36 @@ export function AnnotatedCode({
           code={code}
           filename={filename}
           highlightLines={highlighted}
+          id={id ? `${id}.code` : undefined}
           language={language}
           showLineNumbers={showLineNumbers}
         />
         {annotations.length > 0 ? (
           <div className="ak-annotation-list">
-            {annotations.map((annotation) => (
-              <CommentTarget
-                className="ak-comment-target-section"
-                description={`Annotation for line ${annotation.line}`}
-                key={`${annotation.line}-${annotation.title ?? annotation.body}`}
-                targetId={`annotation:${slugify(title)}:${annotation.line}:${slugify(annotation.title ?? annotation.body)}`}
-                title={annotation.title ?? `Line ${annotation.line}`}
-              >
-                <article className="ak-annotation" data-line={annotation.line}>
-                  <div className="ak-annotation-header">
-                    <span className="ak-annotation-line">Line {annotation.line}</span>
-                    <SeverityBadge level={annotation.severity ?? "info"} />
-                  </div>
-                  {annotation.title ? <InlineText as="h3" text={annotation.title} variant="subtitle" /> : null}
-                  <MarkdownBody body={annotation.body} variant="compact" />
-                </article>
-              </CommentTarget>
-            ))}
+            {annotations.map((annotation) => {
+              const annotationTargetId = id
+                ? `${id}.${annotation.id ?? `line-${annotation.line}`}`
+                : `annotation:${slugify(title)}:${annotation.line}:${slugify(annotation.title ?? annotation.body)}`;
+
+              return (
+                <CommentTarget
+                  className="ak-comment-target-section"
+                  description={`Annotation for line ${annotation.line}`}
+                  key={`${annotation.line}-${annotation.id ?? annotation.title ?? annotation.body}`}
+                  targetId={annotationTargetId}
+                  title={annotation.title ?? `Line ${annotation.line}`}
+                >
+                  <article className="ak-annotation" data-line={annotation.line}>
+                    <div className="ak-annotation-header">
+                      <span className="ak-annotation-line">Line {annotation.line}</span>
+                      <SeverityBadge level={annotation.severity ?? "info"} />
+                    </div>
+                    {annotation.title ? <InlineText as="h3" text={annotation.title} variant="subtitle" /> : null}
+                    <MarkdownBody body={annotation.body} variant="compact" />
+                  </article>
+                </CommentTarget>
+              );
+            })}
           </div>
         ) : null}
       </section>

@@ -25,6 +25,7 @@ Streamlit works well because authors can write a small amount of text, drop in a
 - the artifact shell controls page width and vertical rhythm
 
 <Callout
+  id="callout.linear-check"
   tone="info"
   title="What this example is checking"
   body="The artifact should read as one continuous document, not as disconnected component demos."
@@ -35,9 +36,11 @@ Streamlit works well because authors can write a small amount of text, drop in a
 The first question is whether the core authoring experience should stay close to native MDX or move toward more explicit text components.
 
 <DecisionMatrix
+  id="decision.native-mdx"
   question="Should top-level prose use native MDX by default?"
   options={[
     {
+      id: "native-mdx",
       name: "Native MDX prose",
       summary:
         "Use regular headings, paragraphs, lists, links, and blockquotes between workflow components.",
@@ -54,6 +57,7 @@ The first question is whether the core authoring experience should stay close to
       verdict: "Recommended baseline",
     },
     {
+      id: "text-components",
       name: "Text components everywhere",
       summary:
         "Require components such as InlineText and MarkdownBody for most visible copy.",
@@ -63,6 +67,7 @@ The first question is whether the core authoring experience should stay close to
       verdict: "Use inside reusable components",
     },
     {
+      id: "raw-html",
       name: "Raw HTML escape hatch",
       summary:
         "Let authors write arbitrary HTML when layout or text rendering gets specific.",
@@ -83,9 +88,11 @@ After the decision block, the document should continue naturally. This paragraph
 The next block lists the current component roles. It should feel like a continuation of the same document, not a separate app screen.
 
 <OptionGrid
+  id="option.linear-building-blocks"
   title="Linear authoring building blocks"
   options={[
     {
+      id: "native-mdx",
       name: "Native MDX",
       intent: "Own top-level narrative flow.",
       tradeoffs: [
@@ -94,6 +101,7 @@ The next block lists the current component roles. It should feel like a continua
       ],
     },
     {
+      id: "markdown-body",
       name: "MarkdownBody",
       intent: "Own controlled body copy inside a component slot.",
       tradeoffs: [
@@ -102,6 +110,7 @@ The next block lists the current component roles. It should feel like a continua
       ],
     },
     {
+      id: "workflow-components",
       name: "Workflow components",
       intent:
         "Own structured decisions, comparisons, code notes, and export surfaces.",
@@ -117,8 +126,8 @@ The next block lists the current component roles. It should feel like a continua
 
 Here is a small comparison set with component-local Markdown inside each item. This shows the boundary between native MDX prose and reusable component content.
 
-<ComparisonSet title="Where each text form belongs" columns={3}>
-  <ComparisonSet.Item title="Top-level MDX" value="top-level-mdx">
+<ComparisonSet id="comparison.text-forms" title="Where each text form belongs" columns={3}>
+  <ComparisonSet.Item id="top-level-mdx" title="Top-level MDX" value="top-level-mdx">
     <Frame surface="subtle">
       <MarkdownBody
         variant="compact"
@@ -127,7 +136,7 @@ Here is a small comparison set with component-local Markdown inside each item. T
     </Frame>
   </ComparisonSet.Item>
 
-<ComparisonSet.Item title="MarkdownBody" value="markdown-body">
+<ComparisonSet.Item id="markdown-body" title="MarkdownBody" value="markdown-body">
   <Frame surface="subtle">
     <MarkdownBody
       variant="compact"
@@ -136,8 +145,9 @@ Here is a small comparison set with component-local Markdown inside each item. T
   </Frame>
 </ComparisonSet.Item>
 
-  <ComparisonSet.Item title="CodeBlock" value="code-block">
+  <ComparisonSet.Item id="code-block" title="CodeBlock" value="code-block">
     <CodeBlock
+      id="code.linear-example"
       filename="artifact-docs/examples/streamlit-style-mixed.mdx"
       language="mdx"
       code={`# Title

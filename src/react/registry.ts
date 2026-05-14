@@ -93,6 +93,12 @@ export const componentRegistry: ComponentMeta[] = [
     useWhen: ["Code examples", "Implementation notes", "Technical explanations", "Code review context"],
     props: [
       {
+        name: "id",
+        type: "string",
+        contentType: "plainText",
+        description: "Optional stable anchor id for comments and state. Prefer short semantic ids such as code.example."
+      },
+      {
         name: "code",
         type: "string",
         contentType: "code",
@@ -122,6 +128,7 @@ export const componentRegistry: ComponentMeta[] = [
       }
     ],
     example: `<CodeBlock
+  id="code.artifact-normalizer"
   filename="src/artifact.ts"
   language="ts"
   showLineNumbers
@@ -139,6 +146,12 @@ export const componentRegistry: ComponentMeta[] = [
       "Renders structured diff lines with add, remove, and context rows plus a compact effective line number column.",
     useWhen: ["Code review context", "Patch explanations", "Before and after code changes", "Implementation reports"],
     props: [
+      {
+        name: "id",
+        type: "string",
+        contentType: "plainText",
+        description: "Optional stable anchor id for comments and state. Prefer short semantic ids such as diff.patch."
+      },
       {
         name: "lines",
         type: "DiffLine[]",
@@ -191,6 +204,7 @@ export const componentRegistry: ComponentMeta[] = [
       }
     ],
     example: `<DiffBlock
+  id="diff.exporter"
   filename="src/exporter.ts"
   language="ts"
   lines={[
@@ -230,6 +244,12 @@ export const componentRegistry: ComponentMeta[] = [
     useWhen: ["Review notes", "Assumptions", "Warnings", "Implementation gotchas", "Recommendations"],
     props: [
       {
+        name: "id",
+        type: "string",
+        contentType: "plainText",
+        description: "Optional stable anchor id for comments and state. Prefer short semantic ids such as callout.risk."
+      },
+      {
         name: "body",
         type: "string",
         contentType: "blockMarkdown",
@@ -249,6 +269,7 @@ export const componentRegistry: ComponentMeta[] = [
       }
     ],
     example: `<Callout
+  id="callout.review-focus"
   tone="warning"
   title="Review focus"
   body="Check the **export path** before treating this artifact as complete."
@@ -261,6 +282,12 @@ export const componentRegistry: ComponentMeta[] = [
     description: "Combines a CodeBlock with line-level annotations and severity labels.",
     useWhen: ["Code explanations", "Review focus areas", "Implementation walkthroughs", "Risk notes tied to code lines"],
     props: [
+      {
+        name: "id",
+        type: "string",
+        contentType: "plainText",
+        description: "Optional stable anchor id for comments and state. Child code and annotation anchors derive from this id."
+      },
       {
         name: "code",
         type: "string",
@@ -303,6 +330,12 @@ export const componentRegistry: ComponentMeta[] = [
         description: "Line-level explanation attached to a CodeBlock line.",
         fields: [
           {
+            name: "id",
+            type: "string",
+            contentType: "plainText",
+            description: "Optional stable child anchor id. When AnnotatedCode has id, child anchors become parentId.annotationId."
+          },
+          {
             name: "line",
             type: "number",
             required: true,
@@ -330,6 +363,7 @@ export const componentRegistry: ComponentMeta[] = [
       }
     ],
     example: `<AnnotatedCode
+  id="code.export-panel"
   filename="src/export-panel.ts"
   language="ts"
   code={\`export function copyOutput(value: string) {
@@ -337,6 +371,7 @@ export const componentRegistry: ComponentMeta[] = [
 }\`}
   annotations={[
     {
+      id: "clipboard-boundary",
       line: 2,
       severity: "medium",
       title: "Clipboard boundary",
@@ -824,6 +859,12 @@ export const componentRegistry: ComponentMeta[] = [
     useWhen: ["Candidate comparison", "Mixed media alternatives", "Prototype comparison", "Reviewable option sets"],
     props: [
       {
+        name: "id",
+        type: "string",
+        contentType: "plainText",
+        description: "Optional stable anchor id for comments and state. Prefer short semantic ids such as comparison.content-shapes."
+      },
+      {
         name: "title",
         type: "string",
         contentType: "inlineMarkdown",
@@ -849,6 +890,12 @@ export const componentRegistry: ComponentMeta[] = [
         description: "Compound child used inside ComparisonSet.",
         fields: [
           {
+            name: "id",
+            type: "string",
+            contentType: "plainText",
+            description: "Optional stable child anchor id. When the parent has id, child anchors become parentId.itemId."
+          },
+          {
             name: "title",
             type: "string",
             contentType: "inlineMarkdown",
@@ -870,11 +917,11 @@ export const componentRegistry: ComponentMeta[] = [
         ]
       }
     ],
-    example: `<ComparisonSet title="Compare artifact forms" columns={3}>
-  <ComparisonSet.Item title="Markdown explanation" value="markdown">
+    example: `<ComparisonSet id="comparison.artifact-forms" title="Compare artifact forms" columns={3}>
+  <ComparisonSet.Item id="markdown" title="Markdown explanation" value="markdown">
     <MarkdownBody body="Best for prose-heavy context." />
   </ComparisonSet.Item>
-  <ComparisonSet.Item title="Code path" value="code">
+  <ComparisonSet.Item id="code" title="Code path" value="code">
     <Frame surface="subtle">Code renderer or local component</Frame>
   </ComparisonSet.Item>
 </ComparisonSet>`

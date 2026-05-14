@@ -13,6 +13,7 @@ import { createArtifactStateFromComments } from "./ArtifactState";
 import { AnnotatedCode } from "./AnnotatedCode";
 import { Callout } from "./Callout";
 import { CodeBlock } from "./CodeBlock";
+import { ComparisonSet } from "./ComparisonSet";
 import { DecisionMatrix } from "./DecisionMatrix";
 import { DiffBlock } from "./DiffBlock";
 import { ExportPanel } from "./ExportPanel";
@@ -102,6 +103,50 @@ describe("Comment components", () => {
     expect(html).toContain('data-comment-target-id="decision.comment-targets.explicit"');
     expect(html).toContain('data-comment-target-id="option.comment-flow"');
     expect(html).toContain('data-comment-target-id="option.comment-flow.layer"');
+  });
+
+  it("uses explicit ids for semantic, code, diff, and comparison targets when provided", () => {
+    const html = renderToStaticMarkup(
+      <CommentLayer>
+        <Callout id="callout.review-focus" body="Check the export path." title="Review focus" tone="warning" />
+        <CodeBlock id="code.example" code="const value = 1;" filename="example.ts" language="ts" />
+        <DiffBlock
+          id="diff.example"
+          filename="example.diff"
+          lines={[
+            { type: "remove", oldLine: 1, content: "old" },
+            { type: "add", newLine: 1, content: "new" }
+          ]}
+        />
+        <AnnotatedCode
+          annotations={[
+            {
+              id: "setup",
+              line: 1,
+              title: "Important line",
+              body: "Review the setup."
+            }
+          ]}
+          code="const setup = true;"
+          filename="setup.ts"
+          id="code.setup"
+        />
+        <ComparisonSet id="comparison.content" title="Content forms">
+          <ComparisonSet.Item id="markdown" title="Markdown body">
+            <p>Plain prose.</p>
+          </ComparisonSet.Item>
+        </ComparisonSet>
+      </CommentLayer>
+    );
+
+    expect(html).toContain('data-comment-target-id="callout.review-focus"');
+    expect(html).toContain('data-comment-target-id="code.example"');
+    expect(html).toContain('data-comment-target-id="diff.example"');
+    expect(html).toContain('data-comment-target-id="code.setup"');
+    expect(html).toContain('data-comment-target-id="code.setup.code"');
+    expect(html).toContain('data-comment-target-id="code.setup.setup"');
+    expect(html).toContain('data-comment-target-id="comparison.content"');
+    expect(html).toContain('data-comment-target-id="comparison.content.markdown"');
   });
 
   it("adds targets to semantic, code, and diff blocks inside a layer", () => {

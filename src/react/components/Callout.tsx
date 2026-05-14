@@ -5,20 +5,22 @@ import { MarkdownBody } from "./MarkdownBody";
 export type CalloutTone = "info" | "success" | "warning" | "danger";
 
 export type CalloutProps = {
+  id?: string;
   body: string;
   title?: string;
   tone?: CalloutTone;
   className?: string;
 };
 
-export function Callout({ body, title, tone = "info", className }: CalloutProps) {
+export function Callout({ id, body, title, tone = "info", className }: CalloutProps) {
   const displayTitle = title ?? `${tone} callout`;
+  const targetId = id ?? `callout:${slugify(displayTitle)}:${slugify(body)}`;
 
   return (
     <CommentTarget
       className={classNames("ak-comment-target-section", className)}
       description="Callout component"
-      targetId={`callout:${slugify(displayTitle)}:${slugify(body)}`}
+      targetId={targetId}
       title={displayTitle}
     >
       <aside className={classNames("ak-callout", `ak-callout-${tone}`)}>

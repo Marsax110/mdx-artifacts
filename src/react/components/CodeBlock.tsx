@@ -1,6 +1,7 @@
 import { CommentTarget } from "./Comments";
 
 export type CodeBlockProps = {
+  id?: string;
   code: string;
   language?: string;
   filename?: string;
@@ -10,6 +11,7 @@ export type CodeBlockProps = {
 };
 
 export function CodeBlock({
+  id,
   code,
   language,
   filename,
@@ -20,12 +22,13 @@ export function CodeBlock({
   const lines = splitCodeLines(code);
   const highlighted = new Set(highlightLines);
   const title = filename ?? (language ? `${language} code block` : "Code block");
+  const targetId = id ?? `code:${slugify(filename ?? language ?? code)}`;
 
   return (
     <CommentTarget
       className={classNames("ak-comment-target-section", className)}
       description="CodeBlock component"
-      targetId={`code:${slugify(filename ?? language ?? code)}`}
+      targetId={targetId}
       title={title}
     >
       <figure className="ak-code-block">

@@ -10,6 +10,7 @@ export type DiffLine = {
 };
 
 export type DiffBlockProps = {
+  id?: string;
   lines: DiffLine[];
   filename?: string;
   language?: string;
@@ -22,14 +23,15 @@ const markers: Record<DiffLineType, string> = {
   context: " "
 };
 
-export function DiffBlock({ lines, filename, language, className }: DiffBlockProps) {
+export function DiffBlock({ id, lines, filename, language, className }: DiffBlockProps) {
   const title = filename ?? (language ? `${language} diff block` : "Diff block");
+  const targetId = id ?? `diff:${slugify(filename ?? language ?? lines.map((line) => line.content).join("-"))}`;
 
   return (
     <CommentTarget
       className={classNames("ak-comment-target-section", className)}
       description="DiffBlock component"
-      targetId={`diff:${slugify(filename ?? language ?? lines.map((line) => line.content).join("-"))}`}
+      targetId={targetId}
       title={title}
     >
       <figure className="ak-code-block ak-diff-block">

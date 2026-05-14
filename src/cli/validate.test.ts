@@ -11,6 +11,54 @@ describe("validateMdx", () => {
     expect(result.errors).toEqual([]);
   });
 
+  it("warns when reviewable components omit stable ids", async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), "mdx-artifacts-"));
+    const filePath = path.join(dir, "missing-id.mdx");
+    await writeFile(
+      filePath,
+      `import { Callout, DecisionMatrix, ExportPanel } from "../../src/react";
+
+<Callout title="Risk" body="Add a stable id." />
+
+<DecisionMatrix question="Choose?" options={[]} />
+
+<ExportPanel value={{ ok: true }} />`,
+      "utf8"
+    );
+
+    const result = await validateMdx(filePath);
+
+    expect(result.warnings).toContain(
+      "Callout should include a stable id prop so comments and state can use a durable anchorId."
+    );
+    expect(result.warnings).toContain(
+      "DecisionMatrix should include a stable id prop so comments and state can use a durable anchorId."
+    );
+  });
+
+  it("does not treat component-like strings as missing ids", async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), "mdx-artifacts-"));
+    const filePath = path.join(dir, "code-string.mdx");
+    await writeFile(
+      filePath,
+      `import { CodeBlock, ExportPanel } from "../../src/react";
+
+<CodeBlock
+  id="code.example"
+  code={\`<DecisionMatrix question="Example" options={[]} />\`}
+/>
+
+<ExportPanel value={{ ok: true }} />`,
+      "utf8"
+    );
+
+    const result = await validateMdx(filePath);
+
+    expect(result.warnings).not.toContain(
+      "DecisionMatrix should include a stable id prop so comments and state can use a durable anchorId."
+    );
+  });
+
   it("accepts CommentExport as an export path", async () => {
     const dir = await mkdtemp(path.join(tmpdir(), "mdx-artifacts-"));
     const filePath = path.join(dir, "comment-export.mdx");
