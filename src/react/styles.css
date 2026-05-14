@@ -285,7 +285,7 @@ body {
   gap: 4px;
 }
 
-.ak-section-header h2 {
+.ak-section-header :where(h1, h2, h3, h4, h5, h6) {
   margin: 0;
   font-size: 22px;
   line-height: 1.25;

@@ -2,6 +2,8 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { AnnotatedCode } from "./AnnotatedCode";
 import { Callout } from "./Callout";
+import { CommentLayer } from "./Comments";
+import { Section } from "./Section";
 import { SeverityBadge } from "./SeverityBadge";
 
 describe("Callout", () => {
@@ -13,6 +15,27 @@ describe("Callout", () => {
     expect(html).toContain("ak-callout-warning");
     expect(html).toContain("Review focus");
     expect(html).toContain("<strong>export path</strong>");
+  });
+});
+
+describe("Section", () => {
+  it("renders a stable comment anchor with generated heading", () => {
+    const html = renderToStaticMarkup(
+      <CommentLayer>
+        <Section id="section.context" title="Context" level={3}>
+          <p>Native MDX prose.</p>
+          <ul>
+            <li>Stable anchor</li>
+          </ul>
+        </Section>
+      </CommentLayer>
+    );
+
+    expect(html).toContain('id="section.context"');
+    expect(html).toContain('data-anchor-id="section.context"');
+    expect(html).toContain("<h3");
+    expect(html).toContain("Context");
+    expect(html).toContain("<li>Stable anchor</li>");
   });
 });
 

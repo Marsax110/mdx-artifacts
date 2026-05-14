@@ -528,6 +528,53 @@ export const componentRegistry: ComponentMeta[] = [
 </CommentLayer>`
   },
   {
+    name: "Section",
+    category: "artifact",
+    stability: "stable",
+    description: "Defines a stable reviewable document section for native MDX prose.",
+    useWhen: ["Reviewable prose sections", "Stable Markdown anchors", "Document structure", "Block-level feedback"],
+    props: [
+      {
+        name: "id",
+        type: "string",
+        contentType: "plainText",
+        required: true,
+        description: "Stable unique anchor id for this section within one artifact."
+      },
+      {
+        name: "title",
+        type: "string",
+        contentType: "inlineMarkdown",
+        required: true,
+        description: "Section heading text. Section renders this as the heading; do not repeat it inside children."
+      },
+      {
+        name: "level",
+        type: "1 | 2 | 3 | 4 | 5 | 6",
+        description: "Heading level to render. Defaults to 2."
+      },
+      {
+        name: "description",
+        type: "string",
+        contentType: "plainText",
+        description: "Optional section context exported with comments."
+      },
+      {
+        name: "children",
+        type: "ReactNode",
+        required: true,
+        description: "Native MDX prose or composed content that belongs to this section."
+      }
+    ],
+    example: `<Section id="context" title="Context" level={2}>
+  This section can contain native MDX paragraphs, lists, and code fences.
+
+  - Stable review anchor
+  - Generated heading
+  - One comment thread per section
+</Section>`
+  },
+  {
     name: "CommentableBlock",
     category: "artifact",
     stability: "stable",

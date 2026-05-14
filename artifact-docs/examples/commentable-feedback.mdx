@@ -1,16 +1,16 @@
 import {
   Callout,
-  CommentableBlock,
   CommentTarget,
   DecisionMatrix,
   ExportPanel,
   MarkdownBody,
   OptionGrid,
+  Section,
 } from "../../src/react";
 
 # Commentable Artifact Feedback
 
-This example shows a local block-level comment loop. The author marks stable review targets with `CommentableBlock`, the reader adds comments in the browser, and `ExportPanel` returns the result plus comments to an agent.
+This example shows a local block-level comment loop. The author marks stable review targets with `Section` or component ids, the reader adds comments in the browser, and artifact state is saved beside the MDX file during local dev.
 
 <DecisionMatrix
   id="decision.comment-targets"
@@ -37,10 +37,11 @@ This example shows a local block-level comment loop. The author marks stable rev
   ]}
 />
 
-<CommentableBlock
-  blockId="prose-guidance"
+<Section
+  id="section.prose-guidance"
   description="Review prose that is not owned by a workflow component."
   title="Prose guidance"
+  level={2}
 >
   <Callout
     tone="info"
@@ -55,7 +56,7 @@ This example shows a local block-level comment loop. The author marks stable rev
 - a prose explanation
 - a custom composed section`}
   />
-</CommentableBlock>
+</Section>
 
 <OptionGrid
   id="option.comment-flow"
@@ -65,19 +66,19 @@ This example shows a local block-level comment loop. The author marks stable rev
       id: "layer",
       name: "CommentLayer",
       intent: "The artifact shell now provides this review context automatically.",
-      tradeoffs: ["No backend", "Refresh clears comments"]
+      tradeoffs: ["No production backend", "Local dev persists to sidecar state"]
     },
     {
-      id: "block",
-      name: "CommentableBlock",
-      intent: "Marks one stable review target with a blockId and title.",
-      tradeoffs: ["Clear export context", "Authors choose the target boundary"]
+      id: "section",
+      name: "Section",
+      intent: "Marks native MDX prose with a stable anchor id and generated heading.",
+      tradeoffs: ["Clear review context", "Authors choose the section boundary"]
     },
     {
       id: "export",
       name: "ExportPanel",
-      intent: "Exports the result and current comments from one dock.",
-      tradeoffs: ["Agent-friendly handoff", "No persistence in v1"]
+      intent: "Exports the artifact result when a static handoff is needed.",
+      tradeoffs: ["Agent-friendly handoff", "State is handled by the local dev shell"]
     }
   ]}
 />
@@ -99,6 +100,6 @@ This example shows a local block-level comment loop. The author marks stable rev
   value={{
     recommendation: "Use explicit comment targets first, then evaluate implicit Markdown comments.",
     reviewModel: "One comment per target",
-    nextStep: "Validate CommentableBlock around native MDX prose sections"
+    nextStep: "Validate Section around native MDX prose blocks"
   }}
 />

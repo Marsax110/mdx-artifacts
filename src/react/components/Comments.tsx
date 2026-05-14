@@ -380,6 +380,7 @@ export function CommentTarget({ targetId, title, description, children, classNam
       )}
       data-comment-target-id={targetId}
       data-anchor-id={targetId}
+      id={targetId}
       ref={targetRef}
     >
       <div className="ak-comment-target-content">{children}</div>
