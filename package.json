@@ -41,7 +41,7 @@
     "./styles.css": "./dist/lib/react/styles.css"
   },
   "bin": {
-    "artifact-kit": "./dist/lib/cli/index.js"
+    "artifact-kit": "dist/lib/cli/index.js"
   },
   "scripts": {
     "artifact": "tsx src/cli/index.ts",
