@@ -12,16 +12,19 @@ Typical source:
 import { DecisionMatrix, ExportPanel } from "mdx-artifacts/react";
 
 <DecisionMatrix
+  id="decision.stage-one"
   question="Should stage one focus on a **single HTML artifact**?"
-  options={[
-    {
-      name: "Vite artifact",
-      pros: ["Short feedback loop"],
-      cons: ["No docs-site navigation yet"],
-      verdict: "Recommended"
-    }
-  ]}
-/>
+>
+  <DecisionMatrix.Option
+    id="vite"
+    name="Vite artifact"
+    pros={["Short feedback loop"]}
+    cons={["No docs-site navigation yet"]}
+    verdict="Recommended"
+  >
+    Validate the shortest Markdown-native source to interactive HTML loop first.
+  </DecisionMatrix.Option>
+</DecisionMatrix>
 
 <ExportPanel
   value={{ recommendation: "Start with the single artifact loop." }}
@@ -49,7 +52,7 @@ artifact-kit components --json
 
 When adding or changing a component, update the registry in the same change.
 
-Complex props must be self-describing through the registry. Do not rely on TypeScript LSP alone for agent usage. If a prop type references a named object or object array, such as `DecisionMatrixOption[]`, `DiffLine[]`, or `CodeAnnotation[]`, add a matching entry to the component's `types` metadata:
+Complex props must be self-describing through the registry. Do not rely on TypeScript LSP alone for agent usage. If a prop type references a named object or object array, such as `DiffLine[]`, `CodeAnnotation[]`, or the structured-data form `DecisionMatrixOption[]`, add a matching entry to the component's `types` metadata:
 
 ```ts
 {

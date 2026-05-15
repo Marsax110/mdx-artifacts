@@ -67,9 +67,9 @@ If a prop type references a named object or object array, add `types` metadata i
 
 Examples:
 
-- `DecisionMatrixOption[]` requires a `DecisionMatrixOption` type entry.
 - `DiffLine[]` requires a `DiffLine` type entry.
 - `CodeAnnotation[]` requires a `CodeAnnotation` type entry.
+- `DecisionMatrixOption[]` still requires a `DecisionMatrixOption` type entry when the structured-data form is supported.
 
 Each nested field should include:
 

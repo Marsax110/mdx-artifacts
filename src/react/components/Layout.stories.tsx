@@ -103,25 +103,26 @@ export const ComposedArtifact: Story = {
       <SplitPane ratio="2:1">
         <DecisionMatrix
           question="Should layout primitives stay advanced?"
-          options={[
-            {
-              name: "Advanced-only layout",
-              summary: "Use layout primitives for composition checks and unusual artifact structure.",
-              pros: ["Keeps semantic components as the default", "Avoids becoming a UI builder"],
-              cons: ["Agents need clearer examples when layout is needed"],
-              confidence: "high",
-              verdict: "Recommended"
-            },
-            {
-              name: "Layout-first authoring",
-              summary: "Let agents assemble most artifacts from layout primitives and children.",
-              pros: ["Very flexible"],
-              cons: ["Recreates raw HTML/React authoring", "Harder to validate"],
-              confidence: "low",
-              verdict: "Do not make this the default"
-            }
-          ]}
-        />
+        >
+          <DecisionMatrix.Option
+            name="Advanced-only layout"
+            pros={["Keeps semantic components as the default", "Avoids becoming a UI builder"]}
+            cons={["Agents need clearer examples when layout is needed"]}
+            confidence="high"
+            verdict="Recommended"
+          >
+            Use layout primitives for composition checks and unusual artifact structure.
+          </DecisionMatrix.Option>
+          <DecisionMatrix.Option
+            name="Layout-first authoring"
+            pros={["Very flexible"]}
+            cons={["Recreates raw HTML/React authoring", "Harder to validate"]}
+            confidence="low"
+            verdict="Do not make this the default"
+          >
+            Let agents assemble most artifacts from layout primitives and children.
+          </DecisionMatrix.Option>
+        </DecisionMatrix>
         <Frame surface="subtle">
           <MarkdownBody>{`Layout primitives only control placement and surface.
 

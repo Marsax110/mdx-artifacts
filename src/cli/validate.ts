@@ -10,7 +10,9 @@ export type ValidationResult = {
 const componentsRequiringStableId = [
   "Section",
   "DecisionMatrix",
+  "DecisionMatrix.Option",
   "OptionGrid",
+  "OptionGrid.Item",
   "ComparisonSet",
   "ComparisonSet.Item",
   "AnnotatedCode",

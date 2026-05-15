@@ -36,6 +36,35 @@ describe("validateMdx", () => {
     );
   });
 
+  it("warns when compound option components omit stable ids", async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), "mdx-artifacts-"));
+    const filePath = path.join(dir, "missing-compound-id.mdx");
+    await writeFile(
+      filePath,
+      `import { DecisionMatrix, ExportPanel, OptionGrid } from "../../src/react";
+
+<DecisionMatrix id="decision.api" question="Choose?">
+  <DecisionMatrix.Option name="No stable child id">Readable body.</DecisionMatrix.Option>
+</DecisionMatrix>
+
+<OptionGrid id="option.api" title="Choose?">
+  <OptionGrid.Item name="No stable child id">Readable body.</OptionGrid.Item>
+</OptionGrid>
+
+<ExportPanel value={{ ok: true }} />`,
+      "utf8"
+    );
+
+    const result = await validateMdx(filePath);
+
+    expect(result.warnings).toContain(
+      "DecisionMatrix.Option should include a stable id prop so comments and state can use a durable anchorId."
+    );
+    expect(result.warnings).toContain(
+      "OptionGrid.Item should include a stable id prop so comments and state can use a durable anchorId."
+    );
+  });
+
   it("does not treat component-like strings as missing ids", async () => {
     const dir = await mkdtemp(path.join(tmpdir(), "mdx-artifacts-"));
     const filePath = path.join(dir, "code-string.mdx");

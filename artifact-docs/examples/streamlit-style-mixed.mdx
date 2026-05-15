@@ -39,46 +39,38 @@ The first question is whether the core authoring experience should stay close to
 <DecisionMatrix
   id="decision.native-mdx"
   question="Should top-level prose use native MDX by default?"
-  options={[
-    {
-      id: "native-mdx",
-      name: "Native MDX prose",
-      summary:
-        "Use regular headings, paragraphs, lists, links, and blockquotes between workflow components.",
-      pros: [
-        "Shortest authoring path",
-        "Agent-friendly",
-        "No extra text API to learn",
-      ],
-      cons: [
-        "Needs strong default prose styling",
-        "Harder to constrain every edge case",
-      ],
-      confidence: "high",
-      verdict: "Recommended baseline",
-    },
-    {
-      id: "text-components",
-      name: "Text components everywhere",
-      summary:
-        "Require components such as InlineText and MarkdownBody for most visible copy.",
-      pros: ["More controlled rendering", "Clear metadata boundary"],
-      cons: ["Verbose for simple documents", "Less natural than MDX"],
-      confidence: "medium",
-      verdict: "Use inside reusable components",
-    },
-    {
-      id: "raw-html",
-      name: "Raw HTML escape hatch",
-      summary:
-        "Let authors write arbitrary HTML when layout or text rendering gets specific.",
-      pros: ["Maximum flexibility"],
-      cons: ["Style drift", "Weak validation", "Harder for agents to reuse"],
-      confidence: "low",
-      verdict: "Avoid unless necessary",
-    },
-  ]}
-/>
+>
+  <DecisionMatrix.Option
+    id="native-mdx"
+    name="Native MDX prose"
+    pros={["Shortest authoring path", "Agent-friendly", "No extra text API to learn"]}
+    cons={["Needs strong default prose styling", "Harder to constrain every edge case"]}
+    confidence="high"
+    verdict="Recommended baseline"
+  >
+    Use regular headings, paragraphs, lists, links, and blockquotes between workflow components.
+  </DecisionMatrix.Option>
+  <DecisionMatrix.Option
+    id="text-components"
+    name="Text components everywhere"
+    pros={["More controlled rendering", "Clear metadata boundary"]}
+    cons={["Verbose for simple documents", "Less natural than MDX"]}
+    confidence="medium"
+    verdict="Use inside reusable components"
+  >
+    Require components such as `InlineText` and `MarkdownBody` for most visible copy.
+  </DecisionMatrix.Option>
+  <DecisionMatrix.Option
+    id="raw-html"
+    name="Raw HTML escape hatch"
+    pros={["Maximum flexibility"]}
+    cons={["Style drift", "Weak validation", "Harder for agents to reuse"]}
+    confidence="low"
+    verdict="Avoid unless necessary"
+  >
+    Let authors write arbitrary HTML when layout or text rendering gets specific.
+  </DecisionMatrix.Option>
+</DecisionMatrix>
 
 After the decision block, the document should continue naturally. This paragraph is intentionally plain MDX so the spacing between prose and the component above is easy to judge.
 
@@ -91,37 +83,32 @@ The next block lists the current component roles. It should feel like a continua
 <OptionGrid
   id="option.linear-building-blocks"
   title="Linear authoring building blocks"
-  options={[
-    {
-      id: "native-mdx",
-      name: "Native MDX",
-      intent: "Own top-level narrative flow.",
-      tradeoffs: [
-        "Best for headings and explanatory paragraphs",
-        "Needs polished document-level CSS",
-      ],
-    },
-    {
-      id: "markdown-body",
-      name: "MarkdownBody",
-      intent: "Own controlled body copy inside a component slot.",
-      tradeoffs: [
-        "Good for reusable components",
-        "Less convenient for top-level prose",
-      ],
-    },
-    {
-      id: "workflow-components",
-      name: "Workflow components",
-      intent:
-        "Own structured decisions, comparisons, code notes, and export surfaces.",
-      tradeoffs: [
-        "Agent-queryable through the registry",
-        "Should stay higher-level than raw cards",
-      ],
-    },
-  ]}
-/>
+>
+  <OptionGrid.Item
+    id="native-mdx"
+    name="Native MDX"
+    intent="Own top-level narrative flow."
+    tradeoffs={["Best for headings and explanatory paragraphs", "Needs polished document-level CSS"]}
+  >
+    Use this for the document's main reading order.
+  </OptionGrid.Item>
+  <OptionGrid.Item
+    id="markdown-body"
+    name="MarkdownBody"
+    intent="Own controlled body copy inside a component slot."
+    tradeoffs={["Good for reusable components", "Less convenient for top-level prose"]}
+  >
+    Use this when reusable components need safe Markdown rendering.
+  </OptionGrid.Item>
+  <OptionGrid.Item
+    id="workflow-components"
+    name="Workflow components"
+    intent="Own structured decisions, comparisons, code notes, and export surfaces."
+    tradeoffs={["Agent-queryable through the registry", "Should stay higher-level than raw cards"]}
+  >
+    Use this for reusable artifact meaning rather than layout-only cards.
+  </OptionGrid.Item>
+</OptionGrid>
 
 ## Mixed content
 

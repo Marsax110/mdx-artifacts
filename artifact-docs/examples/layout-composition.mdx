@@ -31,27 +31,28 @@ The layout components control placement and surface. Components such as \`Decisi
     <DecisionMatrix
       id="decision.layout-authoring"
       question="Should layout primitives become the default authoring path?"
-      options={[
-        {
-          id: "semantic-first",
-          name: "Semantic-first authoring",
-          summary: "Agents choose task-oriented components first, then use layout only when composition needs it.",
-          pros: ["Stable protocol", "Less ad hoc JSX", "Better validation path"],
-          cons: ["Less free-form than raw HTML"],
-          confidence: "high",
-          verdict: "Recommended"
-        },
-        {
-          id: "layout-first",
-          name: "Layout-first authoring",
-          summary: "Agents assemble artifacts from generic layout blocks and arbitrary children.",
-          pros: ["Maximum flexibility"],
-          cons: ["Easy to recreate raw HTML", "Harder to query through CLI", "Harder to keep consistent"],
-          confidence: "low",
-          verdict: "Keep as an advanced escape hatch"
-        }
-      ]}
-    />
+    >
+      <DecisionMatrix.Option
+        id="semantic-first"
+        name="Semantic-first authoring"
+        pros={["Stable protocol", "Less ad hoc JSX", "Better validation path"]}
+        cons={["Less free-form than raw HTML"]}
+        confidence="high"
+        verdict="Recommended"
+      >
+        Agents choose task-oriented components first, then use layout only when composition needs it.
+      </DecisionMatrix.Option>
+      <DecisionMatrix.Option
+        id="layout-first"
+        name="Layout-first authoring"
+        pros={["Maximum flexibility"]}
+        cons={["Easy to recreate raw HTML", "Harder to query through CLI", "Harder to keep consistent"]}
+        confidence="low"
+        verdict="Keep as an advanced escape hatch"
+      >
+        Agents assemble artifacts from generic layout blocks and arbitrary children.
+      </DecisionMatrix.Option>
+    </DecisionMatrix>
 
     <Frame surface="subtle">
       <Stack gap="sm">

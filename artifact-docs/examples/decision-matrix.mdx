@@ -5,61 +5,68 @@ import { DecisionMatrix, ExportPanel, OptionGrid } from "mdx-artifacts/react";
 <DecisionMatrix
   id="decision.stage-one"
   question="Should stage one focus on a **Vite single HTML artifact** instead of starting with an Astro docs site?"
-  options={[
-    {
-      id: "vite",
-      name: "**Vite** single HTML artifact",
-      summary: "Validate the shortest `MDX -> HTML` loop first.",
-      pros: ["Shortest loop", "Direct interactive component debugging", "Fits one-off tool artifacts"],
-      cons: ["No docs-site navigation yet", "Weaker long-term archive experience"],
-      confidence: "high",
-      verdict: "Recommended for stage one"
-    },
-    {
-      id: "astro",
-      name: "Astro docs site",
-      summary: "Turn the artifact-docs tree into a structured static docs site.",
-      pros: ["Better long-term reading experience", "File-based pages", "Good for archives"],
-      cons: ["Too heavy for stage one", "Mixes component protocol work with docs-site engineering"],
-      confidence: "medium",
-      verdict: "Add in stage two"
-    },
-    {
-      id: "raw-html",
-      name: "Raw HTML",
-      summary: "Let agents generate complete HTML directly.",
-      pros: ["No toolchain", "Fast for very small throwaway pages"],
-      cons: ["Duplicated code", "Style drift", "~~Reusable~~ export behavior is hard to reuse"],
-      confidence: "low",
-      verdict: "Keep only as fallback"
-    }
-  ]}
-/>
+>
+  <DecisionMatrix.Option
+    id="vite"
+    name="**Vite** single HTML artifact"
+    pros={["Shortest loop", "Direct interactive component debugging", "Fits one-off tool artifacts"]}
+    cons={["No docs-site navigation yet", "Weaker long-term archive experience"]}
+    confidence="high"
+    verdict="Recommended for stage one"
+  >
+    Validate the shortest `MDX -> HTML` loop first.
+  </DecisionMatrix.Option>
+  <DecisionMatrix.Option
+    id="astro"
+    name="Astro docs site"
+    pros={["Better long-term reading experience", "File-based pages", "Good for archives"]}
+    cons={["Too heavy for stage one", "Mixes component protocol work with docs-site engineering"]}
+    confidence="medium"
+    verdict="Add in stage two"
+  >
+    Turn the artifact-docs tree into a structured static docs site.
+  </DecisionMatrix.Option>
+  <DecisionMatrix.Option
+    id="raw-html"
+    name="Raw HTML"
+    pros={["No toolchain", "Fast for very small throwaway pages"]}
+    cons={["Duplicated code", "Style drift", "~~Reusable~~ export behavior is hard to reuse"]}
+    confidence="low"
+    verdict="Keep only as fallback"
+  >
+    Let agents generate complete HTML directly.
+  </DecisionMatrix.Option>
+</DecisionMatrix>
 
 <OptionGrid
   id="option.first-components"
   title="First component scope"
-  options={[
-    {
-      id: "decision-matrix",
-      name: "DecisionMatrix",
-      intent: "Compare options",
-      tradeoffs: ["Stable **decision** structure", "Does not own complex interaction"]
-    },
-    {
-      id: "option-grid",
-      name: "OptionGrid",
-      intent: "Show alternatives side by side",
-      tradeoffs: ["Easy to scan", "Can add selection later"]
-    },
-    {
-      id: "export-panel",
-      name: "ExportPanel",
-      intent: "Return conclusions or edits to the workflow",
-      tradeoffs: ["Copy-only in v1", "Can add file download later"]
-    }
-  ]}
-/>
+>
+  <OptionGrid.Item
+    id="decision-matrix"
+    name="DecisionMatrix"
+    intent="Compare options"
+    tradeoffs={["Stable **decision** structure", "Does not own complex interaction"]}
+  >
+    Use for explicit tradeoff decisions and recommendations.
+  </OptionGrid.Item>
+  <OptionGrid.Item
+    id="option-grid"
+    name="OptionGrid"
+    intent="Show alternatives side by side"
+    tradeoffs={["Easy to scan", "Can add selection later"]}
+  >
+    Use for scannable component candidates or prototype directions.
+  </OptionGrid.Item>
+  <OptionGrid.Item
+    id="export-panel"
+    name="ExportPanel"
+    intent="Return conclusions or edits to the workflow"
+    tradeoffs={["Copy-only in v1", "Can add file download later"]}
+  >
+    Use when the artifact needs to hand structured results back to the agent.
+  </OptionGrid.Item>
+</OptionGrid>
 
 <ExportPanel
   title="Export recommendation"

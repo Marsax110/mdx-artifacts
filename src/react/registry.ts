@@ -568,7 +568,9 @@ Use MarkdownBody when a component needs controlled body copy:
     example: `// Usually provided by the artifact shell.
 <CommentLayer>
   <CommentableBlock blockId="decision" title="Decision">
-    <DecisionMatrix question="Choose a path" options={[]} />
+    <DecisionMatrix id="decision.path" question="Choose a path">
+      <DecisionMatrix.Option id="path-a" name="Path A">Readable option body.</DecisionMatrix.Option>
+    </DecisionMatrix>
   </CommentableBlock>
   <CommentExport />
 </CommentLayer>`
@@ -646,7 +648,9 @@ This section can contain native MDX paragraphs, lists, and code fences.
   title="Component menu"
   description="Feedback on the option grid"
 >
-  <OptionGrid title="Components" options={[]} />
+  <OptionGrid id="option.components" title="Components">
+    <OptionGrid.Item id="export-panel" name="ExportPanel">Readable item body.</OptionGrid.Item>
+  </OptionGrid>
 </CommentableBlock>`
   },
   {
@@ -755,7 +759,7 @@ This section can contain native MDX paragraphs, lists, and code fences.
     name: "DecisionMatrix",
     category: "artifact",
     stability: "stable",
-    description: "Compares options by pros, cons, risks, confidence, and recommendation.",
+    description: "Compares options by pros, cons, risks, confidence, and recommendation with compound options for readable MDX bodies.",
     useWhen: ["Architecture decisions", "Product tradeoffs", "Implementation planning", "Open-source roadmap"],
     props: [
       {
@@ -772,16 +776,82 @@ This section can contain native MDX paragraphs, lists, and code fences.
         description: "The decision question being answered."
       },
       {
+        name: "children",
+        type: "ReactNode",
+        description:
+          "Preferred option content. Use `DecisionMatrix.Option` children when options need readable explanations, lists, or local prose."
+      },
+      {
         name: "options",
         type: "DecisionMatrixOption[]",
-        required: true,
-        description: "Options to compare. Each option can include name, pros, cons, risks, confidence, and verdict."
+        description:
+          "Structured option data. Keep for compact machine-readable options; prefer `DecisionMatrix.Option` children for long human-readable content."
       }
     ],
     types: [
       {
+        name: "DecisionMatrix.Option",
+        description: "Compound child used inside DecisionMatrix for Markdown-native option bodies.",
+        fields: [
+          {
+            name: "id",
+            type: "string",
+            contentType: "plainText",
+            description: "Optional stable child anchor id. When the parent has id, child anchors become parentId.optionId."
+          },
+          {
+            name: "name",
+            type: "string",
+            contentType: "inlineMarkdown",
+            required: true,
+            description: "Option title."
+          },
+          {
+            name: "children",
+            type: "ReactNode",
+            contentType: "blockMarkdown",
+            description: "Preferred human-readable option body."
+          },
+          {
+            name: "summary",
+            type: "string",
+            contentType: "inlineMarkdown",
+            description: "Short option summary. Prefer children for longer explanations."
+          },
+          {
+            name: "pros",
+            type: "string[]",
+            contentType: "inlineMarkdown",
+            description: "Compact advantages for this option."
+          },
+          {
+            name: "cons",
+            type: "string[]",
+            contentType: "inlineMarkdown",
+            description: "Compact disadvantages for this option."
+          },
+          {
+            name: "risks",
+            type: "string[]",
+            contentType: "inlineMarkdown",
+            description: "Compact risks or failure modes for this option."
+          },
+          {
+            name: "confidence",
+            type: "'low' | 'medium' | 'high'",
+            description: "Confidence level for this option."
+          },
+          {
+            name: "verdict",
+            type: "string",
+            contentType: "inlineMarkdown",
+            description: "Short recommendation or conclusion for this option."
+          }
+        ]
+      },
+      {
         name: "DecisionMatrixOption",
-        description: "One option in a decision comparison.",
+        description: "Structured data form for one option in a decision comparison.",
         fields: [
           {
             name: "id",
@@ -837,17 +907,18 @@ This section can contain native MDX paragraphs, lists, and code fences.
     example: `<DecisionMatrix
   id="decision.stage-one"
   question="Should the first stage focus on a Vite single HTML artifact?"
-  options={[
-    {
-      id: "vite",
-      name: "Vite single HTML artifact",
-      pros: ["Short feedback loop", "Direct component debugging"],
-      cons: ["No docs-site navigation yet"],
-      confidence: "high",
-      verdict: "Recommended for stage one"
-    }
-  ]}
-/>`
+>
+  <DecisionMatrix.Option
+    id="vite"
+    name="Vite single HTML artifact"
+    pros={["Short feedback loop", "Direct component debugging"]}
+    cons={["No docs-site navigation yet"]}
+    confidence="high"
+    verdict="Recommended for stage one"
+  >
+    <p>Validate the shortest MDX-to-interactive-HTML loop first.</p>
+  </DecisionMatrix.Option>
+</DecisionMatrix>`
   },
   {
     name: "ComparisonSet",
@@ -928,7 +999,7 @@ This section can contain native MDX paragraphs, lists, and code fences.
     name: "OptionGrid",
     category: "artifact",
     stability: "stable",
-    description: "Displays multiple options, component candidates, or prototype directions in a scannable grid.",
+    description: "Displays multiple options, component candidates, or prototype directions with compound items for readable MDX bodies.",
     useWhen: ["Option exploration", "Component scope", "Prototype comparison"],
     props: [
       {
@@ -945,16 +1016,65 @@ This section can contain native MDX paragraphs, lists, and code fences.
         description: "Grid title."
       },
       {
+        name: "children",
+        type: "ReactNode",
+        description:
+          "Preferred item content. Use `OptionGrid.Item` children when options need readable explanations, lists, or local prose."
+      },
+      {
         name: "options",
         type: "OptionGridItem[]",
-        required: true,
-        description: "Items to display. Each item can include name, intent, description, and tradeoffs."
+        description:
+          "Structured item data. Keep for compact machine-readable options; prefer `OptionGrid.Item` children for long human-readable content."
       }
     ],
     types: [
       {
+        name: "OptionGrid.Item",
+        description: "Compound child used inside OptionGrid for Markdown-native item bodies.",
+        fields: [
+          {
+            name: "id",
+            type: "string",
+            contentType: "plainText",
+            description: "Optional stable child anchor id. When the parent has id, child anchors become parentId.itemId."
+          },
+          {
+            name: "name",
+            type: "string",
+            contentType: "inlineMarkdown",
+            required: true,
+            description: "Option title."
+          },
+          {
+            name: "children",
+            type: "ReactNode",
+            contentType: "blockMarkdown",
+            description: "Preferred human-readable item body."
+          },
+          {
+            name: "intent",
+            type: "string",
+            contentType: "inlineMarkdown",
+            description: "Short statement of what this option is trying to achieve."
+          },
+          {
+            name: "description",
+            type: "string",
+            contentType: "inlineMarkdown",
+            description: "Short option description. Prefer children for longer explanations."
+          },
+          {
+            name: "tradeoffs",
+            type: "string[]",
+            contentType: "inlineMarkdown",
+            description: "Compact tradeoffs or caveats for this option."
+          }
+        ]
+      },
+      {
         name: "OptionGridItem",
-        description: "One option in an OptionGrid.",
+        description: "Structured data form for one option in an OptionGrid.",
         fields: [
           {
             name: "id",
@@ -990,18 +1110,16 @@ This section can contain native MDX paragraphs, lists, and code fences.
         ]
       }
     ],
-    example: `<OptionGrid
-  id="option.first-components"
-  title="First component scope"
-  options={[
-    {
-      id: "export",
-      name: "ExportPanel",
-      intent: "Return human edits to the workflow",
-      tradeoffs: ["Copy-only in v1", "Can add downloads later"]
-    }
-  ]}
-/>`
+    example: `<OptionGrid id="option.first-components" title="First component scope">
+  <OptionGrid.Item
+    id="export"
+    name="ExportPanel"
+    intent="Return human edits to the workflow"
+    tradeoffs={["Copy-only in v1", "Can add downloads later"]}
+  >
+    <p>Use when an artifact needs a clear handoff path.</p>
+  </OptionGrid.Item>
+</OptionGrid>`
   },
   {
     name: "ExportPanel",

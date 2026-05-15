@@ -39,7 +39,7 @@ export type {
   CommentTargetProps
 } from "./components/Comments";
 export { DecisionMatrix } from "./components/DecisionMatrix";
-export type { DecisionMatrixOption, DecisionMatrixProps } from "./components/DecisionMatrix";
+export type { DecisionMatrixOption, DecisionMatrixOptionProps, DecisionMatrixProps } from "./components/DecisionMatrix";
 export { DiffBlock } from "./components/DiffBlock";
 export type { DiffBlockProps, DiffLine, DiffLineType } from "./components/DiffBlock";
 export { ExportPanel } from "./components/ExportPanel";
@@ -62,7 +62,7 @@ export type {
 export { MarkdownBody } from "./components/MarkdownBody";
 export type { MarkdownBodyProps, MarkdownBodyVariant } from "./components/MarkdownBody";
 export { OptionGrid } from "./components/OptionGrid";
-export type { OptionGridItem, OptionGridProps } from "./components/OptionGrid";
+export type { OptionGridItem, OptionGridItemProps, OptionGridProps } from "./components/OptionGrid";
 export { Section } from "./components/Section";
 export type { SectionProps } from "./components/Section";
 export { SeverityBadge } from "./components/SeverityBadge";

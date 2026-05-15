@@ -10,16 +10,19 @@ The goal is not to make agents generate raw HTML from scratch or write a React a
 import { DecisionMatrix, ExportPanel } from "mdx-artifacts/react";
 
 <DecisionMatrix
+  id="decision.stage-one"
   question="Should stage one focus on a Vite single HTML artifact?"
-  options={[
-    {
-      name: "Vite single HTML artifact",
-      pros: ["Short feedback loop", "Fits one-off tool artifacts"],
-      cons: ["No docs-site navigation yet"],
-      verdict: "Recommended for stage one"
-    }
-  ]}
-/>
+>
+  <DecisionMatrix.Option
+    id="vite"
+    name="Vite single HTML artifact"
+    pros={["Short feedback loop", "Fits one-off tool artifacts"]}
+    cons={["No docs-site navigation yet"]}
+    verdict="Recommended for stage one"
+  >
+    Validate the shortest Markdown-native source to interactive HTML loop first.
+  </DecisionMatrix.Option>
+</DecisionMatrix>
 
 <ExportPanel
   title="Export decision"
@@ -146,14 +149,11 @@ Native MDX prose can be reviewed through the section anchor.
 <DecisionMatrix
   id="decision.stage-one"
   question="Should this artifact use stable anchors?"
-  options={[
-    {
-      id: "yes",
-      name: "Use stable anchors",
-      verdict: "Recommended"
-    }
-  ]}
-/>
+>
+  <DecisionMatrix.Option id="yes" name="Use stable anchors" verdict="Recommended">
+    Stable child anchors keep review threads attached across edits.
+  </DecisionMatrix.Option>
+</DecisionMatrix>
 ```
 
 Agents can add a user thread, append an assistant reply, and validate that saved threads still point at anchors in the current MDX:

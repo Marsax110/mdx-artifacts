@@ -14,35 +14,28 @@ This example shows a local block-level comment loop. The author marks stable rev
 <DecisionMatrix
   id="decision.comment-targets"
   question="Should comment targets be explicit blocks in v1?"
-  options={[
-    {
-      id: "explicit",
-      name: "Explicit comment blocks",
-      summary:
-        "Authors wrap reviewable sections with a stable block id and title.",
-      pros: [
-        "Stable export target",
-        "Works for prose and components",
-        "Does not change existing component props",
-      ],
-      cons: ["Adds one wrapper around reviewable regions"],
-      confidence: "high",
-      verdict: "Recommended for v1",
-    },
-    {
-      id: "implicit",
-      name: "Implicit component comments",
-      summary: "Every artifact component becomes commentable by default.",
-      pros: ["Less explicit authoring syntax"],
-      cons: [
-        "Cannot naturally target prose",
-        "Requires changing many component APIs",
-      ],
-      confidence: "medium",
-      verdict: "Defer until block comments prove useful",
-    },
-  ]}
-/>
+>
+  <DecisionMatrix.Option
+    id="explicit"
+    name="Explicit comment blocks"
+    pros={["Stable export target", "Works for prose and components", "Does not change existing component props"]}
+    cons={["Adds one wrapper around reviewable regions"]}
+    confidence="high"
+    verdict="Recommended for v1"
+  >
+    Authors wrap reviewable sections with a stable block id and title.
+  </DecisionMatrix.Option>
+  <DecisionMatrix.Option
+    id="implicit"
+    name="Implicit component comments"
+    pros={["Less explicit authoring syntax"]}
+    cons={["Cannot naturally target prose", "Requires changing many component APIs"]}
+    confidence="medium"
+    verdict="Defer until block comments prove useful"
+  >
+    Every artifact component becomes commentable by default.
+  </DecisionMatrix.Option>
+</DecisionMatrix>
 
 <Section id="section.prose-guidance">
 
@@ -69,38 +62,32 @@ Use section comments when feedback should attach to a visible native MDX region:
 <OptionGrid
   id="option.comment-flow"
   title="Comment workflow pieces"
-  options={[
-    {
-      id: "layer",
-      name: "CommentLayer",
-      intent:
-        "The artifact shell now provides this review context automatically.",
-      tradeoffs: [
-        "No production backend",
-        "Local dev persists to sidecar state",
-      ],
-    },
-    {
-      id: "section",
-      name: "Section",
-      intent:
-        "Marks native MDX prose with a stable anchor id while keeping native headings in the section body.",
-      tradeoffs: [
-        "Clear review context",
-        "Authors choose the section boundary",
-      ],
-    },
-    {
-      id: "export",
-      name: "ExportPanel",
-      intent: "Exports the artifact result when a static handoff is needed.",
-      tradeoffs: [
-        "Agent-friendly handoff",
-        "State is handled by the local dev shell",
-      ],
-    },
-  ]}
-/>
+>
+  <OptionGrid.Item
+    id="layer"
+    name="CommentLayer"
+    intent="The artifact shell now provides this review context automatically."
+    tradeoffs={["No production backend", "Local dev persists to sidecar state"]}
+  >
+    Use this as the shared review context for local browser comments.
+  </OptionGrid.Item>
+  <OptionGrid.Item
+    id="section"
+    name="Section"
+    intent="Marks native MDX prose with a stable anchor id while keeping native headings in the section body."
+    tradeoffs={["Clear review context", "Authors choose the section boundary"]}
+  >
+    Use this when feedback should attach to visible native MDX prose.
+  </OptionGrid.Item>
+  <OptionGrid.Item
+    id="export"
+    name="ExportPanel"
+    intent="Exports the artifact result when a static handoff is needed."
+    tradeoffs={["Agent-friendly handoff", "State is handled by the local dev shell"]}
+  >
+    Use this for copying the result and associated review context back into the workflow.
+  </OptionGrid.Item>
+</OptionGrid>
 
 <CommentTarget
   targetId="custom-comment-target"
