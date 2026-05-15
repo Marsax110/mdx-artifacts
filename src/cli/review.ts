@@ -419,6 +419,7 @@ function extractReviewAnchorIds(source: string) {
   addArrayChildAnchors(source, anchorIds, "OptionGrid", "options");
   addCompoundChildAnchors(source, anchorIds, "DecisionMatrix", "Option");
   addCompoundChildAnchors(source, anchorIds, "OptionGrid", "Item");
+  addCompoundChildAnchors(source, anchorIds, "ContentSet", "Item");
   addArrayChildAnchors(source, anchorIds, "AnnotatedCode", "annotations", { addCodeChild: true });
   addComparisonSetChildAnchors(source, anchorIds);
 

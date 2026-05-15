@@ -2,11 +2,11 @@ import {
   Callout,
   CodeBlock,
   ComparisonSet,
+  ContentSet,
   DecisionMatrix,
   ExportPanel,
   Frame,
   MarkdownBody,
-  OptionGrid,
 } from "mdx-artifacts/react";
 
 # Streamlit-Style Linear Artifact
@@ -84,41 +84,50 @@ After the decision block, the document should continue naturally. This paragraph
 
 The next block lists the current component roles. It should feel like a continuation of the same document, not a separate app screen.
 
-<OptionGrid
-  id="option.linear-building-blocks"
+<ContentSet
+  id="set.linear-building-blocks"
   title="Linear authoring building blocks"
+  layout="grid"
+  columns={3}
 >
-  <OptionGrid.Item
+  <ContentSet.Item
     id="native-mdx"
     title="Native MDX"
+    badge="Document"
+    tone="info"
+    emphasis="primary"
     summary="Own top-level narrative flow."
   >
     Use this for the document's main reading order.
 
     - Best for headings and explanatory paragraphs
     - Needs polished document-level CSS
-  </OptionGrid.Item>
-  <OptionGrid.Item
+  </ContentSet.Item>
+  <ContentSet.Item
     id="markdown-body"
     title="MarkdownBody"
+    badge="Controlled"
+    tone="neutral"
     summary="Own controlled body copy inside a component slot."
   >
     Use this when reusable components need safe Markdown rendering.
 
     - Good for reusable components
     - Less convenient for top-level prose
-  </OptionGrid.Item>
-  <OptionGrid.Item
+  </ContentSet.Item>
+  <ContentSet.Item
     id="workflow-components"
     title="Workflow components"
+    badge="Reusable"
+    tone="accent"
     summary="Own structured decisions, comparisons, code notes, and export surfaces."
   >
     Use this for reusable artifact meaning rather than layout-only cards.
 
     - Agent-queryable through the registry
     - Should stay higher-level than raw cards
-  </OptionGrid.Item>
-</OptionGrid>
+  </ContentSet.Item>
+</ContentSet>
 
 ## Mixed content
 

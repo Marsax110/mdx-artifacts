@@ -220,6 +220,14 @@ describe("review reply", () => {
     Use native MDX for readable prose.
   </DecisionMatrix.Option>
 </DecisionMatrix>
+<ContentSet
+  id="set.authoring"
+  title="Authoring paths"
+>
+  <ContentSet.Item id="component-first" title="Component-first">
+    Use stable components for interaction.
+  </ContentSet.Item>
+</ContentSet>
 <Section id="section.context">
 
 ## Context
@@ -234,7 +242,8 @@ describe("review reply", () => {
         source: "artifact-docs/feedback.mdx",
         threads: [
           { id: "thr_001", anchorId: "section.context", status: "open", messages: [] },
-          { id: "thr_002", anchorId: "decision.text-model.native-mdx", status: "open", messages: [] }
+          { id: "thr_002", anchorId: "decision.text-model.native-mdx", status: "open", messages: [] },
+          { id: "thr_003", anchorId: "set.authoring.component-first", status: "open", messages: [] }
         ],
         interactions: {}
       }),
@@ -245,7 +254,7 @@ describe("review reply", () => {
 
     expect(result.missingThreads).toEqual([]);
     expect(result.output).toContain("review validate ok");
-    expect(result.output).toContain("threads: 2");
+    expect(result.output).toContain("threads: 3");
   });
 
   it("reports review state threads whose anchors are missing from MDX", async () => {

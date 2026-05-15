@@ -59,7 +59,7 @@ Default slots:
 - `summary`: an optional one-line explanation below the title.
 - `children`: Markdown-rich body content for paragraphs, local headings, lists, quotes, risks, pros, cons, and rationale.
 
-This slot model applies to current content-oriented workflow components such as `DecisionMatrix.Option` and `OptionGrid.Item`. It should also be the default for future components such as `FindingCard`, `RiskList.Item`, `StatusReport.Section`, or `ImplementationPlan.Step`.
+This slot model applies to `ContentItem`, `ContentSet.Item`, and current content-oriented workflow components such as `DecisionMatrix.Option` and `OptionGrid.Item`. It should also be the default for future components such as `FindingCard`, `RiskList.Item`, `StatusReport.Section`, or `ImplementationPlan.Step`.
 
 Do not apply the slot model blindly to every complex component:
 
@@ -76,7 +76,7 @@ The registry records the same distinction through `authoring.kind`. This makes t
 
 | Authoring Kind | Current Components | Guidance |
 |---|---|---|
-| `content-block` | `InlineText`, `MarkdownBody`, `SeverityBadge`, `Callout`, `DecisionMatrix`, `ComparisonSet`, `OptionGrid` | Use short display props plus Markdown-rich children for readable body content. |
+| `content-block` | `InlineText`, `MarkdownBody`, `ContentItem`, `ContentSet`, `SeverityBadge`, `Callout`, `DecisionMatrix`, `ComparisonSet`, `OptionGrid` | Use short display props plus Markdown-rich children for readable body content. |
 | `structured-renderer` | `CodeBlock`, `DiffBlock`, `AnnotatedCode` | Keep code, diff rows, and annotations in structured props. |
 | `layout-primitive` | `Stack`, `Columns`, `Grid`, `SplitPane`, `Frame` | Arrange content without owning workflow meaning. |
 | `export-editor` | `ExportPanel`, `CommentExport` | Keep handoff data structured and copy/export behavior explicit. |

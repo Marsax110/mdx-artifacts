@@ -67,6 +67,40 @@ Use props for short display structure. Use `children` for long explanations, pro
 
 Do not parse headings inside `children` as a component protocol. Headings and lists in children are human-readable body structure, not machine-readable slot names.
 
+## Content Items
+
+Use `ContentItem` when one reusable content block needs display slots, tone color, emphasis weight, a stable comment anchor, and Markdown-rich body content.
+
+Use `ContentSet` when multiple same-kind content items should be displayed together:
+
+```mdx
+<ContentSet id="set.authoring-paths" title="Authoring paths" layout="grid" columns={3}>
+  <ContentSet.Item
+    id="component-first"
+    title="Component-first"
+    badge="Recommended"
+    tone="positive"
+    emphasis="primary"
+    summary="Best for stable interaction and visual structure."
+  >
+    ### Tradeoffs
+
+    - Clear component boundaries
+    - Easy to debug
+    - Less natural for long prose
+  </ContentSet.Item>
+</ContentSet>
+```
+
+`tone` and `emphasis` are separate:
+
+- `tone` controls semantic color: `neutral`, `info`, `positive`, `warning`, `danger`, or `accent`.
+- `emphasis` controls structural weight: `default`, `primary`, or `subtle`.
+- `badge` is visible text only. It does not choose color by itself.
+- `subtle` may mute the badge and summary, but body children should remain readable.
+
+`ContentSet` is not a workspace or large layout container. Use it for one group of same-kind items. Use layout primitives such as `SplitPane` or `Columns` for multi-region artifacts.
+
 ## Authoring Kinds
 
 Every public component should declare an authoring kind in `src/react/registry.ts`. This keeps the component API aligned with the product philosophy and gives `artifact-kit components <ComponentName>` enough guidance for agents.

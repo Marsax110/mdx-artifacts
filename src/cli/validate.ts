@@ -18,7 +18,10 @@ const componentsRequiringStableId = [
   "AnnotatedCode",
   "CodeBlock",
   "DiffBlock",
-  "Callout"
+  "Callout",
+  "ContentItem",
+  "ContentSet",
+  "ContentSet.Item"
 ];
 
 const deprecatedAuthoringProps = [

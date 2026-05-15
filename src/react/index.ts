@@ -19,6 +19,16 @@ export { Callout } from "./components/Callout";
 export type { CalloutProps, CalloutTone } from "./components/Callout";
 export { ComparisonSet } from "./components/ComparisonSet";
 export type { ComparisonSetItemProps, ComparisonSetProps } from "./components/ComparisonSet";
+export { ContentItem, ContentSet } from "./components/ContentItem";
+export type {
+  ContentItemEmphasis,
+  ContentItemProps,
+  ContentItemTone,
+  ContentSetColumns,
+  ContentSetItemProps,
+  ContentSetLayout,
+  ContentSetProps
+} from "./components/ContentItem";
 export { CodeBlock } from "./components/CodeBlock";
 export type { CodeBlockProps } from "./components/CodeBlock";
 export {

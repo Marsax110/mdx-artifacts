@@ -140,6 +140,187 @@ Use MarkdownBody when a component needs controlled body copy:
 </MarkdownBody>`
   },
   {
+    name: "ContentItem",
+    category: "content",
+    stability: "stable",
+    authoring: { kind: "content-block", guidance: contentBlockGuidance },
+    description:
+      "Renders one reusable content card with display slots, tone color, emphasis weight, and Markdown-rich body content.",
+    useWhen: ["Standalone content cards", "Recommendations", "Risks", "Highlights", "Reusable item blocks"],
+    props: [
+      {
+        name: "id",
+        type: "string",
+        contentType: "plainText",
+        description: "Optional stable anchor id for comments and state. Prefer short semantic ids such as risk.api-boundary."
+      },
+      {
+        name: "title",
+        type: "string",
+        contentType: "inlineMarkdown",
+        required: true,
+        description: "Primary visible label for this item."
+      },
+      {
+        name: "badge",
+        type: "string",
+        contentType: "plainText",
+        description: "Optional short visible label. Badge text does not choose color; tone controls color."
+      },
+      {
+        name: "summary",
+        type: "string",
+        contentType: "inlineMarkdown",
+        description: "Optional one-line summary. Use children for longer explanations and lists."
+      },
+      {
+        name: "tone",
+        type: "'neutral' | 'info' | 'positive' | 'warning' | 'danger' | 'accent'",
+        description: "Semantic color tone. Defaults to neutral."
+      },
+      {
+        name: "emphasis",
+        type: "'default' | 'primary' | 'subtle'",
+        description: "Structural visual weight. Defaults to default."
+      },
+      {
+        name: "children",
+        type: "ReactNode",
+        contentType: "blockMarkdown",
+        description: "Markdown-rich body content for rationale, lists, caveats, or supporting prose."
+      }
+    ],
+    example: `<ContentItem
+  id="item.component-first"
+  title="Component-first authoring"
+  badge="Recommended"
+  tone="positive"
+  emphasis="primary"
+  summary="Best when the artifact needs stable interaction and visual structure."
+>
+  ### Tradeoffs
+
+  - Clear component boundaries
+  - Easy to debug
+  - Less natural than plain Markdown for long prose
+</ContentItem>`
+  },
+  {
+    name: "ContentSet",
+    category: "artifact",
+    stability: "stable",
+    authoring: { kind: "content-block", guidance: contentBlockGuidance },
+    description:
+      "Groups same-kind content items in a grid or list while preserving item-level tone, emphasis, and comment anchors.",
+    useWhen: ["Option groups", "Risk groups", "Recommendation sets", "Finding lists", "Comparable content cards"],
+    props: [
+      {
+        name: "id",
+        type: "string",
+        contentType: "plainText",
+        description: "Optional stable parent anchor id. Child item anchors become parentId.itemId when provided."
+      },
+      {
+        name: "title",
+        type: "string",
+        contentType: "inlineMarkdown",
+        required: true,
+        description: "Visible title for the content set."
+      },
+      {
+        name: "children",
+        type: "ReactNode",
+        required: true,
+        description: "Use ContentSet.Item children. Each item uses title, badge, summary, tone, emphasis, and Markdown body."
+      },
+      {
+        name: "layout",
+        type: "'grid' | 'list'",
+        description: "Item arrangement. Defaults to grid."
+      },
+      {
+        name: "columns",
+        type: "2 | 3 | 4 | 5",
+        description: "Grid column count on desktop. Defaults to 3. List layout ignores this."
+      },
+      {
+        name: "tone",
+        type: "'neutral' | 'info' | 'positive' | 'warning' | 'danger' | 'accent'",
+        description: "Optional default tone inherited by ContentSet.Item children."
+      },
+      {
+        name: "emphasis",
+        type: "'default' | 'primary' | 'subtle'",
+        description: "Optional default emphasis inherited by ContentSet.Item children."
+      }
+    ],
+    types: [
+      {
+        name: "ContentSet.Item",
+        description: "Compound child used inside ContentSet. It renders the same visual structure as ContentItem.",
+        fields: [
+          {
+            name: "id",
+            type: "string",
+            contentType: "plainText",
+            description: "Optional stable child anchor id. When the parent has id, child anchors become parentId.itemId."
+          },
+          {
+            name: "title",
+            type: "string",
+            contentType: "inlineMarkdown",
+            required: true,
+            description: "Primary visible item label."
+          },
+          {
+            name: "badge",
+            type: "string",
+            contentType: "plainText",
+            description: "Optional short visible label."
+          },
+          {
+            name: "summary",
+            type: "string",
+            contentType: "inlineMarkdown",
+            description: "Optional one-line summary. Use children for longer explanations and lists."
+          },
+          {
+            name: "tone",
+            type: "'neutral' | 'info' | 'positive' | 'warning' | 'danger' | 'accent'",
+            description: "Optional item tone. Overrides the parent tone."
+          },
+          {
+            name: "emphasis",
+            type: "'default' | 'primary' | 'subtle'",
+            description: "Optional item emphasis. Overrides the parent emphasis."
+          },
+          {
+            name: "children",
+            type: "ReactNode",
+            contentType: "blockMarkdown",
+            description: "Markdown-rich item body."
+          }
+        ]
+      }
+    ],
+    example: `<ContentSet id="set.authoring-paths" title="Authoring paths" layout="grid" columns={3}>
+  <ContentSet.Item
+    id="component-first"
+    title="Component-first"
+    badge="Recommended"
+    tone="positive"
+    emphasis="primary"
+    summary="Best for stable interaction and visual structure."
+  >
+    ### Tradeoffs
+
+    - Clear component boundaries
+    - Easy to debug
+    - Less natural for long prose
+  </ContentSet.Item>
+</ContentSet>`
+  },
+  {
     name: "CodeBlock",
     category: "content",
     stability: "stable",
