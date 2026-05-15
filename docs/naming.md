@@ -111,7 +111,7 @@ For main artifact structure, prefer component title props or `InlineText as="h2"
 Use:
 
 ```tsx
-<InlineText as="h3" text="**Recommended option**" />
+<InlineText as="h3">**Recommended option**</InlineText>
 ```
 
 Avoid:

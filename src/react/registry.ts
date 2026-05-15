@@ -32,11 +32,16 @@ export const componentRegistry: ComponentMeta[] = [
     useWhen: ["Titles", "Labels", "Captions", "Short notes", "Inline explanations"],
     props: [
       {
+        name: "children",
+        type: "ReactNode",
+        contentType: "inlineMarkdown",
+        description: "Preferred short inline Markdown content."
+      },
+      {
         name: "text",
         type: "string",
         contentType: "inlineMarkdown",
-        required: true,
-        description: "Short text. Supports bold, emphasis, strikethrough, inline code, and links."
+        description: "Legacy short text prop. Prefer children for human-readable content."
       },
       {
         name: "as",
@@ -49,11 +54,9 @@ export const componentRegistry: ComponentMeta[] = [
         description: "Visual text variant."
       }
     ],
-    example: `<InlineText
-  as="h3"
-  variant="subtitle"
-  text="Use **MDX** as source and ~~raw HTML~~ only as fallback."
-/>`
+    example: `<InlineText as="h3" variant="subtitle">
+  Use **MDX** as source and ~~raw HTML~~ only as fallback.
+</InlineText>`
   },
   {
     name: "MarkdownBody",
@@ -63,12 +66,18 @@ export const componentRegistry: ComponentMeta[] = [
     useWhen: ["Component body explanations", "Controlled lists inside components", "Component-local prose"],
     props: [
       {
+        name: "children",
+        type: "ReactNode",
+        contentType: "blockMarkdown",
+        description:
+          "Preferred body content. Use MDX children for human-readable prose, lists, and local explanations."
+      },
+      {
         name: "body",
         type: "string",
         contentType: "blockMarkdown",
-        required: true,
         description:
-          "Multi-line Markdown. Supports headings, paragraphs, lists, blockquotes, bold, emphasis, strikethrough, inline code, and links. Use native MDX children inside Section for document-level prose."
+          "Legacy multi-line Markdown body prop. Prefer children for human-readable content. Supports headings, paragraphs, lists, blockquotes, bold, emphasis, strikethrough, inline code, and links."
       },
       {
         name: "variant",
@@ -76,14 +85,14 @@ export const componentRegistry: ComponentMeta[] = [
         description: "Body density variant."
       }
     ],
-    example: `<MarkdownBody
-  body={\`Use MarkdownBody when a component needs controlled body copy:
+    example: `<MarkdownBody>
+Use MarkdownBody when a component needs controlled body copy:
 
 - **Readable** paragraphs and lists
 - \\\`inline code\\\` for short technical names
 - Headings for local body sections
-- No tables, HTML, math, or code blocks\`}
-/>`
+- No tables, HTML, math, or code blocks
+</MarkdownBody>`
   },
   {
     name: "CodeBlock",
@@ -250,11 +259,16 @@ export const componentRegistry: ComponentMeta[] = [
         description: "Optional stable anchor id for comments and state. Prefer short semantic ids such as callout.risk."
       },
       {
+        name: "children",
+        type: "ReactNode",
+        contentType: "blockMarkdown",
+        description: "Preferred callout message content. Use MDX children for human-readable body copy."
+      },
+      {
         name: "body",
         type: "string",
         contentType: "blockMarkdown",
-        required: true,
-        description: "Controlled Markdown body. Use for the message inside the callout."
+        description: "Legacy controlled Markdown body prop. Prefer children for the message inside the callout."
       },
       {
         name: "title",
@@ -268,12 +282,9 @@ export const componentRegistry: ComponentMeta[] = [
         description: "Visual tone. Defaults to info."
       }
     ],
-    example: `<Callout
-  id="callout.review-focus"
-  tone="warning"
-  title="Review focus"
-  body="Check the **export path** before treating this artifact as complete."
-/>`
+    example: `<Callout id="callout.review-focus" tone="warning" title="Review focus">
+  Check the **export path** before treating this artifact as complete.
+</Callout>`
   },
   {
     name: "AnnotatedCode",
@@ -405,7 +416,7 @@ export const componentRegistry: ComponentMeta[] = [
       }
     ],
     example: `<Stack gap="md">
-  <MarkdownBody body="Use semantic components first." />
+  <MarkdownBody>Use semantic components first.</MarkdownBody>
   <ExportPanel value={{ status: "ready" }} />
 </Stack>`
   },
@@ -439,7 +450,7 @@ export const componentRegistry: ComponentMeta[] = [
       }
     ],
     example: `<Columns ratio="3:1" gap="md">
-  <MarkdownBody body="Main explanation." />
+  <MarkdownBody>Main explanation.</MarkdownBody>
   <Frame surface="subtle">Supporting notes</Frame>
 </Columns>`
   },
@@ -508,7 +519,7 @@ export const componentRegistry: ComponentMeta[] = [
       }
     ],
     example: `<SplitPane ratio="3:1">
-  <MarkdownBody body="Primary reading surface." />
+  <MarkdownBody>Primary reading surface.</MarkdownBody>
   <Frame surface="outlined">Sidebar</Frame>
 </SplitPane>`
   },
@@ -537,7 +548,7 @@ export const componentRegistry: ComponentMeta[] = [
       }
     ],
     example: `<Frame surface="outlined" padding="md">
-  <MarkdownBody body="A framed preview." />
+  <MarkdownBody>A framed preview.</MarkdownBody>
 </Frame>`
   },
   {
@@ -906,7 +917,7 @@ This section can contain native MDX paragraphs, lists, and code fences.
     ],
     example: `<ComparisonSet id="comparison.artifact-forms" title="Compare artifact forms" columns={3}>
   <ComparisonSet.Item id="markdown" title="Markdown explanation" value="markdown">
-    <MarkdownBody body="Best for prose-heavy context." />
+    <MarkdownBody>Best for prose-heavy context.</MarkdownBody>
   </ComparisonSet.Item>
   <ComparisonSet.Item id="code" title="Code path" value="code">
     <Frame surface="subtle">Code renderer or local component</Frame>

@@ -13,16 +13,13 @@ type Story = StoryObj<typeof meta>;
 
 export const MixedContent: Story = {
   render: () => (
-    <ComparisonSet title="Compare artifact forms" columns={3}>
-      <ComparisonSet.Item title="Markdown explanation" value="markdown">
-        <MarkdownBody
-          body={`Best for prose-heavy context.
+      <ComparisonSet title="Compare artifact forms" columns={3}>
+        <ComparisonSet.Item title="Markdown explanation" value="markdown">
+        <MarkdownBody variant="compact">{`Best for prose-heavy context.
 
 - Easy for agents to write
 - Easy for humans to scan
-- Limited visual structure`}
-          variant="compact"
-        />
+- Limited visual structure`}</MarkdownBody>
       </ComparisonSet.Item>
 
       <ComparisonSet.Item title="Code path" value="code-path">
@@ -35,10 +32,9 @@ artifact-docs/examples/layout-composition.mdx`}</pre>
 
       <ComparisonSet.Item title="Local preview" value="local-preview">
         <Frame surface="plain">
-          <MarkdownBody
-            body={`This slot can hold a future local component, image, Mermaid renderer, or prototype preview.`}
-            variant="compact"
-          />
+          <MarkdownBody variant="compact">
+            This slot can hold a future local component, image, Mermaid renderer, or prototype preview.
+          </MarkdownBody>
         </Frame>
       </ComparisonSet.Item>
     </ComparisonSet>

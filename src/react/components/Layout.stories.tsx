@@ -17,13 +17,13 @@ export const StackBasic: Story = {
   render: () => (
     <Stack gap="md">
       <Frame surface="outlined">
-        <InlineText as="h3" text="Stack item A" variant="subtitle" />
+        <InlineText as="h3" variant="subtitle">Stack item A</InlineText>
       </Frame>
       <Frame surface="subtle">
-        <InlineText as="h3" text="Stack item B" variant="subtitle" />
+        <InlineText as="h3" variant="subtitle">Stack item B</InlineText>
       </Frame>
       <Frame surface="plain">
-        <InlineText as="h3" text="Stack item C" variant="subtitle" />
+        <InlineText as="h3" variant="subtitle">Stack item C</InlineText>
       </Frame>
     </Stack>
   )
@@ -63,14 +63,16 @@ export const SplitPaneBasic: Story = {
   render: () => (
     <SplitPane ratio="3:1">
       <Frame surface="outlined">
-        <MarkdownBody
-          body={`Primary reading surface.
+        <MarkdownBody>{`Primary reading surface.
 
-Use \`SplitPane\` when an artifact needs a clear main area and supporting context.`}
-        />
+Use \`SplitPane\` when an artifact needs a clear main area and supporting context.`}</MarkdownBody>
       </Frame>
       <Frame surface="subtle">
-        <MarkdownBody body={`Sidebar notes:\n\n- Keep narrow\n- Avoid workflow semantics\n- Collapse on smaller screens`} variant="compact" />
+        <MarkdownBody variant="compact">{`Sidebar notes:
+
+- Keep narrow
+- Avoid workflow semantics
+- Collapse on smaller screens`}</MarkdownBody>
       </Frame>
     </SplitPane>
   )
@@ -80,16 +82,16 @@ export const FrameSurfaces: Story = {
   render: () => (
     <Grid columns={4}>
       <Frame surface="none">
-        <InlineText text="none" variant="label" />
+        <InlineText variant="label">none</InlineText>
       </Frame>
       <Frame surface="plain">
-        <InlineText text="plain" variant="label" />
+        <InlineText variant="label">plain</InlineText>
       </Frame>
       <Frame surface="subtle">
-        <InlineText text="subtle" variant="label" />
+        <InlineText variant="label">subtle</InlineText>
       </Frame>
       <Frame surface="outlined">
-        <InlineText text="outlined" variant="label" />
+        <InlineText variant="label">outlined</InlineText>
       </Frame>
     </Grid>
   )
@@ -121,11 +123,9 @@ export const ComposedArtifact: Story = {
           ]}
         />
         <Frame surface="subtle">
-          <MarkdownBody
-            body={`Layout primitives only control placement and surface.
+          <MarkdownBody>{`Layout primitives only control placement and surface.
 
-The child component still owns the meaning.`}
-          />
+The child component still owns the meaning.`}</MarkdownBody>
         </Frame>
       </SplitPane>
       <ExportPanel
@@ -142,8 +142,10 @@ The child component still owns the meaning.`}
 function PreviewFrame({ title }: { title: string }) {
   return (
     <Frame surface="outlined">
-      <InlineText as="h3" text={title} variant="subtitle" />
-      <MarkdownBody body="This frame has no artifact semantics. It only makes layout visible." variant="compact" />
+      <InlineText as="h3" variant="subtitle">{title}</InlineText>
+      <MarkdownBody variant="compact">
+        This frame has no artifact semantics. It only makes layout visible.
+      </MarkdownBody>
     </Frame>
   );
 }

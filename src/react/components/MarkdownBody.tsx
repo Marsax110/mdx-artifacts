@@ -1,10 +1,12 @@
+import type { ReactNode } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 export type MarkdownBodyVariant = "default" | "compact";
 
 export type MarkdownBodyProps = {
-  body: string;
+  body?: string;
+  children?: ReactNode;
   variant?: MarkdownBodyVariant;
   className?: string;
 };
@@ -39,13 +41,27 @@ const blockComponents: Components = {
   }
 };
 
-export function MarkdownBody({ body, variant = "default", className }: MarkdownBodyProps) {
-  if (!body.trim()) {
+export function MarkdownBody({ body, children, variant = "default", className }: MarkdownBodyProps) {
+  const classNamesValue = classNames("ak-markdown-body", `ak-markdown-body--${variant}`, className);
+
+  if (hasRenderableChildren(children)) {
+    if (typeof children === "string") {
+      return <MarkdownBodyFromString body={children} className={classNamesValue} />;
+    }
+
+    return <div className={classNamesValue}>{children}</div>;
+  }
+
+  if (!body?.trim()) {
     return null;
   }
 
+  return <MarkdownBodyFromString body={body} className={classNamesValue} />;
+}
+
+function MarkdownBodyFromString({ body, className }: { body: string; className: string }) {
   return (
-    <div className={classNames("ak-markdown-body", `ak-markdown-body--${variant}`, className)}>
+    <div className={className}>
       <ReactMarkdown
         allowedElements={blockAllowedElements}
         components={blockComponents}
@@ -61,4 +77,8 @@ export function MarkdownBody({ body, variant = "default", className }: MarkdownB
 
 function classNames(...values: Array<string | undefined>) {
   return values.filter(Boolean).join(" ");
+}
+
+function hasRenderableChildren(children: ReactNode) {
+  return children !== undefined && children !== null && children !== false;
 }

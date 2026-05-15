@@ -11,16 +11,17 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Basic: Story = {
-  args: {
-    text: "Use **MDX** for source, ~~raw HTML~~ only as fallback, and `ExportPanel` for handoff.",
-    as: "p"
-  }
+  render: () => (
+    <InlineText as="p">
+      Use **MDX** for source, ~~raw HTML~~ only as fallback, and `ExportPanel` for handoff.
+    </InlineText>
+  )
 };
 
 export const AsHeading: Story = {
-  args: {
-    text: "**Stage one** component naming",
-    as: "h2",
-    variant: "title"
-  }
+  render: () => (
+    <InlineText as="h2" variant="title">
+      **Stage one** component naming
+    </InlineText>
+  )
 };

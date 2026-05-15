@@ -15,6 +15,14 @@ describe("InlineText", () => {
     expect(html).toContain("<code>code</code>");
   });
 
+  it("renders inline markdown from children", () => {
+    const html = renderToStaticMarkup(
+      <InlineText>Use **bold** text from children.</InlineText>
+    );
+
+    expect(html).toContain("<strong>bold</strong>");
+  });
+
   it("does not let markdown headings control semantic level", () => {
     const html = renderToStaticMarkup(<InlineText as="p" text="# Hidden heading" />);
 
@@ -49,6 +57,19 @@ describe("MarkdownBody", () => {
     expect(html).toContain("<strong>Readable</strong>");
     expect(html).toContain("<code>inline code</code>");
     expect(html).toContain("<blockquote>");
+  });
+
+  it("renders block markdown from children", () => {
+    const html = renderToStaticMarkup(
+      <MarkdownBody>{`Body copy:
+
+- **Readable** item
+- \`inline code\``}</MarkdownBody>
+    );
+
+    expect(html).toContain("<ul>");
+    expect(html).toContain("<strong>Readable</strong>");
+    expect(html).toContain("<code>inline code</code>");
   });
 
   it("renders markdown headings inside body copy", () => {

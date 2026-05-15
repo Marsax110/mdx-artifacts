@@ -16,6 +16,18 @@ describe("Callout", () => {
     expect(html).toContain("Review focus");
     expect(html).toContain("<strong>export path</strong>");
   });
+
+  it("renders callout body from children", () => {
+    const html = renderToStaticMarkup(
+      <Callout title="Review focus" tone="warning">
+        Check the **export path** before release.
+      </Callout>
+    );
+
+    expect(html).toContain("ak-callout-warning");
+    expect(html).toContain("Review focus");
+    expect(html).toContain("<strong>export path</strong>");
+  });
 });
 
 describe("Section", () => {

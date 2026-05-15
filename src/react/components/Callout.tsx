@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { CommentTarget } from "./Comments";
 import { InlineText } from "./InlineText";
 import { MarkdownBody } from "./MarkdownBody";
@@ -6,15 +7,16 @@ export type CalloutTone = "info" | "success" | "warning" | "danger";
 
 export type CalloutProps = {
   id?: string;
-  body: string;
+  body?: string;
+  children?: ReactNode;
   title?: string;
   tone?: CalloutTone;
   className?: string;
 };
 
-export function Callout({ id, body, title, tone = "info", className }: CalloutProps) {
+export function Callout({ id, body, children, title, tone = "info", className }: CalloutProps) {
   const displayTitle = title ?? `${tone} callout`;
-  const targetId = id ?? `callout:${slugify(displayTitle)}:${slugify(body)}`;
+  const targetId = id ?? `callout:${slugify(displayTitle)}:${slugify(body ?? textFromChildren(children) ?? displayTitle)}`;
 
   return (
     <CommentTarget
@@ -24,8 +26,10 @@ export function Callout({ id, body, title, tone = "info", className }: CalloutPr
       title={displayTitle}
     >
       <aside className={classNames("ak-callout", `ak-callout-${tone}`)}>
-        {title ? <InlineText as="h3" text={title} variant="subtitle" /> : null}
-        <MarkdownBody body={body} variant="compact" />
+        {title ? <InlineText as="h3" variant="subtitle">{title}</InlineText> : null}
+        <MarkdownBody body={body} variant="compact">
+          {children}
+        </MarkdownBody>
       </aside>
     </CommentTarget>
   );
@@ -44,4 +48,8 @@ function slugify(value: string) {
     .slice(0, 64);
 
   return slug || "item";
+}
+
+function textFromChildren(children: ReactNode) {
+  return typeof children === "string" ? children : undefined;
 }

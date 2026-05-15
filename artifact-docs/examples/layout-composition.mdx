@@ -8,7 +8,7 @@ import {
   InlineText,
   MarkdownBody,
   SplitPane,
-  Stack,
+  Stack
 } from "mdx-artifacts/react";
 
 # Layout Composition Example
@@ -16,19 +16,15 @@ import {
 <Stack gap="lg">
   <Frame surface="plain" padding="lg">
     <Stack gap="sm">
-      <InlineText
-        as="h2"
-        variant="title"
-        text="A composed artifact using **layout primitives** and text components"
-      />
-      <MarkdownBody
-        body={`This example shows how \`Stack\`, \`Columns\`, \`Grid\`, \`SplitPane\`, and \`Frame\` can arrange existing semantic components without replacing them.
+      <InlineText as="h2" variant="title">
+        A composed artifact using **layout primitives** and text components
+      </InlineText>
+      <MarkdownBody>
+        {`This example shows how \`Stack\`, \`Columns\`, \`Grid\`, \`SplitPane\`, and \`Frame\` can arrange existing semantic components without replacing them.
 
 The layout components control placement and surface. Components such as \`DecisionMatrix\`, \`ComparisonSet\`, and \`ExportPanel\` still own the artifact meaning.`}
-/>
-
-</Stack>
-
+      </MarkdownBody>
+    </Stack>
   </Frame>
 
   <SplitPane ratio="3:1" gap="lg">
@@ -59,134 +55,107 @@ The layout components control placement and surface. Components such as \`Decisi
 
     <Frame surface="subtle">
       <Stack gap="sm">
-        <InlineText as="h3" variant="subtitle" text="Reading note" />
-        <MarkdownBody
-          variant="compact"
-          body={`Use layout primitives when the artifact needs a custom reading shape:
+        <InlineText as="h3" variant="subtitle">Reading note</InlineText>
+        <MarkdownBody variant="compact">
+          {`Use layout primitives when the artifact needs a custom reading shape:
 
 - main content plus sidebar
 - equal option previews
 - framed snippets or mockups
 
 Do not use them to rebuild existing semantic components.`}
-/>
-
-</Stack>
-</Frame>
-
+        </MarkdownBody>
+      </Stack>
+    </Frame>
   </SplitPane>
 
   <Columns ratio="1:1:1" gap="md">
     <Frame surface="outlined">
-      <InlineText as="h3" variant="subtitle" text="InlineText" />
-      <MarkdownBody
-        variant="compact"
-        body={`Short labels and headings can use **inline Markdown**, including *emphasis*, ~~removed text~~, and \`inline code\`.`}
-      />
+      <InlineText as="h3" variant="subtitle">InlineText</InlineText>
+      <MarkdownBody variant="compact">
+        Short labels and headings can use **inline Markdown**, including *emphasis*, ~~removed text~~, and `inline code`.
+      </MarkdownBody>
     </Frame>
 
     <Frame surface="outlined">
-      <InlineText as="h3" variant="subtitle" text="MarkdownBody" />
-      <MarkdownBody
-        variant="compact"
-        body={`Body copy supports controlled Markdown:
+      <InlineText as="h3" variant="subtitle">MarkdownBody</InlineText>
+      <MarkdownBody variant="compact">
+        {`Body copy supports controlled Markdown:
 
 1.  paragraphs
 2.  ordered lists
 3.  unordered lists
 4.  blockquotes`}
-    />
+      </MarkdownBody>
+    </Frame>
 
-                  </Frame>
-
-                  <Frame surface="outlined">
-
-              <InlineText as="h3" variant="subtitle" text="Frame" />
-
-          <MarkdownBody
-
-    variant="compact"
-    body={`Frame provides surface treatment:
+    <Frame surface="outlined">
+      <InlineText as="h3" variant="subtitle">Frame</InlineText>
+      <MarkdownBody variant="compact">
+        {`Frame provides surface treatment:
 
 - \`none\`
 - \`plain\`
 - \`subtle\`
 - \`outlined\``}
-  />
+      </MarkdownBody>
+    </Frame>
+  </Columns>
 
-                </Frame>
+  <ComparisonSet id="comparison.content-shapes" title="Compare content shapes" columns={3}>
+    <ComparisonSet.Item id="markdown-body" title="Markdown body" value="markdown-body">
+      <MarkdownBody variant="compact">
+        {`# This **item** is ~~plain Markdown content~~.
 
-            </Columns>
-
-              <ComparisonSet id="comparison.content-shapes" title="Compare content shapes" columns={3}>
-
-          <ComparisonSet.Item id="markdown-body" title="Markdown body" value="markdown-body">
-
-      <MarkdownBody
-
-  variant="compact"
-  body={`# This **item** is ~~plain Markdown content~~.
-
-  #### **item** is ~~plain Markdown content~~.
+#### **item** is ~~plain Markdown content~~.
 
 - Good for notes
 - Easy for agents to write
 - Easy to validate
 
 1. Ordered item
-2. Nested content check
+2. Nested content check`}
+      </MarkdownBody>
+    </ComparisonSet.Item>
 
-`}
-/>
+    <ComparisonSet.Item id="framed-snippet" title="Framed snippet" value="framed-snippet">
+      <Frame surface="subtle">
+        <MarkdownBody variant="compact">
+          This slot can hold a future `CodeBlock`, `MermaidBlock`, image renderer, or project-local component.
+        </MarkdownBody>
+      </Frame>
+    </ComparisonSet.Item>
 
-                  </ComparisonSet.Item>
+    <ComparisonSet.Item id="custom-composition" title="Custom composition" value="custom-composition">
+      <Stack gap="sm">
+        <InlineText variant="label">Nested layout is allowed when the item needs it.</InlineText>
+        <MarkdownBody variant="compact">
+          The comparison item owns the title. Its body remains open to child components.
+        </MarkdownBody>
+      </Stack>
+    </ComparisonSet.Item>
+  </ComparisonSet>
 
-<ComparisonSet.Item id="framed-snippet" title="Framed snippet" value="framed-snippet">
-  <Frame surface="subtle">
-    <MarkdownBody
-      variant="compact"
-      body={`This slot can hold a future \`CodeBlock\`, \`MermaidBlock\`, image renderer, or project-local component.`}
-    />
-  </Frame>
-</ComparisonSet.Item>
-
-                  <ComparisonSet.Item id="custom-composition" title="Custom composition" value="custom-composition">
-                  <Stack gap="sm">
-                    <InlineText text="Nested layout is allowed when the item needs it." variant="label" />
-                    <MarkdownBody body="The comparison item owns the title. Its body remains open to child components." variant="compact" />
-                  </Stack>
-
-                </ComparisonSet.Item>
-
-            </ComparisonSet>
-
-                <Grid columns={2} gap="md">
-
-              <Frame surface="outlined">
-
-          <InlineText as="h3" variant="subtitle" text="Grid is only layout" />
-
-      <MarkdownBody
-
-body={`This card is built manually from \`Frame\`, \`InlineText\`, and \`MarkdownBody\`.
+  <Grid columns={2} gap="md">
+    <Frame surface="outlined">
+      <InlineText as="h3" variant="subtitle">Grid is only layout</InlineText>
+      <MarkdownBody>
+        {`This card is built manually from \`Frame\`, \`InlineText\`, and \`MarkdownBody\`.
 
 Use this when there is no reusable artifact meaning beyond placement.`}
-/>
-
-</Frame>
+      </MarkdownBody>
+    </Frame>
 
     <Frame surface="plain" padding="lg">
       <Stack gap="md">
-        <InlineText as="h3" variant="subtitle" text="Surface check" />
-        <MarkdownBody
-          body={`This frame uses \`surface=\"plain\"\`. In light mode it should read as a white surface on a very light neutral page background.
+        <InlineText as="h3" variant="subtitle">Surface check</InlineText>
+        <MarkdownBody>
+          {`This frame uses \`surface="plain"\`. In light mode it should read as a white surface on a very light neutral page background.
 
 In dark mode it should read as a quiet elevated surface, not as a blue-tinted panel.`}
-/>
-
-</Stack>
-</Frame>
-
+        </MarkdownBody>
+      </Stack>
+    </Frame>
   </Grid>
 
   <ExportPanel

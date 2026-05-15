@@ -11,23 +11,22 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Basic: Story = {
-  args: {
-    body: `This body supports controlled block Markdown:
+  render: () => (
+    <MarkdownBody>{`This body supports controlled block Markdown:
 
 - **Bold** and *emphasis*
 - ~~Removed options~~
 - \`inline code\`
 
-> Headings, tables, HTML, code blocks, and math are intentionally not part of MarkdownBody.`
-  }
+> Headings, tables, HTML, code blocks, and math are intentionally not part of MarkdownBody.`}</MarkdownBody>
+  )
 };
 
 export const Compact: Story = {
-  args: {
-    body: `Use compact body text when a component needs a short explanation:
+  render: () => (
+    <MarkdownBody variant="compact">{`Use compact body text when a component needs a short explanation:
 
 1. Keep it readable.
-2. Keep the component layout predictable.`,
-    variant: "compact"
-  }
+2. Keep the component layout predictable.`}</MarkdownBody>
+  )
 };
