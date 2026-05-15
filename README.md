@@ -52,6 +52,25 @@ Use this product boundary when making component and authoring decisions:
 
 This means new component APIs should usually be children-first for human-readable content and props-first for machine-readable configuration.
 
+## Authoring Notes for 0.1.3
+
+`DecisionMatrix` and `OptionGrid` now require compound children for options and items.
+
+Use:
+
+```mdx
+<DecisionMatrix id="decision.path" title="Choose the implementation path">
+  <DecisionMatrix.Option id="path-a" title="Path A" badge="Recommended" summary="Best first step.">
+    ### Tradeoffs
+
+    - Keeps the MDX source readable
+    - Lets long rationale stay in Markdown
+  </DecisionMatrix.Option>
+</DecisionMatrix>
+```
+
+Do not use `options={[...]}` for these content components. The `validate` command warns when older `options`, `question`, `name`, `intent`, `pros`, `cons`, `risks`, `confidence`, `verdict`, or `tradeoffs` props are found.
+
 ## Current Scope
 
 The first stage focuses on the smallest useful loop:
