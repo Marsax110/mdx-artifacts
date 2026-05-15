@@ -80,7 +80,6 @@ Examples:
 
 - `DiffLine[]` requires a `DiffLine` type entry.
 - `CodeAnnotation[]` requires a `CodeAnnotation` type entry.
-- `DecisionMatrixOption[]` still requires a `DecisionMatrixOption` type entry when the structured-data form is supported.
 
 Each nested field should include:
 

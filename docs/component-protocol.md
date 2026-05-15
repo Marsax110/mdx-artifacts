@@ -89,7 +89,7 @@ The kind is not a styling category. It tells an author where meaning belongs:
 - `export-editor`: keep handoff data structured.
 - `review-boundary`: keep anchors durable and review targets meaningful.
 
-Complex props must be self-describing through the registry. Do not rely on TypeScript LSP alone for agent usage. If a prop type references a named object or object array, such as `DiffLine[]`, `CodeAnnotation[]`, or the structured-data form `DecisionMatrixOption[]`, add a matching entry to the component's `types` metadata:
+Complex props must be self-describing through the registry. Do not rely on TypeScript LSP alone for agent usage. If a prop type references a named object or object array, such as `DiffLine[]` or `CodeAnnotation[]`, add a matching entry to the component's `types` metadata:
 
 ```ts
 {

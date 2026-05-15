@@ -2,27 +2,23 @@ import { createContext, useContext, type ReactNode } from "react";
 import { CommentTarget } from "./Comments";
 import { InlineText } from "./InlineText";
 
-export type OptionGridItem = {
+export type OptionGridProps = {
+  id?: string;
+  title: string;
+  children?: ReactNode;
+};
+
+export type OptionGridItemProps = {
   id?: string;
   title: string;
   badge?: string;
   summary?: string;
-};
-
-export type OptionGridProps = {
-  id?: string;
-  title: string;
-  options?: OptionGridItem[];
-  children?: ReactNode;
-};
-
-export type OptionGridItemProps = OptionGridItem & {
   children?: ReactNode;
 };
 
 const OptionGridContext = createContext<{ id?: string; title: string } | null>(null);
 
-function OptionGridRoot({ id, title, options = [], children }: OptionGridProps) {
+function OptionGridRoot({ id, title, children }: OptionGridProps) {
   const targetId = id ?? `option:${slugify(title)}`;
 
   return (
@@ -41,9 +37,6 @@ function OptionGridRoot({ id, title, options = [], children }: OptionGridProps) 
         </div>
         <div className="ak-option-grid">
           <OptionGridContext.Provider value={{ id, title }}>
-            {options.map((option, index) => (
-              <OptionGridItemCard key={option.id ?? option.title} option={option} index={index} />
-            ))}
             {children}
           </OptionGridContext.Provider>
         </div>
@@ -58,16 +51,14 @@ function OptionGridItemComponent({ children, ...option }: OptionGridItemProps) {
 
 function OptionGridItemCard({
   option,
-  index,
   children
 }: {
-  option: OptionGridItem;
-  index?: number;
+  option: Omit<OptionGridItemProps, "children">;
   children?: ReactNode;
 }) {
   const context = useContext(OptionGridContext);
   const title = context?.title ?? "OptionGrid";
-  const optionTargetId = createOptionTargetId(context?.id, title, option, index);
+  const optionTargetId = createOptionTargetId(context?.id, title, option);
 
   return (
     <CommentTarget
@@ -101,18 +92,13 @@ function OptionGridItemCard({
 function createOptionTargetId(
   parentId: string | undefined,
   title: string,
-  option: OptionGridItem,
-  index: number | undefined
+  option: Omit<OptionGridItemProps, "children">
 ) {
   if (parentId) {
-    return `${parentId}.${option.id ?? (index === undefined ? slugify(option.title) : `${index + 1}`)}`;
+    return `${parentId}.${option.id ?? slugify(option.title)}`;
   }
 
-  if (index === undefined) {
-    return option.id ?? `option:${slugify(title)}:${slugify(option.title)}`;
-  }
-
-  return `option:${slugify(title)}:${index + 1}:${slugify(option.title)}`;
+  return option.id ?? `option:${slugify(title)}:${slugify(option.title)}`;
 }
 
 function slugify(value: string) {

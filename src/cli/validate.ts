@@ -28,6 +28,11 @@ const deprecatedAuthoringProps = [
     warning: 'DecisionMatrix prop "question" is deprecated. Use "title" for the visible decision title.'
   },
   {
+    componentName: "DecisionMatrix",
+    propName: "options",
+    warning: 'DecisionMatrix prop "options" is deprecated. Use DecisionMatrix.Option children.'
+  },
+  {
     componentName: "DecisionMatrix.Option",
     propName: "name",
     warning: 'DecisionMatrix.Option prop "name" is deprecated. Use "title".'
@@ -61,6 +66,11 @@ const deprecatedAuthoringProps = [
     componentName: "OptionGrid.Item",
     propName: "name",
     warning: 'OptionGrid.Item prop "name" is deprecated. Use "title".'
+  },
+  {
+    componentName: "OptionGrid",
+    propName: "options",
+    warning: 'OptionGrid prop "options" is deprecated. Use OptionGrid.Item children.'
   },
   {
     componentName: "OptionGrid.Item",

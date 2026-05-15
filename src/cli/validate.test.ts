@@ -20,7 +20,9 @@ describe("validateMdx", () => {
 
 <Callout title="Risk" body="Add a stable id." />
 
-<DecisionMatrix title="Choose?" options={[]} />
+<DecisionMatrix title="Choose?">
+  <DecisionMatrix.Option title="Missing id">Readable body.</DecisionMatrix.Option>
+</DecisionMatrix>
 
 <ExportPanel value={{ ok: true }} />`,
       "utf8"
@@ -74,7 +76,7 @@ describe("validateMdx", () => {
 
 <CodeBlock
   id="code.example"
-  code={\`<DecisionMatrix title="Example" options={[]} />\`}
+  code={\`<DecisionMatrix title="Example"><DecisionMatrix.Option title="A" /></DecisionMatrix>\`}
 />
 
 <ExportPanel value={{ ok: true }} />`,
@@ -95,7 +97,7 @@ describe("validateMdx", () => {
       filePath,
       `import { DecisionMatrix, ExportPanel, OptionGrid } from "../../src/react";
 
-<DecisionMatrix id="decision.api" question="Choose?">
+<DecisionMatrix id="decision.api" question="Choose?" options={[]}>
   <DecisionMatrix.Option
     id="path-a"
     name="Path A"
@@ -107,7 +109,7 @@ describe("validateMdx", () => {
   />
 </DecisionMatrix>
 
-<OptionGrid id="option.api" title="Options">
+<OptionGrid id="option.api" title="Options" options={[]}>
   <OptionGrid.Item
     id="workflow"
     name="Workflow components"
@@ -126,6 +128,9 @@ describe("validateMdx", () => {
     expect(result.warnings).toContain(
       'DecisionMatrix prop "question" is deprecated. Use "title" for the visible decision title.'
     );
+    expect(result.warnings).toContain(
+      'DecisionMatrix prop "options" is deprecated. Use DecisionMatrix.Option children.'
+    );
     expect(result.warnings).toContain('DecisionMatrix.Option prop "name" is deprecated. Use "title".');
     expect(result.warnings).toContain(
       'DecisionMatrix.Option prop "pros" is deprecated. Move long lists into MDX children.'
@@ -133,6 +138,7 @@ describe("validateMdx", () => {
     expect(result.warnings).toContain(
       'OptionGrid.Item prop "intent" is deprecated. Use "summary" for short intent text.'
     );
+    expect(result.warnings).toContain('OptionGrid prop "options" is deprecated. Use OptionGrid.Item children.');
     expect(result.warnings).toContain(
       'OptionGrid.Item prop "tradeoffs" is deprecated. Move tradeoff lists into MDX children.'
     );

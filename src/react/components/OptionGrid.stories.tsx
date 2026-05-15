@@ -57,7 +57,6 @@ export const Basic: Story = {
 export const Empty: Story = {
   args: {
     id: "option.empty",
-    title: "Empty option list",
-    options: []
+    title: "Empty option list"
   }
 };

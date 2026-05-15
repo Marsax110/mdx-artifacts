@@ -840,14 +840,9 @@ This section can contain native MDX paragraphs, lists, and code fences.
       {
         name: "children",
         type: "ReactNode",
+        required: true,
         description:
           "Preferred option content. Use `DecisionMatrix.Option` children when options need readable explanations, lists, or local prose. Do not encode long lists in props."
-      },
-      {
-        name: "options",
-        type: "DecisionMatrixOption[]",
-        description:
-          "Structured option data using the same title, badge, summary, and children-oriented slot model. Prefer compound children for human-authored MDX."
       }
     ],
     types: [
@@ -885,37 +880,6 @@ This section can contain native MDX paragraphs, lists, and code fences.
             type: "ReactNode",
             contentType: "blockMarkdown",
             description: "Markdown-rich option body. Use headings and lists here for pros, cons, risks, or detailed rationale."
-          }
-        ]
-      },
-      {
-        name: "DecisionMatrixOption",
-        description: "Structured data form for one option in a decision comparison.",
-        fields: [
-          {
-            name: "id",
-            type: "string",
-            contentType: "plainText",
-            description: "Optional stable child anchor id. When the parent has id, child anchors become parentId.optionId."
-          },
-          {
-            name: "title",
-            type: "string",
-            contentType: "inlineMarkdown",
-            required: true,
-            description: "Option title."
-          },
-          {
-            name: "badge",
-            type: "string",
-            contentType: "plainText",
-            description: "Optional short display badge."
-          },
-          {
-            name: "summary",
-            type: "string",
-            contentType: "inlineMarkdown",
-            description: "Short one-line option summary."
           }
         ]
       }
@@ -1039,14 +1003,9 @@ This section can contain native MDX paragraphs, lists, and code fences.
       {
         name: "children",
         type: "ReactNode",
+        required: true,
         description:
           "Preferred item content. Use `OptionGrid.Item` children when options need readable explanations, lists, or local prose. Do not encode long lists in props."
-      },
-      {
-        name: "options",
-        type: "OptionGridItem[]",
-        description:
-          "Structured item data using the same title, badge, and summary slot model. Prefer compound children for human-authored MDX."
       }
     ],
     types: [
@@ -1084,37 +1043,6 @@ This section can contain native MDX paragraphs, lists, and code fences.
             type: "ReactNode",
             contentType: "blockMarkdown",
             description: "Markdown-rich item body. Use paragraphs, headings, and lists for detailed rationale."
-          }
-        ]
-      },
-      {
-        name: "OptionGridItem",
-        description: "Structured data form for one option in an OptionGrid.",
-        fields: [
-          {
-            name: "id",
-            type: "string",
-            contentType: "plainText",
-            description: "Optional stable child anchor id. When the parent has id, child anchors become parentId.itemId."
-          },
-          {
-            name: "title",
-            type: "string",
-            contentType: "inlineMarkdown",
-            required: true,
-            description: "Option title."
-          },
-          {
-            name: "badge",
-            type: "string",
-            contentType: "plainText",
-            description: "Optional short display badge."
-          },
-          {
-            name: "summary",
-            type: "string",
-            contentType: "inlineMarkdown",
-            description: "Short one-line item summary."
           }
         ]
       }

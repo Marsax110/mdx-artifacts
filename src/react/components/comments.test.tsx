@@ -50,52 +50,28 @@ describe("Comment components", () => {
   it("adds fine-grained targets to decision and option items inside a layer", () => {
     const html = renderToStaticMarkup(
       <CommentLayer>
-        <DecisionMatrix
-          options={[
-            {
-              title: "Explicit blocks"
-            }
-          ]}
-          title="Comment target scope"
-        />
-        <OptionGrid
-          options={[
-            {
-              title: "CommentLayer"
-            }
-          ]}
-          title="Comment workflow pieces"
-        />
+        <DecisionMatrix title="Comment target scope">
+          <DecisionMatrix.Option title="Explicit blocks" />
+        </DecisionMatrix>
+        <OptionGrid title="Comment workflow pieces">
+          <OptionGrid.Item title="CommentLayer" />
+        </OptionGrid>
       </CommentLayer>
     );
 
-    expect(html).toContain('data-comment-target-id="decision:comment-target-scope:1:explicit-blocks"');
-    expect(html).toContain('data-comment-target-id="option:comment-workflow-pieces:1:commentlayer"');
+    expect(html).toContain('data-comment-target-id="decision:comment-target-scope:explicit-blocks"');
+    expect(html).toContain('data-comment-target-id="option:comment-workflow-pieces:commentlayer"');
   });
 
   it("uses explicit ids for shorter anchor targets when provided", () => {
     const html = renderToStaticMarkup(
       <CommentLayer>
-        <DecisionMatrix
-          id="decision.comment-targets"
-          options={[
-            {
-              id: "explicit",
-              title: "Explicit blocks"
-            }
-          ]}
-          title="Comment target scope"
-        />
-        <OptionGrid
-          id="option.comment-flow"
-          options={[
-            {
-              id: "layer",
-              title: "CommentLayer"
-            }
-          ]}
-          title="Comment workflow pieces"
-        />
+        <DecisionMatrix id="decision.comment-targets" title="Comment target scope">
+          <DecisionMatrix.Option id="explicit" title="Explicit blocks" />
+        </DecisionMatrix>
+        <OptionGrid id="option.comment-flow" title="Comment workflow pieces">
+          <OptionGrid.Item id="layer" title="CommentLayer" />
+        </OptionGrid>
       </CommentLayer>
     );
 

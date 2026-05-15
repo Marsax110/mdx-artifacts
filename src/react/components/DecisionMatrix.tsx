@@ -2,27 +2,23 @@ import { createContext, useContext, type ReactNode } from "react";
 import { CommentTarget } from "./Comments";
 import { InlineText } from "./InlineText";
 
-export type DecisionMatrixOption = {
+export type DecisionMatrixProps = {
+  id?: string;
+  title: string;
+  children?: ReactNode;
+};
+
+export type DecisionMatrixOptionProps = {
   id?: string;
   title: string;
   badge?: string;
   summary?: string;
-};
-
-export type DecisionMatrixProps = {
-  id?: string;
-  title: string;
-  options?: DecisionMatrixOption[];
-  children?: ReactNode;
-};
-
-export type DecisionMatrixOptionProps = DecisionMatrixOption & {
   children?: ReactNode;
 };
 
 const DecisionMatrixContext = createContext<{ id?: string; title: string } | null>(null);
 
-function DecisionMatrixRoot({ id, title, options = [], children }: DecisionMatrixProps) {
+function DecisionMatrixRoot({ id, title, children }: DecisionMatrixProps) {
   const targetId = id ?? `decision:${slugify(title)}`;
 
   return (
@@ -41,9 +37,6 @@ function DecisionMatrixRoot({ id, title, options = [], children }: DecisionMatri
         </div>
         <div className="ak-decision-grid">
           <DecisionMatrixContext.Provider value={{ id, title }}>
-            {options.map((option, index) => (
-              <DecisionMatrixOptionCard key={option.id ?? option.title} option={option} index={index} />
-            ))}
             {children}
           </DecisionMatrixContext.Provider>
         </div>
@@ -58,16 +51,14 @@ function DecisionMatrixOptionComponent({ children, ...option }: DecisionMatrixOp
 
 function DecisionMatrixOptionCard({
   option,
-  index,
   children
 }: {
-  option: DecisionMatrixOption;
-  index?: number;
+  option: Omit<DecisionMatrixOptionProps, "children">;
   children?: ReactNode;
 }) {
   const context = useContext(DecisionMatrixContext);
   const title = context?.title ?? "DecisionMatrix";
-  const optionTargetId = createOptionTargetId(context?.id, title, option, index);
+  const optionTargetId = createOptionTargetId(context?.id, title, option);
 
   return (
     <CommentTarget
@@ -101,18 +92,13 @@ function DecisionMatrixOptionCard({
 function createOptionTargetId(
   parentId: string | undefined,
   title: string,
-  option: DecisionMatrixOption,
-  index: number | undefined
+  option: Omit<DecisionMatrixOptionProps, "children">
 ) {
   if (parentId) {
-    return `${parentId}.${option.id ?? (index === undefined ? slugify(option.title) : `${index + 1}`)}`;
+    return `${parentId}.${option.id ?? slugify(option.title)}`;
   }
 
-  if (index === undefined) {
-    return option.id ?? `decision:${slugify(title)}:${slugify(option.title)}`;
-  }
-
-  return `decision:${slugify(title)}:${index + 1}:${slugify(option.title)}`;
+  return option.id ?? `decision:${slugify(title)}:${slugify(option.title)}`;
 }
 
 function slugify(value: string) {
