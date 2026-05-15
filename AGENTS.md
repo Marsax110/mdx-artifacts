@@ -12,17 +12,31 @@ This repository is being prepared as an open-source npm package.
 
 ## Project Goal
 
-MDX Artifacts helps agents write structured MDX with reusable React components, then compile that MDX into standalone HTML artifacts.
+MDX Artifacts helps agents write Markdown-native MDX with reusable React components, then compile that MDX into standalone HTML artifacts.
 
 The core idea is:
 
 ```text
-MDX source + high-level React components
+Markdown-native MDX source + high-level React components
   -> CLI build
   -> standalone HTML artifact
 ```
 
-Do not frame the project as a raw HTML generator or an Astro docs site. Astro may become a later adapter, but it is not the core abstraction.
+Do not frame the project as a raw HTML generator, a React app DSL, or an Astro docs site. Astro may become a later adapter, but it is not the core abstraction.
+
+## Product Philosophy
+
+MDX Artifacts is a Markdown-native artifact system.
+
+The source should read like a document. The output can behave like an interactive HTML artifact. Components should be semantic islands inside the document, not the whole authoring model.
+
+Use this boundary when adding components, examples, registry metadata, and agent instructions:
+
+- Prefer native Markdown or MDX children for narrative content, explanations, long descriptions, lists, and reviewable prose.
+- Prefer semantic components for structured workflow regions such as decisions, comparisons, code review, export handoff, and interactive state.
+- Prefer props for stable ids, short labels, variants, layout controls, machine-readable values, and genuinely structured data.
+- Do not invent an implicit Markdown parser where headings, lists, or tables secretly become component data. Component-owned slots must be explicit in the MDX.
+- Do not make MDX authors write arbitrary React application code for normal artifacts. If an artifact needs app-level state, project-specific CSS, or custom interaction, use a project local component or a dedicated web artifact builder.
 
 ## Development Workflow
 
@@ -82,6 +96,13 @@ When adding or changing a component:
 7. Follow `docs/testing.md` for the minimum required test layer.
 
 The component registry is the source of truth for CLI lookup, agent usage, and future generated docs.
+
+For component API shape:
+
+- Human-readable body content should be children-first or slot-first.
+- Long string props such as `body` or `description` should be avoided for new public APIs unless the value is genuinely data.
+- Keep props for ids, titles, enum-like settings, layout controls, export values, code strings, and structured arrays.
+- Existing props-first APIs may remain compatible, but new examples should prefer the Markdown-native form when the component supports it.
 
 ### Layout Components
 

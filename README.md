@@ -4,7 +4,7 @@ Interactive MDX artifacts for agents.
 
 MDX Artifacts lets an agent write structured MDX with reusable React components, then compile it into a standalone HTML artifact that can be opened locally in a browser.
 
-The goal is not to make agents generate raw HTML from scratch. The goal is to make agents call stable, high-level components:
+The goal is not to make agents generate raw HTML from scratch or write a React app DSL inside MDX. The goal is to keep the source Markdown-native while using stable, high-level components as semantic islands:
 
 ```mdx
 import { DecisionMatrix, ExportPanel } from "mdx-artifacts/react";
@@ -29,6 +29,22 @@ import { DecisionMatrix, ExportPanel } from "mdx-artifacts/react";
 ```
 
 The CLI turns that MDX file into a self-contained HTML file.
+
+## Authoring Philosophy
+
+MDX Artifacts is a Markdown-native artifact system.
+
+Source files should read like documents. Output files should behave like interactive HTML artifacts. Components should mark semantic islands inside the document, not replace the document with a large JSX configuration object.
+
+Use this product boundary when making component and authoring decisions:
+
+- Prefer native Markdown or MDX children for narrative content, explanations, long descriptions, lists, and reviewable prose.
+- Prefer semantic components for structured workflow regions such as decisions, comparisons, code review, export handoff, and interactive state.
+- Prefer props for stable ids, short labels, enum-like settings, layout controls, machine-readable values, and genuinely structured data.
+- Do not move all semantics into an implicit Markdown parser. Headings, lists, and tables should not secretly become component data unless a component explicitly owns that slot.
+- Do not turn artifact sources into React application code. If an artifact needs arbitrary stateful UI, project-specific CSS, or app-level interaction, use a dedicated web artifact builder or a project local component.
+
+This means new component APIs should usually be children-first for human-readable content and props-first for machine-readable configuration.
 
 ## Current Scope
 
@@ -226,7 +242,11 @@ Custom styles are imported after the default styles, so they can override CSS va
 ## Design Principles
 
 - Source files are MDX, not raw HTML.
+- Source should stay Markdown-native; output can be richer, interactive HTML.
+- Components are semantic islands in the document, not the whole authoring model.
 - Component APIs should be semantic and self-describing.
+- Human-readable body content should prefer MDX children or explicit slots over long string props.
+- Props should carry ids, short labels, variants, layout controls, and structured data.
 - Interactive artifacts must provide an export path.
 - Bulky data should live in adjacent JSON files instead of JSX props.
 - Core components stay React/TypeScript and should be reusable from Vite, Astro, or artifact builders.
