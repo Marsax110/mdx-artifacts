@@ -15,6 +15,17 @@ describe("componentsCommand", () => {
     expect(output.join("\n")).toContain("content type: inlineMarkdown");
   });
 
+  it("prints the Markdown-native authoring rule in the component list", () => {
+    const output: string[] = [];
+    vi.spyOn(console, "log").mockImplementation((value = "") => output.push(String(value)));
+
+    componentsCommand();
+
+    const text = output.join("\n");
+    expect(text).toContain("prefer MDX children for human-readable content");
+    expect(text).toContain("props for stable ids");
+  });
+
   it("prints block markdown content type metadata", () => {
     const output: string[] = [];
     vi.spyOn(console, "log").mockImplementation((value = "") => output.push(String(value)));

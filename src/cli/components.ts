@@ -25,6 +25,7 @@ export function componentsCommand(input?: string, options: { json?: boolean } = 
   for (const component of componentRegistry) {
     console.log(`- ${component.name}: ${component.description}`);
   }
+  console.log("\nAuthoring rule: prefer MDX children for human-readable content; use props for stable ids, variants, layout controls, export values, and structured data.");
   console.log("\nUse `artifact-kit components <ComponentName>` to inspect props and examples.");
   console.log("Use `artifact-kit components --json` for machine-readable metadata.");
 }

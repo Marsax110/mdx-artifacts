@@ -28,7 +28,7 @@ export const componentRegistry: ComponentMeta[] = [
     name: "InlineText",
     category: "content",
     stability: "stable",
-    description: "Renders short single-line text with controlled inline Markdown.",
+    description: "Renders children-first short single-line text with controlled inline Markdown.",
     useWhen: ["Titles", "Labels", "Captions", "Short notes", "Inline explanations"],
     props: [
       {
@@ -62,7 +62,7 @@ export const componentRegistry: ComponentMeta[] = [
     name: "MarkdownBody",
     category: "content",
     stability: "stable",
-    description: "Renders controlled multi-line Markdown for component body copy.",
+    description: "Renders children-first controlled multi-line Markdown for component body copy.",
     useWhen: ["Component body explanations", "Controlled lists inside components", "Component-local prose"],
     props: [
       {
@@ -249,7 +249,7 @@ Use MarkdownBody when a component needs controlled body copy:
     name: "Callout",
     category: "semantic",
     stability: "stable",
-    description: "Highlights a focused note, warning, recommendation, or risk with controlled Markdown body copy.",
+    description: "Highlights a focused note, warning, recommendation, or risk with children-first Markdown body copy.",
     useWhen: ["Review notes", "Assumptions", "Warnings", "Implementation gotchas", "Recommendations"],
     props: [
       {
