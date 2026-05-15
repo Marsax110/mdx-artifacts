@@ -21,35 +21,44 @@ export const BlockComments: Story = {
     <>
       <DecisionMatrix
         id="decision.comment-targets"
-        question="Should comments target explicit blocks?"
+        title="Should comments target explicit blocks?"
       >
         <DecisionMatrix.Option
           id="explicit-blocks"
-          name="Explicit blocks"
-          pros={["Stable target ids", "Clear export context"]}
-          cons={["Authors must wrap reviewable regions"]}
-          confidence="high"
-          verdict="Recommended"
-        />
+          title="Explicit blocks"
+          badge="Recommended"
+          summary="Use stable block targets for prose and components."
+        >
+          <ul>
+            <li>Stable target ids</li>
+            <li>Clear export context</li>
+            <li>Authors must wrap reviewable regions</li>
+          </ul>
+        </DecisionMatrix.Option>
         <DecisionMatrix.Option
           id="implicit-components"
-          name="Implicit component comments"
-          pros={["Less explicit authoring syntax"]}
-          cons={["Harder to comment on prose", "Harder to export stable targets"]}
-          confidence="medium"
-        />
+          title="Implicit component comments"
+          badge="Deferred"
+          summary="Let components create targets without explicit author wrappers."
+        >
+          <ul>
+            <li>Less explicit authoring syntax</li>
+            <li>Harder to comment on prose</li>
+            <li>Harder to export stable targets</li>
+          </ul>
+        </DecisionMatrix.Option>
       </DecisionMatrix>
 
       <OptionGrid
         id="option.comment-workflow"
         title="Comment workflow components"
       >
-        <OptionGrid.Item id="comment-layer" name="CommentLayer" intent="Own shared local comment state." />
-        <OptionGrid.Item id="commentable-block" name="CommentableBlock" intent="Mark one stable review target." />
+        <OptionGrid.Item id="comment-layer" title="CommentLayer" summary="Own shared local comment state." />
+        <OptionGrid.Item id="commentable-block" title="CommentableBlock" summary="Mark one stable review target." />
         <OptionGrid.Item
           id="export-panel"
-          name="ExportPanel"
-          intent="Copy the result and current comments back to an agent."
+          title="ExportPanel"
+          summary="Copy the result and current comments back to an agent."
         />
       </OptionGrid>
 

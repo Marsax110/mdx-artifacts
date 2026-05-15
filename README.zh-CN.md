@@ -9,16 +9,19 @@ import { DecisionMatrix, ExportPanel } from "mdx-artifacts/react";
 
 <DecisionMatrix
   id="decision.stage-one"
-  question="是否先用 Vite 跑通单 HTML artifact？"
+  title="是否先用 Vite 跑通单 HTML artifact？"
 >
   <DecisionMatrix.Option
     id="vite"
-    name="先做 Vite 单页"
-    pros={["闭环短", "更贴近交互工具"]}
-    cons={["暂时没有文档站导航"]}
-    verdict="第一阶段推荐"
+    title="先做 Vite 单页"
+    badge="第一阶段推荐"
+    summary="先验证从 Markdown-native source 到交互式 HTML 的最短闭环。"
   >
-    先验证从 Markdown-native source 到交互式 HTML 的最短闭环。
+    ### 取舍
+
+    - 闭环短
+    - 更贴近交互工具
+    - 暂时没有文档站导航
   </DecisionMatrix.Option>
 </DecisionMatrix>
 

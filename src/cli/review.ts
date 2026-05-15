@@ -417,6 +417,8 @@ function extractReviewAnchorIds(source: string) {
 
   addArrayChildAnchors(source, anchorIds, "DecisionMatrix", "options");
   addArrayChildAnchors(source, anchorIds, "OptionGrid", "options");
+  addCompoundChildAnchors(source, anchorIds, "DecisionMatrix", "Option");
+  addCompoundChildAnchors(source, anchorIds, "OptionGrid", "Item");
   addArrayChildAnchors(source, anchorIds, "AnnotatedCode", "annotations", { addCodeChild: true });
   addComparisonSetChildAnchors(source, anchorIds);
 
@@ -450,6 +452,30 @@ function addArrayChildAnchors(
 
     for (const itemId of extractObjectIds(arraySource)) {
       anchorIds.add(`${parentId}.${itemId}`);
+    }
+  }
+}
+
+function addCompoundChildAnchors(
+  source: string,
+  anchorIds: Set<string>,
+  componentName: string,
+  childName: string
+) {
+  const componentPattern = new RegExp(`<${componentName}\\b[\\s\\S]*?</${componentName}>`, "g");
+  const childPattern = new RegExp(`<${componentName}\\.${childName}\\b[^>]*\\sid\\s*=\\s*["']([^"']+)["'][^>]*>`, "g");
+
+  for (const match of source.matchAll(componentPattern)) {
+    const componentSource = match[0];
+    const parentId = extractJsxStringProp(componentSource, "id");
+    if (!parentId) {
+      continue;
+    }
+
+    for (const childMatch of componentSource.matchAll(childPattern)) {
+      if (childMatch[1]) {
+        anchorIds.add(`${parentId}.${childMatch[1]}`);
+      }
     }
   }
 }

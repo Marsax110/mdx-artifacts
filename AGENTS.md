@@ -100,6 +100,9 @@ The component registry is the source of truth for CLI lookup, agent usage, and f
 For component API shape:
 
 - Human-readable body content should be children-first or slot-first.
+- Readable content block components should default to `title`, `badge`, `summary`, and `children`.
+- Use `children` for Markdown-rich body content such as paragraphs, local headings, lists, pros, cons, risks, tradeoffs, and rationale.
+- Do not apply this slot model to structured renderers such as `CodeBlock`, `DiffBlock`, or `AnnotatedCode`, layout primitives, or export/editor components.
 - Long string props such as `body` or `description` should be avoided for new public APIs unless the value is genuinely data.
 - Keep props for ids, titles, enum-like settings, layout controls, export values, code strings, and structured arrays.
 - Existing props-first APIs may remain compatible, but new examples should prefer the Markdown-native form when the component supports it.

@@ -20,7 +20,7 @@ describe("validateMdx", () => {
 
 <Callout title="Risk" body="Add a stable id." />
 
-<DecisionMatrix question="Choose?" options={[]} />
+<DecisionMatrix title="Choose?" options={[]} />
 
 <ExportPanel value={{ ok: true }} />`,
       "utf8"
@@ -43,12 +43,12 @@ describe("validateMdx", () => {
       filePath,
       `import { DecisionMatrix, ExportPanel, OptionGrid } from "../../src/react";
 
-<DecisionMatrix id="decision.api" question="Choose?">
-  <DecisionMatrix.Option name="No stable child id">Readable body.</DecisionMatrix.Option>
+<DecisionMatrix id="decision.api" title="Choose?">
+  <DecisionMatrix.Option title="No stable child id">Readable body.</DecisionMatrix.Option>
 </DecisionMatrix>
 
 <OptionGrid id="option.api" title="Choose?">
-  <OptionGrid.Item name="No stable child id">Readable body.</OptionGrid.Item>
+  <OptionGrid.Item title="No stable child id">Readable body.</OptionGrid.Item>
 </OptionGrid>
 
 <ExportPanel value={{ ok: true }} />`,
@@ -74,7 +74,7 @@ describe("validateMdx", () => {
 
 <CodeBlock
   id="code.example"
-  code={\`<DecisionMatrix question="Example" options={[]} />\`}
+  code={\`<DecisionMatrix title="Example" options={[]} />\`}
 />
 
 <ExportPanel value={{ ok: true }} />`,

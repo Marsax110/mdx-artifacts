@@ -13,16 +13,18 @@ import { DecisionMatrix, ExportPanel } from "mdx-artifacts/react";
 
 <DecisionMatrix
   id="decision.stage-one"
-  question="Should stage one focus on a **single HTML artifact**?"
+  title="Should stage one focus on a **single HTML artifact**?"
 >
   <DecisionMatrix.Option
     id="vite"
-    name="Vite artifact"
-    pros={["Short feedback loop"]}
-    cons={["No docs-site navigation yet"]}
-    verdict="Recommended"
+    title="Vite artifact"
+    badge="Recommended"
+    summary="Validate the shortest artifact loop first."
   >
-    Validate the shortest Markdown-native source to interactive HTML loop first.
+    ### Tradeoffs
+
+    - Short feedback loop
+    - No docs-site navigation yet
   </DecisionMatrix.Option>
 </DecisionMatrix>
 
@@ -51,6 +53,19 @@ artifact-kit components --json
 ```
 
 When adding or changing a component, update the registry in the same change.
+
+## Content Slots
+
+Content components should use a small display-oriented slot model. Prefer these slots before inventing component-specific text props:
+
+- `title`: required visible heading or item label.
+- `badge`: optional short display label shown beside the title.
+- `summary`: optional one-line explanation below the title.
+- `children`: Markdown-rich body content for paragraphs, local headings, lists, quotes, and rationale.
+
+Use props for short display structure. Use `children` for long explanations, pros and cons, tradeoff lists, risks, and any content that should remain readable in MDX diffs.
+
+Do not parse headings inside `children` as a component protocol. Headings and lists in children are human-readable body structure, not machine-readable slot names.
 
 Complex props must be self-describing through the registry. Do not rely on TypeScript LSP alone for agent usage. If a prop type references a named object or object array, such as `DiffLine[]`, `CodeAnnotation[]`, or the structured-data form `DecisionMatrixOption[]`, add a matching entry to the component's `types` metadata:
 
@@ -180,12 +195,14 @@ Content rendering primitives may grow beyond text and Markdown. Future candidate
 `DecisionMatrix`
 
 - Use for tradeoff comparison.
-- Text fields should remain short and scannable.
+- Use `title`, optional `badge`, optional `summary`, and Markdown-rich option children.
+- Keep pros, cons, risks, and detailed rationale in children rather than array props.
 
 `OptionGrid`
 
 - Use for side-by-side alternatives.
-- Each option should focus on intent and tradeoffs.
+- Use `title`, optional `badge`, optional `summary`, and Markdown-rich item children.
+- Keep detailed tradeoffs and caveats in children rather than array props.
 
 `ExportPanel`
 

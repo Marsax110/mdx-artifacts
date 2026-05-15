@@ -48,6 +48,28 @@ The common risk is exposing too many `Card`, `Panel`, or ad hoc `Grid` shapes. T
 
 Semantic examples matter. A code diff is not just a container with monospace text. It has files, hunks, line ranges, annotations, severity, findings, and review handoff. That is why `AnnotatedCode` belongs in the semantic layer, and why `DiffExplainer` should start as a workflow recipe before becoming a large code component.
 
+## Content Component Slot Model
+
+Use the shared display slot model for readable content components that render repeated cards, items, options, findings, risks, or sections.
+
+Default slots:
+
+- `title`: the primary visible label.
+- `badge`: an optional short status or category label beside the title.
+- `summary`: an optional one-line explanation below the title.
+- `children`: Markdown-rich body content for paragraphs, local headings, lists, quotes, risks, pros, cons, and rationale.
+
+This slot model applies to current content-oriented workflow components such as `DecisionMatrix.Option` and `OptionGrid.Item`. It should also be the default for future components such as `FindingCard`, `RiskList.Item`, `StatusReport.Section`, or `ImplementationPlan.Step`.
+
+Do not apply the slot model blindly to every complex component:
+
+- Structured renderers such as `CodeBlock`, `DiffBlock`, and `AnnotatedCode` should keep their domain schemas.
+- Layout primitives such as `Stack`, `Columns`, `Grid`, `SplitPane`, and `Frame` should keep layout props and children.
+- Export or editor components such as `ExportPanel` should keep state and handoff props.
+- Document boundaries such as `Section` should stay focused on stable review anchors and native MDX children.
+
+The test is whether the component is primarily a readable content block. If yes, use `title`, `badge`, `summary`, and `children`. If the component primarily renders structured data, controls layout, or exports state, keep its domain-specific schema.
+
 ## Extension Lifecycle
 
 Component candidates do not all need to enter the core package. Use the lifecycle below to keep the core package small while still giving agents room to handle new artifact shapes.

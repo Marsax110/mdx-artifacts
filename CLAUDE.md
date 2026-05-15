@@ -31,6 +31,8 @@ For complex props such as `CodeAnnotation[]`, `DiffLine[]`, or `DecisionMatrixOp
 
 For new public component APIs, prefer children-first or slot-first design for human-readable body content. Keep props for ids, titles, enum-like settings, layout controls, code strings, export values, and structured data. Existing props-first APIs may remain compatible, but new examples should prefer the Markdown-native form when available.
 
+Readable content block components should default to `title`, `badge`, `summary`, and `children`. Use `children` for Markdown-rich body content such as paragraphs, local headings, lists, pros, cons, risks, tradeoffs, and rationale. Do not apply this slot model to structured renderers, layout primitives, or export/editor components.
+
 Do not generate raw HTML unless explicitly requested.
 
 Layout primitives such as `Stack`, `Columns`, `Grid`, `SplitPane`, and `Frame` are advanced composition tools. Prefer semantic or workflow components first, and use layout primitives only when a custom arrangement is needed.

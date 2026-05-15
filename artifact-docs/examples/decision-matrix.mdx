@@ -4,37 +4,49 @@ import { DecisionMatrix, ExportPanel, OptionGrid } from "mdx-artifacts/react";
 
 <DecisionMatrix
   id="decision.stage-one"
-  question="Should stage one focus on a **Vite single HTML artifact** instead of starting with an Astro docs site?"
+  title="Should stage one focus on a **Vite single HTML artifact** instead of starting with an Astro docs site?"
 >
   <DecisionMatrix.Option
     id="vite"
-    name="**Vite** single HTML artifact"
-    pros={["Shortest loop", "Direct interactive component debugging", "Fits one-off tool artifacts"]}
-    cons={["No docs-site navigation yet", "Weaker long-term archive experience"]}
-    confidence="high"
-    verdict="Recommended for stage one"
+    title="**Vite** single HTML artifact"
+    badge="Recommended"
+    summary="Validate the shortest `MDX -> HTML` loop first."
   >
-    Validate the shortest `MDX -> HTML` loop first.
+    ### Tradeoffs
+
+    - Shortest loop
+    - Direct interactive component debugging
+    - Fits one-off tool artifacts
+    - No docs-site navigation yet
+    - Weaker long-term archive experience
   </DecisionMatrix.Option>
   <DecisionMatrix.Option
     id="astro"
-    name="Astro docs site"
-    pros={["Better long-term reading experience", "File-based pages", "Good for archives"]}
-    cons={["Too heavy for stage one", "Mixes component protocol work with docs-site engineering"]}
-    confidence="medium"
-    verdict="Add in stage two"
+    title="Astro docs site"
+    badge="Later"
+    summary="Turn the artifact-docs tree into a structured static docs site."
   >
-    Turn the artifact-docs tree into a structured static docs site.
+    ### Tradeoffs
+
+    - Better long-term reading experience
+    - File-based pages
+    - Good for archives
+    - Too heavy for stage one
+    - Mixes component protocol work with docs-site engineering
   </DecisionMatrix.Option>
   <DecisionMatrix.Option
     id="raw-html"
-    name="Raw HTML"
-    pros={["No toolchain", "Fast for very small throwaway pages"]}
-    cons={["Duplicated code", "Style drift", "~~Reusable~~ export behavior is hard to reuse"]}
-    confidence="low"
-    verdict="Keep only as fallback"
+    title="Raw HTML"
+    badge="Fallback"
+    summary="Let agents generate complete HTML directly."
   >
-    Let agents generate complete HTML directly.
+    ### Tradeoffs
+
+    - No toolchain
+    - Fast for very small throwaway pages
+    - Duplicated code
+    - Style drift
+    - ~~Reusable~~ export behavior is hard to reuse
   </DecisionMatrix.Option>
 </DecisionMatrix>
 
@@ -44,27 +56,34 @@ import { DecisionMatrix, ExportPanel, OptionGrid } from "mdx-artifacts/react";
 >
   <OptionGrid.Item
     id="decision-matrix"
-    name="DecisionMatrix"
-    intent="Compare options"
-    tradeoffs={["Stable **decision** structure", "Does not own complex interaction"]}
+    title="DecisionMatrix"
+    badge="Core"
+    summary="Compare options."
   >
     Use for explicit tradeoff decisions and recommendations.
+
+    - Stable **decision** structure
+    - Does not own complex interaction
   </OptionGrid.Item>
   <OptionGrid.Item
     id="option-grid"
-    name="OptionGrid"
-    intent="Show alternatives side by side"
-    tradeoffs={["Easy to scan", "Can add selection later"]}
+    title="OptionGrid"
+    summary="Show alternatives side by side."
   >
     Use for scannable component candidates or prototype directions.
+
+    - Easy to scan
+    - Can add selection later
   </OptionGrid.Item>
   <OptionGrid.Item
     id="export-panel"
-    name="ExportPanel"
-    intent="Return conclusions or edits to the workflow"
-    tradeoffs={["Copy-only in v1", "Can add file download later"]}
+    title="ExportPanel"
+    summary="Return conclusions or edits to the workflow."
   >
     Use when the artifact needs to hand structured results back to the agent.
+
+    - Copy-only in v1
+    - Can add file download later
   </OptionGrid.Item>
 </OptionGrid>
 

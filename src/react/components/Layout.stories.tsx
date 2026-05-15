@@ -102,25 +102,29 @@ export const ComposedArtifact: Story = {
     <Stack gap="lg">
       <SplitPane ratio="2:1">
         <DecisionMatrix
-          question="Should layout primitives stay advanced?"
+          title="Should layout primitives stay advanced?"
         >
           <DecisionMatrix.Option
-            name="Advanced-only layout"
-            pros={["Keeps semantic components as the default", "Avoids becoming a UI builder"]}
-            cons={["Agents need clearer examples when layout is needed"]}
-            confidence="high"
-            verdict="Recommended"
+            title="Advanced-only layout"
+            badge="Recommended"
+            summary="Use layout primitives for composition checks and unusual artifact structure."
           >
-            Use layout primitives for composition checks and unusual artifact structure.
+            <ul>
+              <li>Keeps semantic components as the default</li>
+              <li>Avoids becoming a UI builder</li>
+              <li>Agents need clearer examples when layout is needed</li>
+            </ul>
           </DecisionMatrix.Option>
           <DecisionMatrix.Option
-            name="Layout-first authoring"
-            pros={["Very flexible"]}
-            cons={["Recreates raw HTML/React authoring", "Harder to validate"]}
-            confidence="low"
-            verdict="Do not make this the default"
+            title="Layout-first authoring"
+            badge="Avoid"
+            summary="Do not make this the default authoring model."
           >
-            Let agents assemble most artifacts from layout primitives and children.
+            <ul>
+              <li>Very flexible</li>
+              <li>Recreates raw HTML/React authoring</li>
+              <li>Harder to validate</li>
+            </ul>
           </DecisionMatrix.Option>
         </DecisionMatrix>
         <Frame surface="subtle">

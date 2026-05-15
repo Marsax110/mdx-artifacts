@@ -53,15 +53,15 @@ describe("Comment components", () => {
         <DecisionMatrix
           options={[
             {
-              name: "Explicit blocks"
+              title: "Explicit blocks"
             }
           ]}
-          question="Comment target scope"
+          title="Comment target scope"
         />
         <OptionGrid
           options={[
             {
-              name: "CommentLayer"
+              title: "CommentLayer"
             }
           ]}
           title="Comment workflow pieces"
@@ -81,17 +81,17 @@ describe("Comment components", () => {
           options={[
             {
               id: "explicit",
-              name: "Explicit blocks"
+              title: "Explicit blocks"
             }
           ]}
-          question="Comment target scope"
+          title="Comment target scope"
         />
         <OptionGrid
           id="option.comment-flow"
           options={[
             {
               id: "layer",
-              name: "CommentLayer"
+              title: "CommentLayer"
             }
           ]}
           title="Comment workflow pieces"

@@ -214,14 +214,12 @@ describe("review reply", () => {
       mdxPath,
       `<DecisionMatrix
   id="decision.text-model"
-  question="Choose a text model"
-  options={[
-    {
-      id: "native-mdx",
-      name: "Native MDX"
-    }
-  ]}
-/>
+  title="Choose a text model"
+>
+  <DecisionMatrix.Option id="native-mdx" title="Native MDX">
+    Use native MDX for readable prose.
+  </DecisionMatrix.Option>
+</DecisionMatrix>
 <Section id="section.context">
 
 ## Context

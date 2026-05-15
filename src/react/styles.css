@@ -1145,38 +1145,13 @@ body {
   font-weight: 700;
 }
 
-.ak-badge-high {
-  background: var(--ak-good-subtle);
-  color: var(--ak-good);
-}
-
-.ak-badge-medium {
-  background: var(--ak-warn-subtle);
-  color: var(--ak-warn);
-}
-
-.ak-badge-low {
-  background: var(--ak-risk-subtle);
-  color: var(--ak-risk);
+.ak-badge-default {
+  background: var(--ak-surface-subtle);
+  color: var(--ak-muted);
 }
 
 .ak-muted {
   color: var(--ak-muted);
-}
-
-.ak-list-block {
-  margin-top: 12px;
-}
-
-.ak-list-block h4 {
-  margin: 0;
-  font-size: 13px;
-}
-
-.ak-verdict,
-.ak-intent {
-  color: var(--ak-primary-dark);
-  font-weight: 700;
 }
 
 .ak-export-panel {

@@ -4,18 +4,14 @@ import { InlineText } from "./InlineText";
 
 export type DecisionMatrixOption = {
   id?: string;
-  name: string;
+  title: string;
+  badge?: string;
   summary?: string;
-  pros?: string[];
-  cons?: string[];
-  risks?: string[];
-  confidence?: "low" | "medium" | "high";
-  verdict?: string;
 };
 
 export type DecisionMatrixProps = {
   id?: string;
-  question: string;
+  title: string;
   options?: DecisionMatrixOption[];
   children?: ReactNode;
 };
@@ -24,29 +20,29 @@ export type DecisionMatrixOptionProps = DecisionMatrixOption & {
   children?: ReactNode;
 };
 
-const DecisionMatrixContext = createContext<{ id?: string; question: string } | null>(null);
+const DecisionMatrixContext = createContext<{ id?: string; title: string } | null>(null);
 
-function DecisionMatrixRoot({ id, question, options = [], children }: DecisionMatrixProps) {
-  const targetId = id ?? `decision:${slugify(question)}`;
+function DecisionMatrixRoot({ id, title, options = [], children }: DecisionMatrixProps) {
+  const targetId = id ?? `decision:${slugify(title)}`;
 
   return (
     <CommentTarget
       className="ak-comment-target-section"
       description="DecisionMatrix component"
       targetId={targetId}
-      title={question}
+      title={title}
     >
       <section className="ak-section ak-decision-matrix">
         <div className="ak-section-header">
           <p className="ak-eyebrow">Decision Matrix</p>
           <InlineText as="h2" variant="title">
-            {question}
+            {title}
           </InlineText>
         </div>
         <div className="ak-decision-grid">
-          <DecisionMatrixContext.Provider value={{ id, question }}>
+          <DecisionMatrixContext.Provider value={{ id, title }}>
             {options.map((option, index) => (
-              <DecisionMatrixOptionCard key={option.id ?? option.name} option={option} index={index} />
+              <DecisionMatrixOptionCard key={option.id ?? option.title} option={option} index={index} />
             ))}
             {children}
           </DecisionMatrixContext.Provider>
@@ -70,24 +66,24 @@ function DecisionMatrixOptionCard({
   children?: ReactNode;
 }) {
   const context = useContext(DecisionMatrixContext);
-  const question = context?.question ?? "DecisionMatrix";
-  const optionTargetId = createOptionTargetId(context?.id, question, option, index);
+  const title = context?.title ?? "DecisionMatrix";
+  const optionTargetId = createOptionTargetId(context?.id, title, option, index);
 
   return (
     <CommentTarget
       className="ak-comment-target-card"
-      description={`DecisionMatrix option in ${question}`}
+      description={`DecisionMatrix option in ${title}`}
       targetId={optionTargetId}
-      title={option.name}
+      title={option.title}
     >
       <article className="ak-card">
         <div className="ak-card-header">
           <InlineText as="h3" variant="subtitle">
-            {option.name}
+            {option.title}
           </InlineText>
-          {option.confidence ? (
-            <span className={`ak-badge ak-badge-${option.confidence}`}>
-              {option.confidence}
+          {option.badge ? (
+            <span className="ak-badge ak-badge-default">
+              {option.badge}
             </span>
           ) : null}
         </div>
@@ -96,54 +92,27 @@ function DecisionMatrixOptionCard({
             {option.summary}
           </InlineText>
         ) : null}
-        <ListBlock title="Pros" items={option.pros} />
-        <ListBlock title="Cons" items={option.cons} />
-        <ListBlock title="Risks" items={option.risks} />
         {children ? <div className="ak-card-body">{children}</div> : null}
-        {option.verdict ? (
-          <InlineText as="p" className="ak-verdict">
-            {option.verdict}
-          </InlineText>
-        ) : null}
       </article>
     </CommentTarget>
   );
 }
 
-function ListBlock({ title, items }: { title: string; items?: string[] }) {
-  if (!items?.length) {
-    return null;
-  }
-
-  return (
-    <div className="ak-list-block">
-      <h4>{title}</h4>
-      <ul>
-        {items.map((item) => (
-          <li key={item}>
-            <InlineText>{item}</InlineText>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
 function createOptionTargetId(
   parentId: string | undefined,
-  question: string,
+  title: string,
   option: DecisionMatrixOption,
   index: number | undefined
 ) {
   if (parentId) {
-    return `${parentId}.${option.id ?? (index === undefined ? slugify(option.name) : `${index + 1}`)}`;
+    return `${parentId}.${option.id ?? (index === undefined ? slugify(option.title) : `${index + 1}`)}`;
   }
 
   if (index === undefined) {
-    return option.id ?? `decision:${slugify(question)}:${slugify(option.name)}`;
+    return option.id ?? `decision:${slugify(title)}:${slugify(option.title)}`;
   }
 
-  return `decision:${slugify(question)}:${index + 1}:${slugify(option.name)}`;
+  return `decision:${slugify(title)}:${index + 1}:${slugify(option.title)}`;
 }
 
 function slugify(value: string) {

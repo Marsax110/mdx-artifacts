@@ -29,7 +29,9 @@ Use a small shared vocabulary:
 
 - `title`: short title, usually `inlineMarkdown`
 - `subtitle`: secondary short title, usually `inlineMarkdown`
-- `description`: short explanation, usually `inlineMarkdown`
+- `badge`: short display label, usually `plainText`
+- `summary`: one-line explanation, usually `inlineMarkdown`
+- `description`: short explanation for non-content metadata only, usually `plainText`
 - `caption`: auxiliary note, usually `inlineMarkdown`
 - `text`: primary field for `InlineText`
 - `body`: primary field for `MarkdownBody` and future long-form prose components
@@ -41,6 +43,15 @@ Avoid introducing synonyms unless a component has a specific workflow reason:
 - `content`
 - `details`
 - `richText`
+
+For content components, prefer the display slot model:
+
+- `title`
+- `badge`
+- `summary`
+- `children`
+
+Do not introduce component-specific aliases such as `name`, `intent`, `verdict`, or `tradeoffs` unless the component has a clear workflow reason and the field is not just a display slot.
 
 ## Content Types
 

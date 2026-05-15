@@ -4,10 +4,9 @@ import { InlineText } from "./InlineText";
 
 export type OptionGridItem = {
   id?: string;
-  name: string;
-  intent?: string;
-  description?: string;
-  tradeoffs?: string[];
+  title: string;
+  badge?: string;
+  summary?: string;
 };
 
 export type OptionGridProps = {
@@ -43,7 +42,7 @@ function OptionGridRoot({ id, title, options = [], children }: OptionGridProps) 
         <div className="ak-option-grid">
           <OptionGridContext.Provider value={{ id, title }}>
             {options.map((option, index) => (
-              <OptionGridItemCard key={option.id ?? option.name} option={option} index={index} />
+              <OptionGridItemCard key={option.id ?? option.title} option={option} index={index} />
             ))}
             {children}
           </OptionGridContext.Provider>
@@ -75,26 +74,23 @@ function OptionGridItemCard({
       className="ak-comment-target-card"
       description={`OptionGrid item in ${title}`}
       targetId={optionTargetId}
-      title={option.name}
+      title={option.title}
     >
       <article className="ak-card">
-        <InlineText as="h3" variant="subtitle">
-          {option.name}
-        </InlineText>
-        {option.intent ? (
-          <InlineText as="p" className="ak-intent">
-            {option.intent}
+        <div className="ak-card-header">
+          <InlineText as="h3" variant="subtitle">
+            {option.title}
           </InlineText>
-        ) : null}
-        {option.description ? <InlineText as="p">{option.description}</InlineText> : null}
-        {option.tradeoffs?.length ? (
-          <ul>
-            {option.tradeoffs.map((tradeoff) => (
-              <li key={tradeoff}>
-                <InlineText>{tradeoff}</InlineText>
-              </li>
-            ))}
-          </ul>
+          {option.badge ? (
+            <span className="ak-badge ak-badge-default">
+              {option.badge}
+            </span>
+          ) : null}
+        </div>
+        {option.summary ? (
+          <InlineText as="p" className="ak-muted">
+            {option.summary}
+          </InlineText>
         ) : null}
         {children ? <div className="ak-card-body">{children}</div> : null}
       </article>
@@ -109,14 +105,14 @@ function createOptionTargetId(
   index: number | undefined
 ) {
   if (parentId) {
-    return `${parentId}.${option.id ?? (index === undefined ? slugify(option.name) : `${index + 1}`)}`;
+    return `${parentId}.${option.id ?? (index === undefined ? slugify(option.title) : `${index + 1}`)}`;
   }
 
   if (index === undefined) {
-    return option.id ?? `option:${slugify(title)}:${slugify(option.name)}`;
+    return option.id ?? `option:${slugify(title)}:${slugify(option.title)}`;
   }
 
-  return `option:${slugify(title)}:${index + 1}:${slugify(option.name)}`;
+  return `option:${slugify(title)}:${index + 1}:${slugify(option.title)}`;
 }
 
 function slugify(value: string) {

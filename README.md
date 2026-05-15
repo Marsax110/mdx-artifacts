@@ -11,16 +11,19 @@ import { DecisionMatrix, ExportPanel } from "mdx-artifacts/react";
 
 <DecisionMatrix
   id="decision.stage-one"
-  question="Should stage one focus on a Vite single HTML artifact?"
+  title="Should stage one focus on a Vite single HTML artifact?"
 >
   <DecisionMatrix.Option
     id="vite"
-    name="Vite single HTML artifact"
-    pros={["Short feedback loop", "Fits one-off tool artifacts"]}
-    cons={["No docs-site navigation yet"]}
-    verdict="Recommended for stage one"
+    title="Vite single HTML artifact"
+    badge="Recommended"
+    summary="Validate the shortest Markdown-native source to interactive HTML loop first."
   >
-    Validate the shortest Markdown-native source to interactive HTML loop first.
+    ### Tradeoffs
+
+    - Short feedback loop
+    - Fits one-off tool artifacts
+    - No docs-site navigation yet
   </DecisionMatrix.Option>
 </DecisionMatrix>
 
@@ -148,9 +151,9 @@ Native MDX prose can be reviewed through the section anchor.
 
 <DecisionMatrix
   id="decision.stage-one"
-  question="Should this artifact use stable anchors?"
+  title="Should this artifact use stable anchors?"
 >
-  <DecisionMatrix.Option id="yes" name="Use stable anchors" verdict="Recommended">
+  <DecisionMatrix.Option id="yes" title="Use stable anchors" badge="Recommended">
     Stable child anchors keep review threads attached across edits.
   </DecisionMatrix.Option>
 </DecisionMatrix>

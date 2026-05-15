@@ -45,16 +45,19 @@ export default config;
 
 <DecisionMatrix
   id="decision.initialized"
-  question="Has Artifact Kit been initialized?"
-  options={[
-    {
-      name: "Initialized",
-      pros: ["MDX source exists", "Export panel exists"],
-      cons: ["Real content still needs to be added"],
-      verdict: "Ready to continue generating artifacts"
-    }
-  ]}
-/>
+  title="Has Artifact Kit been initialized?"
+>
+  <DecisionMatrix.Option
+    id="initialized"
+    title="Initialized"
+    badge="Ready"
+    summary="Ready to continue generating artifacts."
+  >
+    - MDX source exists
+    - Export panel exists
+    - Real content still needs to be added
+  </DecisionMatrix.Option>
+</DecisionMatrix>
 
 <ExportPanel
   value={{

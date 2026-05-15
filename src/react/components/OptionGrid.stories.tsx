@@ -18,27 +18,37 @@ export const Basic: Story = {
     <OptionGrid id="option.first-components" title="First component scope">
       <OptionGrid.Item
         id="decision"
-        name="DecisionMatrix"
-        intent="Compare options"
-        tradeoffs={["Stable structure", "Good for design decisions"]}
+        title="DecisionMatrix"
+        badge="Core"
+        summary="Compare options."
       >
         <p>Use for explicit tradeoff decisions and recommendations.</p>
+        <ul>
+          <li>Stable structure</li>
+          <li>Good for design decisions</li>
+        </ul>
       </OptionGrid.Item>
       <OptionGrid.Item
         id="option-grid"
-        name="OptionGrid"
-        intent="Show alternatives side by side"
-        tradeoffs={["Easy to scan", "Can add selection later"]}
+        title="OptionGrid"
+        summary="Show alternatives side by side."
       >
         <p>Use when each item needs readable local explanation.</p>
+        <ul>
+          <li>Easy to scan</li>
+          <li>Can add selection later</li>
+        </ul>
       </OptionGrid.Item>
       <OptionGrid.Item
         id="export"
-        name="ExportPanel"
-        intent="Return edited state to the workflow"
-        tradeoffs={["Copy-only in v1", "Can add downloads later"]}
+        title="ExportPanel"
+        summary="Return edited state to the workflow."
       >
         <p>Use when an artifact needs a clear handoff path.</p>
+        <ul>
+          <li>Copy-only in v1</li>
+          <li>Can add downloads later</li>
+        </ul>
       </OptionGrid.Item>
     </OptionGrid>
   )

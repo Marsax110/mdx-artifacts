@@ -568,8 +568,8 @@ Use MarkdownBody when a component needs controlled body copy:
     example: `// Usually provided by the artifact shell.
 <CommentLayer>
   <CommentableBlock blockId="decision" title="Decision">
-    <DecisionMatrix id="decision.path" question="Choose a path">
-      <DecisionMatrix.Option id="path-a" name="Path A">Readable option body.</DecisionMatrix.Option>
+    <DecisionMatrix id="decision.path" title="Choose a path">
+      <DecisionMatrix.Option id="path-a" title="Path A">Readable option body.</DecisionMatrix.Option>
     </DecisionMatrix>
   </CommentableBlock>
   <CommentExport />
@@ -649,7 +649,7 @@ This section can contain native MDX paragraphs, lists, and code fences.
   description="Feedback on the option grid"
 >
   <OptionGrid id="option.components" title="Components">
-    <OptionGrid.Item id="export-panel" name="ExportPanel">Readable item body.</OptionGrid.Item>
+    <OptionGrid.Item id="export-panel" title="ExportPanel">Readable item body.</OptionGrid.Item>
   </OptionGrid>
 </CommentableBlock>`
   },
@@ -759,7 +759,8 @@ This section can contain native MDX paragraphs, lists, and code fences.
     name: "DecisionMatrix",
     category: "artifact",
     stability: "stable",
-    description: "Compares options by pros, cons, risks, confidence, and recommendation with compound options for readable MDX bodies.",
+    description:
+      "Compares decision options with stable display slots: title, badge, summary, and Markdown-rich option bodies.",
     useWhen: ["Architecture decisions", "Product tradeoffs", "Implementation planning", "Open-source roadmap"],
     props: [
       {
@@ -769,23 +770,23 @@ This section can contain native MDX paragraphs, lists, and code fences.
         description: "Optional stable anchor id for comments and state. Prefer short semantic ids such as decision.comment-targets."
       },
       {
-        name: "question",
+        name: "title",
         type: "string",
         contentType: "inlineMarkdown",
         required: true,
-        description: "The decision question being answered."
+        description: "Visible decision title or question."
       },
       {
         name: "children",
         type: "ReactNode",
         description:
-          "Preferred option content. Use `DecisionMatrix.Option` children when options need readable explanations, lists, or local prose."
+          "Preferred option content. Use `DecisionMatrix.Option` children when options need readable explanations, lists, or local prose. Do not encode long lists in props."
       },
       {
         name: "options",
         type: "DecisionMatrixOption[]",
         description:
-          "Structured option data. Keep for compact machine-readable options; prefer `DecisionMatrix.Option` children for long human-readable content."
+          "Structured option data using the same title, badge, summary, and children-oriented slot model. Prefer compound children for human-authored MDX."
       }
     ],
     types: [
@@ -800,52 +801,29 @@ This section can contain native MDX paragraphs, lists, and code fences.
             description: "Optional stable child anchor id. When the parent has id, child anchors become parentId.optionId."
           },
           {
-            name: "name",
+            name: "title",
             type: "string",
             contentType: "inlineMarkdown",
             required: true,
             description: "Option title."
           },
           {
-            name: "children",
-            type: "ReactNode",
-            contentType: "blockMarkdown",
-            description: "Preferred human-readable option body."
+            name: "badge",
+            type: "string",
+            contentType: "plainText",
+            description: "Optional short display badge shown beside the title, such as Recommended, Later, or Fallback."
           },
           {
             name: "summary",
             type: "string",
             contentType: "inlineMarkdown",
-            description: "Short option summary. Prefer children for longer explanations."
+            description: "Short one-line option summary. Use children for longer explanations, pros, cons, and lists."
           },
           {
-            name: "pros",
-            type: "string[]",
-            contentType: "inlineMarkdown",
-            description: "Compact advantages for this option."
-          },
-          {
-            name: "cons",
-            type: "string[]",
-            contentType: "inlineMarkdown",
-            description: "Compact disadvantages for this option."
-          },
-          {
-            name: "risks",
-            type: "string[]",
-            contentType: "inlineMarkdown",
-            description: "Compact risks or failure modes for this option."
-          },
-          {
-            name: "confidence",
-            type: "'low' | 'medium' | 'high'",
-            description: "Confidence level for this option."
-          },
-          {
-            name: "verdict",
-            type: "string",
-            contentType: "inlineMarkdown",
-            description: "Short recommendation or conclusion for this option."
+            name: "children",
+            type: "ReactNode",
+            contentType: "blockMarkdown",
+            description: "Markdown-rich option body. Use headings and lists here for pros, cons, risks, or detailed rationale."
           }
         ]
       },
@@ -860,63 +838,42 @@ This section can contain native MDX paragraphs, lists, and code fences.
             description: "Optional stable child anchor id. When the parent has id, child anchors become parentId.optionId."
           },
           {
-            name: "name",
+            name: "title",
             type: "string",
             contentType: "inlineMarkdown",
             required: true,
             description: "Option title."
           },
           {
+            name: "badge",
+            type: "string",
+            contentType: "plainText",
+            description: "Optional short display badge."
+          },
+          {
             name: "summary",
             type: "string",
             contentType: "inlineMarkdown",
-            description: "Short option summary."
-          },
-          {
-            name: "pros",
-            type: "string[]",
-            contentType: "inlineMarkdown",
-            description: "Advantages for this option."
-          },
-          {
-            name: "cons",
-            type: "string[]",
-            contentType: "inlineMarkdown",
-            description: "Disadvantages for this option."
-          },
-          {
-            name: "risks",
-            type: "string[]",
-            contentType: "inlineMarkdown",
-            description: "Risks or failure modes for this option."
-          },
-          {
-            name: "confidence",
-            type: "'low' | 'medium' | 'high'",
-            description: "Confidence level for this option."
-          },
-          {
-            name: "verdict",
-            type: "string",
-            contentType: "inlineMarkdown",
-            description: "Short recommendation or conclusion for this option."
+            description: "Short one-line option summary."
           }
         ]
       }
     ],
     example: `<DecisionMatrix
   id="decision.stage-one"
-  question="Should the first stage focus on a Vite single HTML artifact?"
+  title="Should the first stage focus on a Vite single HTML artifact?"
 >
   <DecisionMatrix.Option
     id="vite"
-    name="Vite single HTML artifact"
-    pros={["Short feedback loop", "Direct component debugging"]}
-    cons={["No docs-site navigation yet"]}
-    confidence="high"
-    verdict="Recommended for stage one"
+    title="Vite single HTML artifact"
+    badge="Recommended"
+    summary="Validate the shortest MDX-to-interactive-HTML loop first."
   >
-    <p>Validate the shortest MDX-to-interactive-HTML loop first.</p>
+    ### Tradeoffs
+
+    - Short feedback loop
+    - Direct component debugging
+    - No docs-site navigation yet
   </DecisionMatrix.Option>
 </DecisionMatrix>`
   },
@@ -999,7 +956,8 @@ This section can contain native MDX paragraphs, lists, and code fences.
     name: "OptionGrid",
     category: "artifact",
     stability: "stable",
-    description: "Displays multiple options, component candidates, or prototype directions with compound items for readable MDX bodies.",
+    description:
+      "Displays options or component candidates with stable display slots: title, badge, summary, and Markdown-rich item bodies.",
     useWhen: ["Option exploration", "Component scope", "Prototype comparison"],
     props: [
       {
@@ -1019,13 +977,13 @@ This section can contain native MDX paragraphs, lists, and code fences.
         name: "children",
         type: "ReactNode",
         description:
-          "Preferred item content. Use `OptionGrid.Item` children when options need readable explanations, lists, or local prose."
+          "Preferred item content. Use `OptionGrid.Item` children when options need readable explanations, lists, or local prose. Do not encode long lists in props."
       },
       {
         name: "options",
         type: "OptionGridItem[]",
         description:
-          "Structured item data. Keep for compact machine-readable options; prefer `OptionGrid.Item` children for long human-readable content."
+          "Structured item data using the same title, badge, and summary slot model. Prefer compound children for human-authored MDX."
       }
     ],
     types: [
@@ -1040,35 +998,29 @@ This section can contain native MDX paragraphs, lists, and code fences.
             description: "Optional stable child anchor id. When the parent has id, child anchors become parentId.itemId."
           },
           {
-            name: "name",
+            name: "title",
             type: "string",
             contentType: "inlineMarkdown",
             required: true,
             description: "Option title."
           },
           {
+            name: "badge",
+            type: "string",
+            contentType: "plainText",
+            description: "Optional short display badge shown beside the title."
+          },
+          {
+            name: "summary",
+            type: "string",
+            contentType: "inlineMarkdown",
+            description: "Short one-line item summary. Use children for longer explanations and lists."
+          },
+          {
             name: "children",
             type: "ReactNode",
             contentType: "blockMarkdown",
-            description: "Preferred human-readable item body."
-          },
-          {
-            name: "intent",
-            type: "string",
-            contentType: "inlineMarkdown",
-            description: "Short statement of what this option is trying to achieve."
-          },
-          {
-            name: "description",
-            type: "string",
-            contentType: "inlineMarkdown",
-            description: "Short option description. Prefer children for longer explanations."
-          },
-          {
-            name: "tradeoffs",
-            type: "string[]",
-            contentType: "inlineMarkdown",
-            description: "Compact tradeoffs or caveats for this option."
+            description: "Markdown-rich item body. Use paragraphs, headings, and lists for detailed rationale."
           }
         ]
       },
@@ -1083,29 +1035,23 @@ This section can contain native MDX paragraphs, lists, and code fences.
             description: "Optional stable child anchor id. When the parent has id, child anchors become parentId.itemId."
           },
           {
-            name: "name",
+            name: "title",
             type: "string",
             contentType: "inlineMarkdown",
             required: true,
             description: "Option title."
           },
           {
-            name: "intent",
+            name: "badge",
             type: "string",
-            contentType: "inlineMarkdown",
-            description: "Short statement of what this option is trying to achieve."
+            contentType: "plainText",
+            description: "Optional short display badge."
           },
           {
-            name: "description",
+            name: "summary",
             type: "string",
             contentType: "inlineMarkdown",
-            description: "Short option description."
-          },
-          {
-            name: "tradeoffs",
-            type: "string[]",
-            contentType: "inlineMarkdown",
-            description: "Tradeoffs or caveats for this option."
+            description: "Short one-line item summary."
           }
         ]
       }
@@ -1113,11 +1059,13 @@ This section can contain native MDX paragraphs, lists, and code fences.
     example: `<OptionGrid id="option.first-components" title="First component scope">
   <OptionGrid.Item
     id="export"
-    name="ExportPanel"
-    intent="Return human edits to the workflow"
-    tradeoffs={["Copy-only in v1", "Can add downloads later"]}
+    title="ExportPanel"
+    summary="Return human edits to the workflow."
   >
-    <p>Use when an artifact needs a clear handoff path.</p>
+    Use when an artifact needs a clear handoff path.
+
+    - Copy-only in v1
+    - Can add downloads later
   </OptionGrid.Item>
 </OptionGrid>`
   },
