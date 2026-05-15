@@ -88,6 +88,80 @@ describe("validateMdx", () => {
     );
   });
 
+  it("warns when deprecated authoring props are used", async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), "mdx-artifacts-"));
+    const filePath = path.join(dir, "deprecated-authoring-props.mdx");
+    await writeFile(
+      filePath,
+      `import { DecisionMatrix, ExportPanel, OptionGrid } from "../../src/react";
+
+<DecisionMatrix id="decision.api" question="Choose?">
+  <DecisionMatrix.Option
+    id="path-a"
+    name="Path A"
+    pros={["Readable"]}
+    cons={["Old API"]}
+    risks={["Drift"]}
+    confidence="high"
+    verdict="Use the slot model"
+  />
+</DecisionMatrix>
+
+<OptionGrid id="option.api" title="Options">
+  <OptionGrid.Item
+    id="workflow"
+    name="Workflow components"
+    intent="Explain choices."
+    description="Longer prose belongs in children."
+    tradeoffs={["Readable diffs"]}
+  />
+</OptionGrid>
+
+<ExportPanel value={{ ok: true }} />`,
+      "utf8"
+    );
+
+    const result = await validateMdx(filePath);
+
+    expect(result.warnings).toContain(
+      'DecisionMatrix prop "question" is deprecated. Use "title" for the visible decision title.'
+    );
+    expect(result.warnings).toContain('DecisionMatrix.Option prop "name" is deprecated. Use "title".');
+    expect(result.warnings).toContain(
+      'DecisionMatrix.Option prop "pros" is deprecated. Move long lists into MDX children.'
+    );
+    expect(result.warnings).toContain(
+      'OptionGrid.Item prop "intent" is deprecated. Use "summary" for short intent text.'
+    );
+    expect(result.warnings).toContain(
+      'OptionGrid.Item prop "tradeoffs" is deprecated. Move tradeoff lists into MDX children.'
+    );
+  });
+
+  it("does not warn for deprecated authoring props inside string literals", async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), "mdx-artifacts-"));
+    const filePath = path.join(dir, "deprecated-authoring-props-string.mdx");
+    await writeFile(
+      filePath,
+      `import { CodeBlock, ExportPanel } from "../../src/react";
+
+<CodeBlock
+  id="code.example"
+  code={\`<OptionGrid.Item name="Old example" tradeoffs={[]} />\`}
+/>
+
+<ExportPanel value={{ ok: true }} />`,
+      "utf8"
+    );
+
+    const result = await validateMdx(filePath);
+
+    expect(result.warnings).not.toContain('OptionGrid.Item prop "name" is deprecated. Use "title".');
+    expect(result.warnings).not.toContain(
+      'OptionGrid.Item prop "tradeoffs" is deprecated. Move tradeoff lists into MDX children.'
+    );
+  });
+
   it("accepts CommentExport as an export path", async () => {
     const dir = await mkdtemp(path.join(tmpdir(), "mdx-artifacts-"));
     const filePath = path.join(dir, "comment-export.mdx");

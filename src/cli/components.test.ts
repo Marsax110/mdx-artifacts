@@ -48,4 +48,16 @@ describe("componentsCommand", () => {
     expect(text).toContain("- body (required): string");
     expect(text).toContain("content type: blockMarkdown");
   });
+
+  it("prints authoring guidance for a component", () => {
+    const output: string[] = [];
+    vi.spyOn(console, "log").mockImplementation((value = "") => output.push(String(value)));
+
+    componentsCommand("DecisionMatrix");
+
+    const text = output.join("\n");
+    expect(text).toContain("Authoring: content-block");
+    expect(text).toContain("Use title, badge, and summary for short visible display slots.");
+    expect(text).toContain("Use MDX children for long explanations");
+  });
 });

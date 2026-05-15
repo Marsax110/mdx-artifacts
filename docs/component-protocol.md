@@ -67,6 +67,28 @@ Use props for short display structure. Use `children` for long explanations, pro
 
 Do not parse headings inside `children` as a component protocol. Headings and lists in children are human-readable body structure, not machine-readable slot names.
 
+## Authoring Kinds
+
+Every public component should declare an authoring kind in `src/react/registry.ts`. This keeps the component API aligned with the product philosophy and gives `artifact-kit components <ComponentName>` enough guidance for agents.
+
+Use these kinds:
+
+| Kind | Use For | API Shape |
+|---|---|---|
+| `content-block` | Readable cards, options, findings, risks, callouts, and repeated items. | `title`, optional `badge`, optional `summary`, and Markdown-rich `children`. |
+| `structured-renderer` | Code, diffs, line annotations, and other domain-shaped renderers. | Explicit structured props such as `code`, `lines`, or `annotations`. |
+| `layout-primitive` | Arrangement-only helpers such as `Stack`, `Columns`, `Grid`, `SplitPane`, and `Frame`. | Layout props plus `children`; no workflow semantics. |
+| `export-editor` | Export docks, editors, and state handoff controls. | Structured `value`, state, format, or handoff props. |
+| `review-boundary` | Comment layers, stable review sections, and fine-grained comment targets. | Stable ids or target ids plus the visible reviewed `children`. |
+
+The kind is not a styling category. It tells an author where meaning belongs:
+
+- `content-block`: keep long human-readable text in MDX children.
+- `structured-renderer`: keep machine-shaped data in props.
+- `layout-primitive`: do not encode domain meaning.
+- `export-editor`: keep handoff data structured.
+- `review-boundary`: keep anchors durable and review targets meaningful.
+
 Complex props must be self-describing through the registry. Do not rely on TypeScript LSP alone for agent usage. If a prop type references a named object or object array, such as `DiffLine[]`, `CodeAnnotation[]`, or the structured-data form `DecisionMatrixOption[]`, add a matching entry to the component's `types` metadata:
 
 ```ts

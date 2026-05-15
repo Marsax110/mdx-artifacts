@@ -21,6 +21,64 @@ const componentsRequiringStableId = [
   "Callout"
 ];
 
+const deprecatedAuthoringProps = [
+  {
+    componentName: "DecisionMatrix",
+    propName: "question",
+    warning: 'DecisionMatrix prop "question" is deprecated. Use "title" for the visible decision title.'
+  },
+  {
+    componentName: "DecisionMatrix.Option",
+    propName: "name",
+    warning: 'DecisionMatrix.Option prop "name" is deprecated. Use "title".'
+  },
+  {
+    componentName: "DecisionMatrix.Option",
+    propName: "pros",
+    warning: 'DecisionMatrix.Option prop "pros" is deprecated. Move long lists into MDX children.'
+  },
+  {
+    componentName: "DecisionMatrix.Option",
+    propName: "cons",
+    warning: 'DecisionMatrix.Option prop "cons" is deprecated. Move long lists into MDX children.'
+  },
+  {
+    componentName: "DecisionMatrix.Option",
+    propName: "risks",
+    warning: 'DecisionMatrix.Option prop "risks" is deprecated. Move risks into MDX children.'
+  },
+  {
+    componentName: "DecisionMatrix.Option",
+    propName: "confidence",
+    warning: 'DecisionMatrix.Option prop "confidence" is deprecated. Use "badge" for short display labels.'
+  },
+  {
+    componentName: "DecisionMatrix.Option",
+    propName: "verdict",
+    warning: 'DecisionMatrix.Option prop "verdict" is deprecated. Use "summary" or MDX children.'
+  },
+  {
+    componentName: "OptionGrid.Item",
+    propName: "name",
+    warning: 'OptionGrid.Item prop "name" is deprecated. Use "title".'
+  },
+  {
+    componentName: "OptionGrid.Item",
+    propName: "intent",
+    warning: 'OptionGrid.Item prop "intent" is deprecated. Use "summary" for short intent text.'
+  },
+  {
+    componentName: "OptionGrid.Item",
+    propName: "description",
+    warning: 'OptionGrid.Item prop "description" is deprecated. Move longer descriptions into MDX children.'
+  },
+  {
+    componentName: "OptionGrid.Item",
+    propName: "tradeoffs",
+    warning: 'OptionGrid.Item prop "tradeoffs" is deprecated. Move tradeoff lists into MDX children.'
+  }
+];
+
 export async function validateMdx(filePath: string): Promise<ValidationResult> {
   const result: ValidationResult = { errors: [], warnings: [] };
 
@@ -64,6 +122,18 @@ export async function validateMdx(filePath: string): Promise<ValidationResult> {
     }
   }
 
+  for (const deprecatedProp of deprecatedAuthoringProps) {
+    if (
+      hasOpeningTagWithProp(
+        sourceWithoutStringLiterals,
+        deprecatedProp.componentName,
+        deprecatedProp.propName
+      )
+    ) {
+      result.warnings.push(deprecatedProp.warning);
+    }
+  }
+
   return result;
 }
 
@@ -96,6 +166,20 @@ function hasOpeningTagWithoutProp(source: string, componentName: string, propNam
   for (const match of source.matchAll(tagPattern)) {
     const openingTag = match[0];
     if (!propPattern.test(openingTag)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function hasOpeningTagWithProp(source: string, componentName: string, propName: string) {
+  const escapedName = componentName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const tagPattern = new RegExp(`<${escapedName}(?=[\\s>/])[^>]*>`, "g");
+  const propPattern = new RegExp(`\\s${propName}\\s*=`);
+
+  for (const match of source.matchAll(tagPattern)) {
+    if (propPattern.test(match[0])) {
       return true;
     }
   }

@@ -70,6 +70,18 @@ Do not apply the slot model blindly to every complex component:
 
 The test is whether the component is primarily a readable content block. If yes, use `title`, `badge`, `summary`, and `children`. If the component primarily renders structured data, controls layout, or exports state, keep its domain-specific schema.
 
+## Authoring Metadata
+
+The registry records the same distinction through `authoring.kind`. This makes the taxonomy queryable from the CLI instead of leaving it only in prose docs.
+
+| Authoring Kind | Current Components | Guidance |
+|---|---|---|
+| `content-block` | `InlineText`, `MarkdownBody`, `SeverityBadge`, `Callout`, `DecisionMatrix`, `ComparisonSet`, `OptionGrid` | Use short display props plus Markdown-rich children for readable body content. |
+| `structured-renderer` | `CodeBlock`, `DiffBlock`, `AnnotatedCode` | Keep code, diff rows, and annotations in structured props. |
+| `layout-primitive` | `Stack`, `Columns`, `Grid`, `SplitPane`, `Frame` | Arrange content without owning workflow meaning. |
+| `export-editor` | `ExportPanel`, `CommentExport` | Keep handoff data structured and copy/export behavior explicit. |
+| `review-boundary` | `CommentLayer`, `Section`, `CommentableBlock`, `CommentTarget` | Provide stable anchors around meaningful review targets. |
+
 ## Extension Lifecycle
 
 Component candidates do not all need to enter the core package. Use the lifecycle below to keep the core package small while still giving agents room to handle new artifact shapes.

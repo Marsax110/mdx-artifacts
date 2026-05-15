@@ -12,10 +12,23 @@ export type ComponentTypeMeta = {
   fields: ComponentPropMeta[];
 };
 
+export type ComponentAuthoringKind =
+  | "content-block"
+  | "structured-renderer"
+  | "layout-primitive"
+  | "export-editor"
+  | "review-boundary";
+
+export type ComponentAuthoringMeta = {
+  kind: ComponentAuthoringKind;
+  guidance: string[];
+};
+
 export type ComponentMeta = {
   name: string;
   category?: "artifact" | "content" | "layout" | "semantic";
   stability?: "stable" | "advanced";
+  authoring?: ComponentAuthoringMeta;
   description: string;
   useWhen: string[];
   props: ComponentPropMeta[];
@@ -23,11 +36,42 @@ export type ComponentMeta = {
   example: string;
 };
 
+const contentBlockGuidance = [
+  "Use title, badge, and summary for short visible display slots.",
+  "Use MDX children for long explanations, rationale, pros, cons, risks, and lists.",
+  "Do not invent Markdown heading parsers for slot names inside children."
+];
+
+const structuredRendererGuidance = [
+  "Keep domain data in explicit structured props.",
+  "Use ids for stable review anchors when the rendered block should be commentable.",
+  "Do not move code, diff rows, or line annotations into free-form prose children."
+];
+
+const layoutPrimitiveGuidance = [
+  "Use only when semantic components cannot express the arrangement.",
+  "Keep props focused on layout concerns such as spacing, ratios, collapse behavior, and surface treatment.",
+  "Do not encode workflow or domain semantics in layout wrappers."
+];
+
+const exportEditorGuidance = [
+  "Keep handoff data in structured value or state props.",
+  "Use formats and titles for export UX, not for artifact domain modeling.",
+  "Prefer ExportPanel when an artifact needs to return decisions, edits, or comments to the workflow."
+];
+
+const reviewBoundaryGuidance = [
+  "Use stable ids for durable comment anchors.",
+  "Wrap the smallest meaningful review target, not decorative layout fragments.",
+  "Keep children as the visible content being reviewed."
+];
+
 export const componentRegistry: ComponentMeta[] = [
   {
     name: "InlineText",
     category: "content",
     stability: "stable",
+    authoring: { kind: "content-block", guidance: contentBlockGuidance },
     description: "Renders children-first short single-line text with controlled inline Markdown.",
     useWhen: ["Titles", "Labels", "Captions", "Short notes", "Inline explanations"],
     props: [
@@ -62,6 +106,7 @@ export const componentRegistry: ComponentMeta[] = [
     name: "MarkdownBody",
     category: "content",
     stability: "stable",
+    authoring: { kind: "content-block", guidance: contentBlockGuidance },
     description: "Renders children-first controlled multi-line Markdown for component body copy.",
     useWhen: ["Component body explanations", "Controlled lists inside components", "Component-local prose"],
     props: [
@@ -98,6 +143,7 @@ Use MarkdownBody when a component needs controlled body copy:
     name: "CodeBlock",
     category: "content",
     stability: "stable",
+    authoring: { kind: "structured-renderer", guidance: structuredRendererGuidance },
     description: "Renders code text with optional filename, language label, line numbers, and highlighted lines.",
     useWhen: ["Code examples", "Implementation notes", "Technical explanations", "Code review context"],
     props: [
@@ -151,6 +197,7 @@ Use MarkdownBody when a component needs controlled body copy:
     name: "DiffBlock",
     category: "content",
     stability: "stable",
+    authoring: { kind: "structured-renderer", guidance: structuredRendererGuidance },
     description:
       "Renders structured diff lines with add, remove, and context rows plus a compact effective line number column.",
     useWhen: ["Code review context", "Patch explanations", "Before and after code changes", "Implementation reports"],
@@ -228,6 +275,7 @@ Use MarkdownBody when a component needs controlled body copy:
     name: "SeverityBadge",
     category: "semantic",
     stability: "stable",
+    authoring: { kind: "content-block", guidance: contentBlockGuidance },
     description: "Renders a compact severity, confidence, status, or risk label.",
     useWhen: ["Code review findings", "Risk labels", "Status summaries", "Annotated explanations"],
     props: [
@@ -249,6 +297,7 @@ Use MarkdownBody when a component needs controlled body copy:
     name: "Callout",
     category: "semantic",
     stability: "stable",
+    authoring: { kind: "content-block", guidance: contentBlockGuidance },
     description: "Highlights a focused note, warning, recommendation, or risk with children-first Markdown body copy.",
     useWhen: ["Review notes", "Assumptions", "Warnings", "Implementation gotchas", "Recommendations"],
     props: [
@@ -290,6 +339,7 @@ Use MarkdownBody when a component needs controlled body copy:
     name: "AnnotatedCode",
     category: "semantic",
     stability: "stable",
+    authoring: { kind: "structured-renderer", guidance: structuredRendererGuidance },
     description: "Combines a CodeBlock with line-level annotations and severity labels.",
     useWhen: ["Code explanations", "Review focus areas", "Implementation walkthroughs", "Risk notes tied to code lines"],
     props: [
@@ -395,6 +445,7 @@ Use MarkdownBody when a component needs controlled body copy:
     name: "Stack",
     category: "layout",
     stability: "advanced",
+    authoring: { kind: "layout-primitive", guidance: layoutPrimitiveGuidance },
     description: "Arranges children in a single vertical column with controlled spacing and alignment.",
     useWhen: ["Advanced composition", "Vertical sections", "Storybook layout checks"],
     props: [
@@ -424,6 +475,7 @@ Use MarkdownBody when a component needs controlled body copy:
     name: "Columns",
     category: "layout",
     stability: "advanced",
+    authoring: { kind: "layout-primitive", guidance: layoutPrimitiveGuidance },
     description: "Arranges children in ratio-based columns that collapse responsively.",
     useWhen: ["Advanced composition", "Main and supporting content", "Side-by-side artifact sections"],
     props: [
@@ -458,6 +510,7 @@ Use MarkdownBody when a component needs controlled body copy:
     name: "Grid",
     category: "layout",
     stability: "advanced",
+    authoring: { kind: "layout-primitive", guidance: layoutPrimitiveGuidance },
     description: "Arranges children in equal-width two, three, or four column grids.",
     useWhen: ["Advanced composition", "Equal alternative cards", "Preview groups"],
     props: [
@@ -493,6 +546,7 @@ Use MarkdownBody when a component needs controlled body copy:
     name: "SplitPane",
     category: "layout",
     stability: "advanced",
+    authoring: { kind: "layout-primitive", guidance: layoutPrimitiveGuidance },
     description: "Arranges children into a two-pane layout with a controlled ratio.",
     useWhen: ["Advanced composition", "Main content with sidebar", "Editor and preview layouts"],
     props: [
@@ -527,6 +581,7 @@ Use MarkdownBody when a component needs controlled body copy:
     name: "Frame",
     category: "layout",
     stability: "advanced",
+    authoring: { kind: "layout-primitive", guidance: layoutPrimitiveGuidance },
     description: "Provides a stable visual boundary for previews, snippets, mockups, or charts.",
     useWhen: ["Advanced composition", "Preview boundaries", "Code or mockup framing"],
     props: [
@@ -555,6 +610,7 @@ Use MarkdownBody when a component needs controlled body copy:
     name: "CommentLayer",
     category: "artifact",
     stability: "stable",
+    authoring: { kind: "review-boundary", guidance: reviewBoundaryGuidance },
     description: "Provides local browser comment state for block-level artifact feedback. Artifact and Storybook shells provide this automatically.",
     useWhen: ["Custom React shells", "Reviewable artifacts", "Block-level user feedback", "Agent handoff comments"],
     props: [
@@ -579,6 +635,7 @@ Use MarkdownBody when a component needs controlled body copy:
     name: "Section",
     category: "artifact",
     stability: "stable",
+    authoring: { kind: "review-boundary", guidance: reviewBoundaryGuidance },
     description: "Defines a stable reviewable document section for native MDX prose.",
     useWhen: ["Reviewable native MDX prose", "Stable Markdown anchors", "Document structure", "Block-level feedback"],
     props: [
@@ -613,6 +670,7 @@ This section can contain native MDX paragraphs, lists, and code fences.
     name: "CommentableBlock",
     category: "artifact",
     stability: "stable",
+    authoring: { kind: "review-boundary", guidance: reviewBoundaryGuidance },
     description: "Wraps any artifact content with a stable block target and hover-revealed local comment input.",
     useWhen: ["Commenting on existing components", "Commenting on prose blocks", "Exporting block-level feedback"],
     props: [
@@ -657,6 +715,7 @@ This section can contain native MDX paragraphs, lists, and code fences.
     name: "CommentTarget",
     category: "artifact",
     stability: "stable",
+    authoring: { kind: "review-boundary", guidance: reviewBoundaryGuidance },
     description: "Marks a fine-grained comment target with hover affordance and persistent comment count.",
     useWhen: ["Component internals", "Fine-grained review targets", "Custom local component comment anchors"],
     props: [
@@ -695,6 +754,7 @@ This section can contain native MDX paragraphs, lists, and code fences.
     name: "CommentExport",
     category: "artifact",
     stability: "stable",
+    authoring: { kind: "export-editor", guidance: exportEditorGuidance },
     description: "Compatibility dock for exporting comments from the nearest CommentLayer. Prefer ExportPanel when an artifact also has result output.",
     useWhen: ["Comments-only artifacts", "Legacy comment handoff", "Copying review comments without a result export"],
     props: [
@@ -759,6 +819,7 @@ This section can contain native MDX paragraphs, lists, and code fences.
     name: "DecisionMatrix",
     category: "artifact",
     stability: "stable",
+    authoring: { kind: "content-block", guidance: contentBlockGuidance },
     description:
       "Compares decision options with stable display slots: title, badge, summary, and Markdown-rich option bodies.",
     useWhen: ["Architecture decisions", "Product tradeoffs", "Implementation planning", "Open-source roadmap"],
@@ -881,6 +942,7 @@ This section can contain native MDX paragraphs, lists, and code fences.
     name: "ComparisonSet",
     category: "artifact",
     stability: "stable",
+    authoring: { kind: "content-block", guidance: contentBlockGuidance },
     description: "Groups comparable candidates while allowing each item to render arbitrary component content.",
     useWhen: ["Candidate comparison", "Mixed media alternatives", "Prototype comparison", "Reviewable option sets"],
     props: [
@@ -956,6 +1018,7 @@ This section can contain native MDX paragraphs, lists, and code fences.
     name: "OptionGrid",
     category: "artifact",
     stability: "stable",
+    authoring: { kind: "content-block", guidance: contentBlockGuidance },
     description:
       "Displays options or component candidates with stable display slots: title, badge, summary, and Markdown-rich item bodies.",
     useWhen: ["Option exploration", "Component scope", "Prototype comparison"],
@@ -1073,6 +1136,7 @@ This section can contain native MDX paragraphs, lists, and code fences.
     name: "ExportPanel",
     category: "artifact",
     stability: "stable",
+    authoring: { kind: "export-editor", guidance: exportEditorGuidance },
     description: "Shows a floating export dock for artifact results and, when comments are available, review comments.",
     useWhen: ["Exporting decisions", "Copying state back to an agent", "Issue or PR handoff", "Configuration handoff", "Exporting comments with artifact results"],
     props: [

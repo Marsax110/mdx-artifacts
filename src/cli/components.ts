@@ -25,8 +25,10 @@ export function componentsCommand(input?: string, options: { json?: boolean } = 
   for (const component of componentRegistry) {
     console.log(`- ${component.name}: ${component.description}`);
   }
-  console.log("\nAuthoring rule: prefer MDX children for human-readable content; use props for stable ids, variants, layout controls, export values, and structured data.");
-  console.log("\nUse `artifact-kit components <ComponentName>` to inspect props and examples.");
+  console.log(
+    "\nAuthoring rule: prefer MDX children for human-readable content; use props for stable ids, variants, layout controls, export values, and structured data."
+  );
+  console.log("\nUse `artifact-kit components <ComponentName>` to inspect props, authoring guidance, and examples.");
   console.log("Use `artifact-kit components --json` for machine-readable metadata.");
 }
 
@@ -38,6 +40,14 @@ function printComponent(component: (typeof componentRegistry)[number]) {
       `\nMetadata: ${[component.category ? `category=${component.category}` : undefined, component.stability ? `stability=${component.stability}` : undefined].filter(Boolean).join(", ")}`
     );
   }
+
+  if (component.authoring) {
+    console.log(`\nAuthoring: ${component.authoring.kind}`);
+    for (const item of component.authoring.guidance) {
+      console.log(`- ${item}`);
+    }
+  }
+
   console.log("\nUse when:");
   for (const item of component.useWhen) {
     console.log(`- ${item}`);
