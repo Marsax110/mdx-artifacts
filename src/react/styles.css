@@ -658,6 +658,61 @@ body {
   color: var(--ak-muted);
 }
 
+.ak-sortable-list-editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ak-sortable-list-editor {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  border: 1px solid var(--ak-border);
+  border-radius: 8px;
+  background: var(--ak-surface);
+  padding: 12px;
+}
+
+.ak-sortable-list-editor-field,
+.ak-sortable-list-editor-check {
+  display: grid;
+  gap: 5px;
+  color: var(--ak-muted);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.ak-sortable-list-editor-field input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--ak-border);
+  border-radius: 6px;
+  background: var(--ak-surface);
+  color: var(--ak-text);
+  font: inherit;
+  font-size: 13px;
+  padding: 8px 9px;
+}
+
+.ak-sortable-list-editor-check {
+  grid-template-columns: auto 1fr;
+  align-items: center;
+}
+
+.ak-sortable-list-editor-buttons {
+  display: flex;
+  align-items: end;
+  gap: 6px;
+}
+
+.ak-sortable-list-editor-error {
+  margin: 0;
+  color: var(--ak-risk);
+  font-size: 13px;
+  font-weight: 650;
+}
+
 .ak-sortable-list-items {
   display: grid;
   gap: 10px;
@@ -745,6 +800,7 @@ body {
 
 .ak-sortable-list-controls {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
 }
 
@@ -763,6 +819,20 @@ body {
 .ak-sortable-list-control:disabled {
   cursor: not-allowed;
   opacity: 0.5;
+}
+
+@media (max-width: 720px) {
+  .ak-sortable-list-editor {
+    grid-template-columns: 1fr;
+  }
+
+  .ak-sortable-list-item {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .ak-sortable-list-controls {
+    grid-column: 1 / -1;
+  }
 }
 
 .ak-inline-text {

@@ -48,6 +48,8 @@ describe("SortableList", () => {
     expect(html).toContain("P0");
     expect(html).toContain("api");
     expect(html).toContain("Move Stabilize ContentSet API down");
+    expect(html).not.toContain("Add item");
+    expect(html).not.toContain("Delete Stabilize ContentSet API");
   });
 
   it("resolves persisted order while appending new items", () => {

@@ -32,17 +32,37 @@ export type SortableListProps = {
   className?: string;
 };
 
+type SortableListItemDraft = {
+  id: string;
+  title: string;
+  summary: string;
+  badge: string;
+  tags: string;
+  disabled: boolean;
+};
+
 export function SortableList({ id, title, summary, items, surface = "outlined", className }: SortableListProps) {
   const artifactState = useOptionalArtifactState();
+  const writable = artifactState?.meta.daemon?.writable === true;
   const persistedInteraction = artifactState?.state?.interactions[id];
   const persistedOrder = useMemo(() => getPersistedOrder(persistedInteraction), [persistedInteraction]);
-  const [orderedIds, setOrderedIds] = useState(() => resolveSortableListOrder(items, persistedOrder));
+  const [currentItems, setCurrentItems] = useState(items);
+  const [orderedIds, setOrderedIds] = useState(() => resolveSortableListOrder(currentItems, persistedOrder));
   const [draggingId, setDraggingId] = useState<string | undefined>();
-  const orderedItems = useMemo(() => orderItems(items, orderedIds), [items, orderedIds]);
+  const [editorMode, setEditorMode] = useState<"add" | "edit" | undefined>();
+  const [editingItemId, setEditingItemId] = useState<string | undefined>();
+  const [draft, setDraft] = useState(() => createEmptyDraft());
+  const [editorStatus, setEditorStatus] = useState<"idle" | "saving" | "error">("idle");
+  const [editorError, setEditorError] = useState<string | undefined>();
+  const orderedItems = useMemo(() => orderItems(currentItems, orderedIds), [currentItems, orderedIds]);
 
   useEffect(() => {
-    setOrderedIds(resolveSortableListOrder(items, persistedOrder));
-  }, [items, persistedOrder]);
+    setCurrentItems(items);
+  }, [items]);
+
+  useEffect(() => {
+    setOrderedIds(resolveSortableListOrder(currentItems, persistedOrder));
+  }, [currentItems, persistedOrder]);
 
   function commitOrder(nextOrderedIds: string[]) {
     setOrderedIds(nextOrderedIds);
@@ -55,7 +75,7 @@ export function SortableList({ id, title, summary, items, surface = "outlined", 
       ...artifactState.state,
       interactions: {
         ...artifactState.state.interactions,
-        [id]: createSortableListInteraction(id, title, nextOrderedIds, items)
+        [id]: createSortableListInteraction(id, title, nextOrderedIds, currentItems)
       }
     };
 
@@ -63,7 +83,7 @@ export function SortableList({ id, title, summary, items, surface = "outlined", 
   }
 
   function moveItem(activeId: string, targetId: string) {
-    const activeItem = items.find((item) => item.id === activeId);
+    const activeItem = currentItems.find((item) => item.id === activeId);
     if (!activeItem || activeItem.disabled || activeId === targetId) {
       return;
     }
@@ -72,7 +92,7 @@ export function SortableList({ id, title, summary, items, surface = "outlined", 
   }
 
   function moveByOffset(itemId: string, offset: -1 | 1) {
-    const item = items.find((candidate) => candidate.id === itemId);
+    const item = currentItems.find((candidate) => candidate.id === itemId);
     if (!item || item.disabled) {
       return;
     }
@@ -114,6 +134,92 @@ export function SortableList({ id, title, summary, items, surface = "outlined", 
     setDraggingId(undefined);
   }
 
+  function startAddItem() {
+    setEditorMode("add");
+    setEditingItemId(undefined);
+    setDraft(createEmptyDraft());
+    setEditorStatus("idle");
+    setEditorError(undefined);
+  }
+
+  function startEditItem(item: SortableListItem) {
+    setEditorMode("edit");
+    setEditingItemId(item.id);
+    setDraft(createDraftFromItem(item));
+    setEditorStatus("idle");
+    setEditorError(undefined);
+  }
+
+  function cancelEdit() {
+    setEditorMode(undefined);
+    setEditingItemId(undefined);
+    setDraft(createEmptyDraft());
+    setEditorStatus("idle");
+    setEditorError(undefined);
+  }
+
+  async function saveDraft() {
+    if (!editorMode || editorStatus === "saving") {
+      return;
+    }
+
+    const nextItem = createItemFromDraft(draft);
+    if (!nextItem.id || !nextItem.title) {
+      setEditorStatus("error");
+      setEditorError("Item id and title are required.");
+      return;
+    }
+
+    try {
+      setEditorStatus("saving");
+      setEditorError(undefined);
+
+      if (editorMode === "add") {
+        await postInteraction("/__artifact/interactions/add-item", {
+          id,
+          item: nextItem,
+          afterId: orderedIds[orderedIds.length - 1]
+        });
+        const nextItems = [...currentItems, nextItem];
+        setCurrentItems(nextItems);
+        setOrderedIds(resolveSortableListOrder(nextItems, [...orderedIds, nextItem.id]));
+      } else if (editingItemId) {
+        const patch = createPatchFromDraft(draft);
+        await postInteraction("/__artifact/interactions/update-item", {
+          id,
+          itemId: editingItemId,
+          patch: createPatchPayloadFromDraft(draft)
+        });
+        const nextItems = currentItems.map((item) => (item.id === editingItemId ? { ...item, ...patch } : item));
+        setCurrentItems(nextItems);
+      }
+
+      cancelEdit();
+    } catch (error) {
+      setEditorStatus("error");
+      setEditorError(error instanceof Error ? error.message : String(error));
+    }
+  }
+
+  async function deleteItem(item: SortableListItem) {
+    if (!window.confirm(`Delete ${item.title}?`)) {
+      return;
+    }
+
+    try {
+      await postInteraction("/__artifact/interactions/remove-item", {
+        id,
+        itemId: item.id
+      });
+      const nextItems = currentItems.filter((candidate) => candidate.id !== item.id);
+      setCurrentItems(nextItems);
+      setOrderedIds(orderedIds.filter((itemId) => itemId !== item.id));
+    } catch (error) {
+      setEditorStatus("error");
+      setEditorError(error instanceof Error ? error.message : String(error));
+    }
+  }
+
   return (
     <CommentTarget
       className={classNames("ak-comment-target-section", className)}
@@ -126,7 +232,25 @@ export function SortableList({ id, title, summary, items, surface = "outlined", 
           <p className="ak-eyebrow">Sortable List</p>
           <InlineText as="h2" text={title} variant="title" />
           {summary ? <InlineText as="p" className="ak-sortable-list-summary" text={summary} /> : null}
+          {writable ? (
+            <div className="ak-sortable-list-editor-actions">
+              <button className="ak-sortable-list-control" onClick={startAddItem} type="button">
+                Add item
+              </button>
+            </div>
+          ) : null}
         </div>
+        {writable && editorMode ? (
+          <SortableListEditor
+            draft={draft}
+            itemIdLocked={editorMode === "edit"}
+            onCancel={cancelEdit}
+            onChange={setDraft}
+            onSave={saveDraft}
+            status={editorStatus}
+          />
+        ) : null}
+        {editorError ? <p className="ak-sortable-list-editor-error">{editorError}</p> : null}
         <ol className="ak-sortable-list-items">
           {orderedItems.map((item, index) => (
             <li
@@ -174,6 +298,26 @@ export function SortableList({ id, title, summary, items, surface = "outlined", 
                 >
                   Down
                 </button>
+                {writable ? (
+                  <>
+                    <button
+                      aria-label={`Edit ${item.title}`}
+                      className="ak-sortable-list-control"
+                      onClick={() => startEditItem(item)}
+                      type="button"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      aria-label={`Delete ${item.title}`}
+                      className="ak-sortable-list-control"
+                      onClick={() => void deleteItem(item)}
+                      type="button"
+                    >
+                      Delete
+                    </button>
+                  </>
+                ) : null}
               </div>
             </li>
           ))}
@@ -181,6 +325,140 @@ export function SortableList({ id, title, summary, items, surface = "outlined", 
       </section>
     </CommentTarget>
   );
+}
+
+function SortableListEditor({
+  draft,
+  itemIdLocked,
+  onCancel,
+  onChange,
+  onSave,
+  status
+}: {
+  draft: SortableListItemDraft;
+  itemIdLocked: boolean;
+  onCancel: () => void;
+  onChange: (draft: SortableListItemDraft) => void;
+  onSave: () => void;
+  status: "idle" | "saving" | "error";
+}) {
+  return (
+    <div className="ak-sortable-list-editor">
+      <label className="ak-sortable-list-editor-field">
+        <span>Id</span>
+        <input
+          disabled={itemIdLocked}
+          onChange={(event) => onChange({ ...draft, id: event.currentTarget.value })}
+          value={draft.id}
+        />
+      </label>
+      <label className="ak-sortable-list-editor-field">
+        <span>Title</span>
+        <input onChange={(event) => onChange({ ...draft, title: event.currentTarget.value })} value={draft.title} />
+      </label>
+      <label className="ak-sortable-list-editor-field">
+        <span>Summary</span>
+        <input onChange={(event) => onChange({ ...draft, summary: event.currentTarget.value })} value={draft.summary} />
+      </label>
+      <label className="ak-sortable-list-editor-field">
+        <span>Badge</span>
+        <input onChange={(event) => onChange({ ...draft, badge: event.currentTarget.value })} value={draft.badge} />
+      </label>
+      <label className="ak-sortable-list-editor-field">
+        <span>Tags</span>
+        <input onChange={(event) => onChange({ ...draft, tags: event.currentTarget.value })} value={draft.tags} />
+      </label>
+      <label className="ak-sortable-list-editor-check">
+        <input
+          checked={draft.disabled}
+          onChange={(event) => onChange({ ...draft, disabled: event.currentTarget.checked })}
+          type="checkbox"
+        />
+        <span>Disabled</span>
+      </label>
+      <div className="ak-sortable-list-editor-buttons">
+        <button className="ak-sortable-list-control" disabled={status === "saving"} onClick={onSave} type="button">
+          Save
+        </button>
+        <button className="ak-sortable-list-control" onClick={onCancel} type="button">
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function createEmptyDraft(): SortableListItemDraft {
+  return {
+    id: "",
+    title: "",
+    summary: "",
+    badge: "",
+    tags: "",
+    disabled: false
+  };
+}
+
+function createDraftFromItem(item: SortableListItem): SortableListItemDraft {
+  return {
+    id: item.id,
+    title: item.title,
+    summary: item.summary ?? "",
+    badge: item.badge ?? "",
+    tags: item.tags?.join(", ") ?? "",
+    disabled: item.disabled ?? false
+  };
+}
+
+function createItemFromDraft(draft: SortableListItemDraft): SortableListItem {
+  return {
+    id: draft.id.trim(),
+    title: draft.title.trim(),
+    ...createPatchFromDraft(draft)
+  };
+}
+
+function createPatchFromDraft(draft: SortableListItemDraft): Partial<Omit<SortableListItem, "id">> {
+  return {
+    title: draft.title.trim(),
+    summary: draft.summary.trim() || undefined,
+    badge: draft.badge.trim() || undefined,
+    tags: parseTagDraft(draft.tags),
+    disabled: draft.disabled
+  };
+}
+
+function createPatchPayloadFromDraft(draft: SortableListItemDraft) {
+  return {
+    title: draft.title.trim(),
+    summary: draft.summary.trim() || null,
+    badge: draft.badge.trim() || null,
+    tags: parseTagDraft(draft.tags) ?? null,
+    disabled: draft.disabled
+  };
+}
+
+function parseTagDraft(value: string) {
+  const tags = value
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+  return tags.length > 0 ? tags : undefined;
+}
+
+async function postInteraction(path: string, body: unknown) {
+  const response = await fetch(path, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body)
+  });
+
+  if (!response.ok) {
+    const payload = await response.json().catch(() => undefined);
+    throw new Error(isRecord(payload) && typeof payload.error === "string" ? payload.error : "Failed to save item.");
+  }
+
+  return response.json();
 }
 
 export function createSortableListInteraction(

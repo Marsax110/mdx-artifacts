@@ -183,6 +183,8 @@ These endpoints are for local artifact tooling and reuse the same state and sour
 
 Item editing commands and endpoints are authored-truth writes. They patch the static MDX `items` array and keep any existing runtime order overlay synchronized. They only support short structured fields: `title`, `summary`, `badge`, `tags`, and `disabled`.
 
+When a local writable dev server is available, `SortableList` may expose a small item editor that calls these endpoints. Static artifacts remain read-only.
+
 ## Authoring Kinds
 
 Every public component should declare an authoring kind in `src/react/registry.ts`. This keeps the component API aligned with the product philosophy and gives `artifact-kit components <ComponentName>` enough guidance for agents.
