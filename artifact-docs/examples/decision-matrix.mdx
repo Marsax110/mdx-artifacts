@@ -1,4 +1,4 @@
-import { ContentSet, ExportPanel } from "mdx-artifacts/react";
+import { ContentSet, ExportPanel, SortableList } from "mdx-artifacts/react";
 
 # Artifact Kit Stage One Content Set
 
@@ -99,6 +99,35 @@ import { ContentSet, ExportPanel } from "mdx-artifacts/react";
     - Can add file download later
   </ContentSet.Item>
 </ContentSet>
+
+<SortableList
+  id="list.next-priorities"
+  title="Next priorities"
+  summary="Drag items or use the controls to change the priority order."
+  items={[
+    {
+      id: "validate-build",
+      title: "Keep validate/build/dev reliable",
+      summary: "The CLI loop is the artifact authoring baseline.",
+      badge: "P0",
+      tags: ["cli"]
+    },
+    {
+      id: "example-output",
+      title: "Verify example HTML output",
+      summary: "The example MDX must keep producing standalone HTML.",
+      badge: "P1",
+      tags: ["artifact"]
+    },
+    {
+      id: "adapter-design",
+      title: "Design the Astro adapter later",
+      summary: "Adapter work should follow the component protocol.",
+      badge: "Later",
+      tags: ["adapter"]
+    }
+  ]}
+/>
 
 <ExportPanel
   title="Export recommendation"

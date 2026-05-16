@@ -106,6 +106,40 @@ Use `ContentSet` when multiple same-kind content items should be displayed toget
 
 `ContentSet` is not a workspace or large layout container. Use it for one group of same-kind items. Use layout primitives such as `SplitPane` or `Columns` for multi-region artifacts.
 
+## Interactive Data Components
+
+Use props-first APIs when a component owns user-controlled state such as sorting, board columns, selected values, or exportable edits.
+
+`SortableList` is the current baseline:
+
+```mdx
+<SortableList
+  id="list.launch-priority"
+  title="Launch priority"
+  summary="Drag items or use the controls to change the handoff order."
+  items={[
+    {
+      id: "contentset-api",
+      title: "Stabilize ContentSet API",
+      summary: "Must land before public examples.",
+      badge: "P0",
+      tags: ["api", "docs"]
+    }
+  ]}
+/>
+```
+
+For interactive data components:
+
+- Use structured props for stable ids, item labels, tags, and initial state.
+- Keep item records short. Do not put long prose, Markdown lists, or narrative rationale into item data.
+- Persist user-controlled state into artifact interactions when available.
+- Treat MDX props as the authored truth and artifact interactions as the runtime overlay.
+- Use `artifact-kit interactions inspect <file.mdx> <id>` to read the current truth from MDX plus the state overlay.
+- Use `Section` beside the component for long explanation, criteria, or rationale.
+
+`interactions inspect` is read-only. It reports the resolved order, ignores stale state ids that no longer exist in MDX, and appends new MDX item ids that are not yet present in the state overlay.
+
 ## Authoring Kinds
 
 Every public component should declare an authoring kind in `src/react/registry.ts`. This keeps the component API aligned with the product philosophy and gives `artifact-kit components <ComponentName>` enough guidance for agents.
@@ -117,6 +151,7 @@ Use these kinds:
 | `content-block` | Readable cards, options, findings, risks, callouts, and repeated items. | `title`, optional `badge`, optional `summary`, and Markdown-rich `children`. |
 | `structured-renderer` | Code, diffs, line annotations, and other domain-shaped renderers. | Explicit structured props such as `code`, `lines`, or `annotations`. |
 | `layout-primitive` | Arrangement-only helpers such as `Stack`, `Columns`, `Grid`, `SplitPane`, and `Frame`. | Layout props plus `children`; no workflow semantics. |
+| `interactive-data` | User-controlled structured state such as sortable lists and future boards. | Structured props for initial state plus artifact interactions for user edits. |
 | `export-editor` | Export docks, editors, and state handoff controls. | Structured `value`, state, format, or handoff props. |
 | `review-boundary` | Comment layers, stable review sections, and fine-grained comment targets. | Stable ids or target ids plus the visible reviewed `children`. |
 
@@ -125,6 +160,7 @@ The kind is not a styling category. It tells an author where meaning belongs:
 - `content-block`: keep long human-readable text in MDX children.
 - `structured-renderer`: keep machine-shaped data in props.
 - `layout-primitive`: do not encode domain meaning.
+- `interactive-data`: keep stateful records structured and exportable.
 - `export-editor`: keep handoff data structured.
 - `review-boundary`: keep anchors durable and review targets meaningful.
 

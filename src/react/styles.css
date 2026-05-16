@@ -653,6 +653,118 @@ body {
   margin: 4px 0;
 }
 
+.ak-sortable-list-summary {
+  margin: 0;
+  color: var(--ak-muted);
+}
+
+.ak-sortable-list-items {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ak-sortable-list-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px;
+  border: 1px solid var(--ak-border);
+  border-radius: 8px;
+  background: var(--ak-surface);
+  padding: 12px;
+}
+
+.ak-sortable-list-item[draggable="true"] {
+  cursor: grab;
+}
+
+.ak-sortable-list-item[draggable="true"]:active {
+  cursor: grabbing;
+}
+
+.ak-sortable-list-item-disabled {
+  opacity: 0.62;
+}
+
+.ak-sortable-list-rank {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 1px solid var(--ak-border);
+  border-radius: 999px;
+  color: var(--ak-muted);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.ak-sortable-list-content {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.ak-sortable-list-item-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.ak-sortable-list-item-header h3 {
+  margin: 0;
+}
+
+.ak-sortable-list-badge,
+.ak-sortable-list-tag {
+  width: fit-content;
+  border: 1px solid var(--ak-border);
+  border-radius: 999px;
+  background: var(--ak-surface-subtle);
+  color: var(--ak-muted);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1;
+  padding: 4px 8px;
+}
+
+.ak-sortable-list-item-summary {
+  margin: 0;
+  color: var(--ak-muted);
+}
+
+.ak-sortable-list-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ak-sortable-list-controls {
+  display: flex;
+  gap: 6px;
+}
+
+.ak-sortable-list-control {
+  border: 1px solid var(--ak-border);
+  border-radius: 6px;
+  background: var(--ak-surface);
+  color: var(--ak-text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1;
+  padding: 7px 9px;
+}
+
+.ak-sortable-list-control:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 .ak-inline-text {
   min-width: 0;
 }

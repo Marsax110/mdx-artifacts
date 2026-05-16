@@ -17,7 +17,8 @@ const componentsRequiringStableId = [
   "Callout",
   "ContentItem",
   "ContentSet",
-  "ContentSet.Item"
+  "ContentSet.Item",
+  "SortableList"
 ];
 
 const deprecatedAuthoringComponents = [

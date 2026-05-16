@@ -79,6 +79,7 @@ The registry records the same distinction through `authoring.kind`. This makes t
 | `content-block` | `InlineText`, `MarkdownBody`, `ContentItem`, `ContentSet`, `SeverityBadge`, `Callout`, `ComparisonSet` | Use short display props plus Markdown-rich children for readable body content. |
 | `structured-renderer` | `CodeBlock`, `DiffBlock`, `AnnotatedCode` | Keep code, diff rows, and annotations in structured props. |
 | `layout-primitive` | `Stack`, `Columns`, `Grid`, `SplitPane`, `Frame` | Arrange content without owning workflow meaning. |
+| `interactive-data` | `SortableList` | Keep user-controlled state structured, short, and exportable through artifact interactions. |
 | `export-editor` | `ExportPanel`, `CommentExport` | Keep handoff data structured and copy/export behavior explicit. |
 | `review-boundary` | `CommentLayer`, `Section`, `CommentableBlock`, `CommentTarget` | Provide stable anchors around meaningful review targets. |
 

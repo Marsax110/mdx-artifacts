@@ -16,6 +16,7 @@ export type ComponentAuthoringKind =
   | "content-block"
   | "structured-renderer"
   | "layout-primitive"
+  | "interactive-data"
   | "export-editor"
   | "review-boundary";
 
@@ -52,6 +53,12 @@ const layoutPrimitiveGuidance = [
   "Use only when semantic components cannot express the arrangement.",
   "Keep props focused on layout concerns such as spacing, ratios, collapse behavior, and surface treatment.",
   "Do not encode workflow or domain semantics in layout wrappers."
+];
+
+const interactiveDataGuidance = [
+  "Use structured props for ids, labels, tags, and initial state.",
+  "Keep item fields short; do not put long prose or Markdown blocks into item records.",
+  "Persist user-controlled order or state through artifact interactions when available."
 ];
 
 const exportEditorGuidance = [
@@ -324,6 +331,138 @@ Use MarkdownBody when a component needs controlled body copy:
     - Less natural for long prose
   </ContentSet.Item>
 </ContentSet>`
+  },
+  {
+    name: "SortableList",
+    category: "artifact",
+    stability: "stable",
+    authoring: { kind: "interactive-data", guidance: interactiveDataGuidance },
+    description: "Renders a draggable priority list from structured item data and persists the user-controlled order.",
+    useWhen: ["Priority sorting", "Ranked handoff tasks", "User-adjustable queues", "Structured ordering decisions"],
+    props: [
+      {
+        name: "id",
+        type: "string",
+        contentType: "plainText",
+        required: true,
+        description: "Stable interaction id used for review anchors and artifact state."
+      },
+      {
+        name: "title",
+        type: "string",
+        contentType: "inlineMarkdown",
+        required: true,
+        description: "Visible title for the sortable list."
+      },
+      {
+        name: "summary",
+        type: "string",
+        contentType: "inlineMarkdown",
+        description: "Optional one-line explanation for the sorting task."
+      },
+      {
+        name: "items",
+        type: "SortableListItem[]",
+        required: true,
+        description:
+          "Structured item records. Keep fields short; use this component for interactive ordering, not long Markdown prose."
+      },
+      {
+        name: "surface",
+        type: "'plain' | 'subtle' | 'outlined'",
+        description: "Container surface treatment. Defaults to outlined."
+      }
+    ],
+    types: [
+      {
+        name: "SortableListItem",
+        description: "One short structured item in a SortableList.",
+        fields: [
+          {
+            name: "id",
+            type: "string",
+            contentType: "plainText",
+            required: true,
+            description: "Stable item id used in orderedIds exports."
+          },
+          {
+            name: "title",
+            type: "string",
+            contentType: "inlineMarkdown",
+            required: true,
+            description: "Primary visible item label."
+          },
+          {
+            name: "summary",
+            type: "string",
+            contentType: "inlineMarkdown",
+            description: "Optional one-line item context."
+          },
+          {
+            name: "badge",
+            type: "string",
+            contentType: "plainText",
+            description: "Optional short priority or status label."
+          },
+          {
+            name: "tags",
+            type: "string[]",
+            contentType: "json",
+            description: "Optional short labels for filtering or scanning."
+          },
+          {
+            name: "disabled",
+            type: "boolean",
+            description: "When true, the item is visible but cannot be moved by the user."
+          }
+        ]
+      },
+      {
+        name: "SortableListInteraction",
+        description: "Persisted artifact interaction written after the user changes order.",
+        fields: [
+          {
+            name: "type",
+            type: "'sortable-list'",
+            required: true,
+            description: "Interaction discriminator."
+          },
+          {
+            name: "orderedIds",
+            type: "string[]",
+            required: true,
+            description: "Current user-controlled item order."
+          },
+          {
+            name: "orderedItems",
+            type: "SortableListItem[]",
+            required: true,
+            description: "Current ordered item records for export handoff."
+          }
+        ]
+      }
+    ],
+    example: `<SortableList
+  id="list.launch-priority"
+  title="Launch priority"
+  summary="Drag items or use the controls to change the handoff order."
+  items={[
+    {
+      id: "contentset-api",
+      title: "Stabilize ContentSet API",
+      summary: "Must land before public examples.",
+      badge: "P0",
+      tags: ["api", "docs"]
+    },
+    {
+      id: "layout-guidance",
+      title: "Clarify layout guidance",
+      summary: "Explain Frame, Columns, Section, and ContentSet boundaries.",
+      badge: "P1",
+      tags: ["protocol"]
+    }
+  ]}
+/>`
   },
   {
     name: "CodeBlock",

@@ -74,6 +74,13 @@ export { Section } from "./components/Section";
 export type { SectionProps } from "./components/Section";
 export { SeverityBadge } from "./components/SeverityBadge";
 export type { SeverityBadgeProps, SeverityLevel } from "./components/SeverityBadge";
+export { SortableList, createSortableListInteraction, reorderIds, resolveSortableListOrder } from "./components/SortableList";
+export type {
+  SortableListInteraction,
+  SortableListItem,
+  SortableListProps,
+  SortableListSurface
+} from "./components/SortableList";
 export { componentRegistry, findComponentMeta } from "./registry";
 export type { ComponentMeta, ComponentPropMeta } from "./registry";
 export type { ArtifactKitConfig } from "../cli/types";

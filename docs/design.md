@@ -37,11 +37,12 @@ First-stage components:
 - `MarkdownBody`: controlled component-local body Markdown.
 - `ContentItem`: standalone readable content card.
 - `ContentSet`: grouped readable content cards with tone and emphasis.
+- `SortableList`: draggable structured priority list with persisted order.
 - `ExportPanel`: export Markdown or JSON.
 
 Planned components:
 
-- `PriorityBoard`: drag-and-drop priority sorting.
+- `KanbanBoard`: column-based card sorting.
 - `PromptWorkbench`: prompt variables and sample previews.
 - `DiffExplainer`: PR and diff explanation.
 - `ParameterTuner`: parameter tuning UI.

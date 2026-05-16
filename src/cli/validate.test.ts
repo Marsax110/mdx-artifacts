@@ -16,13 +16,15 @@ describe("validateMdx", () => {
     const filePath = path.join(dir, "missing-id.mdx");
     await writeFile(
       filePath,
-      `import { Callout, ContentSet, ExportPanel } from "../../src/react";
+      `import { Callout, ContentSet, ExportPanel, SortableList } from "../../src/react";
 
 <Callout title="Risk" body="Add a stable id." />
 
 <ContentSet title="Choose?">
   <ContentSet.Item title="Missing id">Readable body.</ContentSet.Item>
 </ContentSet>
+
+<SortableList title="Priority" items={[{ id: "api", title: "API" }]} />
 
 <ExportPanel value={{ ok: true }} />`,
       "utf8"
@@ -35,6 +37,9 @@ describe("validateMdx", () => {
     );
     expect(result.warnings).toContain(
       "ContentSet should include a stable id prop so comments and state can use a durable anchorId."
+    );
+    expect(result.warnings).toContain(
+      "SortableList should include a stable id prop so comments and state can use a durable anchorId."
     );
   });
 

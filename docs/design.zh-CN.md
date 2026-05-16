@@ -39,11 +39,12 @@ HTML artifact 的价值不在于替代 Markdown，而在于把一些阅读、比
 - `MarkdownBody`：组件内部正文，支持受控 block Markdown。
 - `ContentItem`：独立可读内容卡片。
 - `ContentSet`：带 tone 和 emphasis 的成组内容卡片。
+- `SortableList`：可拖拽的结构化优先级列表，保存用户排序结果。
 - `ExportPanel`：导出 Markdown / JSON。
 
 后续组件：
 
-- `PriorityBoard`：任务拖拽排序。
+- `KanbanBoard`：按列组织的卡片排序。
 - `PromptWorkbench`：提示词变量和样例预览。
 - `DiffExplainer`：PR / diff 解释。
 - `ParameterTuner`：参数调试器。
