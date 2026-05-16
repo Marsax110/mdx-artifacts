@@ -77,6 +77,9 @@ Usage:
   artifact-kit interactions set-order <file.mdx> <id> --ordered-ids <id> [...id]
   artifact-kit interactions reset <file.mdx> <id>
   artifact-kit interactions promote <file.mdx> <id>
+  artifact-kit interactions add-item <file.mdx> <id> --item-id <id> --title <title> [--summary <text>] [--badge <text>] [--tags <tag,tag>] [--disabled true|false] [--after <itemId>]
+  artifact-kit interactions remove-item <file.mdx> <id> --item-id <id>
+  artifact-kit interactions update-item <file.mdx> <id> --item-id <id> [--title <title>] [--summary <text>] [--badge <text>] [--tags <tag,tag>] [--disabled true|false]
   artifact-kit review add <file.mdx> --anchor <anchorId> --body <message> [--title <title>]
   artifact-kit review reply <file.mdx> --thread <threadId> --body <message> [...repeat] [--status <status>]
   artifact-kit review validate <file.mdx>

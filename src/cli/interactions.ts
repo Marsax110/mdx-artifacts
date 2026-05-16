@@ -1,33 +1,17 @@
-import { readFile, writeFile } from "node:fs/promises";
-import path from "node:path";
 import {
-  createArtifactMeta,
-  createArtifactRoute,
-  readArtifactState,
-  writeArtifactState,
-  type ArtifactRoute
-} from "./artifact-state";
-import { loadConfig } from "./config";
-import { extractSortableListSeeds, promoteSortableListOrder, type SortableListSeed } from "./interaction-mdx";
-import type { SortableListInteraction } from "../react";
+  addInteractionItemService,
+  inspectInteractionService,
+  promoteInteractionService,
+  removeInteractionItemService,
+  resetInteractionService,
+  setInteractionOrderService,
+  updateInteractionItemService,
+  type InteractionMutationResult,
+  type InteractionsInspectResult
+} from "./interaction-service";
+import type { SortableListItem } from "../react";
 
-export type InteractionsInspectResult = {
-  component: SortableListSeed;
-  order: {
-    source: "mdx" | "state";
-    orderedIds: string[];
-    staleIds: string[];
-    appendedIds: string[];
-  };
-  state: {
-    path: string;
-    exists: boolean;
-  };
-  source: {
-    path: string;
-  };
-  warnings: string[];
-};
+export type { InteractionsInspectResult } from "./interaction-service";
 
 type ParsedInspectArgs = {
   input: string;
@@ -49,6 +33,26 @@ type ParsedResetArgs = {
 type ParsedPromoteArgs = {
   input: string;
   id: string;
+};
+
+type ParsedAddItemArgs = {
+  input: string;
+  id: string;
+  item: SortableListItem;
+  afterId?: string;
+};
+
+type ParsedRemoveItemArgs = {
+  input: string;
+  id: string;
+  itemId: string;
+};
+
+type ParsedUpdateItemArgs = {
+  input: string;
+  id: string;
+  itemId: string;
+  patch: Partial<Omit<SortableListItem, "id">>;
 };
 
 export async function interactionsCommand(projectRoot: string, args: string[]) {
@@ -79,112 +83,67 @@ export async function interactionsCommand(projectRoot: string, args: string[]) {
     return;
   }
 
+  if (subcommand === "add-item") {
+    const options = parseAddItemArgs(args.slice(1));
+    console.log(await addInteractionItem(projectRoot, options.input, options.id, options.item, { afterId: options.afterId }));
+    return;
+  }
+
+  if (subcommand === "remove-item") {
+    const options = parseRemoveItemArgs(args.slice(1));
+    console.log(await removeInteractionItem(projectRoot, options.input, options.id, options.itemId));
+    return;
+  }
+
+  if (subcommand === "update-item") {
+    const options = parseUpdateItemArgs(args.slice(1));
+    console.log(await updateInteractionItem(projectRoot, options.input, options.id, options.itemId, options.patch));
+    return;
+  }
+
   throw new Error(
-    "interactions requires a subcommand. Use `artifact-kit interactions inspect <file.mdx> <id> [--json]`, `artifact-kit interactions set-order <file.mdx> <id> --ordered-ids ...`, `artifact-kit interactions reset <file.mdx> <id>`, or `artifact-kit interactions promote <file.mdx> <id>`."
+    "interactions requires a subcommand. Use inspect, set-order, reset, promote, add-item, remove-item, or update-item."
   );
 }
 
-export async function inspectInteraction(
-  projectRoot: string,
-  input: string,
-  id: string
-): Promise<InteractionsInspectResult> {
-  const artifact = await createArtifactFromInput(projectRoot, input);
-  const meta = await createArtifactMeta(projectRoot, artifact);
-  const state = await readArtifactState(artifact);
-  const source = await readFile(artifact.sourcePath, "utf8");
-  const seeds = extractSortableListSeeds(source);
-  const component = seeds.find((seed) => seed.id === id);
-
-  if (!component) {
-    const availableIds = seeds.map((seed) => seed.id);
-    throw new Error(
-      availableIds.length > 0
-        ? `SortableList not found: ${id}. Available SortableList ids: ${availableIds.join(", ")}.`
-        : `SortableList not found: ${id}.`
-    );
-  }
-
-  const persistedOrder = readPersistedOrder(state.interactions[id]);
-  const resolvedOrder = resolveOrder(component, persistedOrder);
-  const warnings = createInspectWarnings(id, resolvedOrder.staleIds);
-
-  return {
-    component,
-    order: resolvedOrder,
-    state: {
-      path: meta.statePath,
-      exists: meta.stateExists
-    },
-    source: {
-      path: meta.sourcePath
-    },
-    warnings
-  };
+export function inspectInteraction(projectRoot: string, input: string, id: string) {
+  return inspectInteractionService(projectRoot, input, id);
 }
 
 export async function setInteractionOrder(projectRoot: string, input: string, id: string, orderedIds: string[]) {
-  const { artifact, component } = await loadSortableList(projectRoot, input, id);
-  validateOrderedIds(component, orderedIds);
-
-  const state = await readArtifactState(artifact);
-  const interaction = createSortableListInteraction(component, orderedIds);
-  await writeArtifactState(projectRoot, artifact, {
-    ...state,
-    interactions: {
-      ...state.interactions,
-      [id]: interaction
-    }
-  });
-
-  return [
-    "interactions set-order ok",
-    `state: ${artifact.stateRelativePath}`,
-    `component: ${id}`,
-    `items: ${orderedIds.length}`,
-    `orderedIds: ${orderedIds.join(", ")}`
-  ].join("\n");
+  return formatMutationResult(await setInteractionOrderService(projectRoot, input, id, orderedIds));
 }
 
 export async function resetInteraction(projectRoot: string, input: string, id: string) {
-  const { artifact } = await loadSortableList(projectRoot, input, id);
-  const state = await readArtifactState(artifact);
-  const { [id]: _removed, ...interactions } = state.interactions;
-
-  await writeArtifactState(projectRoot, artifact, {
-    ...state,
-    interactions
-  });
-
-  return ["interactions reset ok", `state: ${artifact.stateRelativePath}`, `component: ${id}`].join("\n");
+  return formatMutationResult(await resetInteractionService(projectRoot, input, id));
 }
 
 export async function promoteInteraction(projectRoot: string, input: string, id: string) {
-  const { artifact, component, source } = await loadSortableList(projectRoot, input, id);
-  const state = await readArtifactState(artifact);
-  const orderedIds = readPersistedOrder(state.interactions[id]);
+  return formatMutationResult(await promoteInteractionService(projectRoot, input, id));
+}
 
-  if (!orderedIds) {
-    return ["interactions promote noop", `source: ${artifact.sourceRelativePath}`, `component: ${id}`, "reason: no runtime overlay"].join("\n");
-  }
+export async function addInteractionItem(
+  projectRoot: string,
+  input: string,
+  id: string,
+  item: SortableListItem,
+  options: { afterId?: string } = {}
+) {
+  return formatMutationResult(await addInteractionItemService(projectRoot, input, id, item, options));
+}
 
-  validateOrderedIds(component, orderedIds);
-  const nextSource = promoteSortableListOrder(source, id, orderedIds);
-  await writeFile(artifact.sourcePath, nextSource, "utf8");
+export async function removeInteractionItem(projectRoot: string, input: string, id: string, itemId: string) {
+  return formatMutationResult(await removeInteractionItemService(projectRoot, input, id, itemId));
+}
 
-  const { [id]: _removed, ...interactions } = state.interactions;
-  await writeArtifactState(projectRoot, artifact, {
-    ...state,
-    interactions
-  });
-
-  return [
-    "interactions promote ok",
-    `source: ${artifact.sourceRelativePath}`,
-    `state: ${artifact.stateRelativePath}`,
-    `component: ${id}`,
-    `orderedIds: ${orderedIds.join(", ")}`
-  ].join("\n");
+export async function updateInteractionItem(
+  projectRoot: string,
+  input: string,
+  id: string,
+  itemId: string,
+  patch: Partial<Omit<SortableListItem, "id">>
+) {
+  return formatMutationResult(await updateInteractionItemService(projectRoot, input, id, itemId, patch));
 }
 
 function parseInspectArgs(args: string[]): ParsedInspectArgs {
@@ -258,6 +217,78 @@ function parsePromoteArgs(args: string[]): ParsedPromoteArgs {
   return { input, id };
 }
 
+function parseAddItemArgs(args: string[]): ParsedAddItemArgs {
+  const [input, id, ...rest] = args;
+  if (!input) {
+    throw new Error("interactions add-item requires a .mdx file path.");
+  }
+  if (!id) {
+    throw new Error("interactions add-item requires a component id.");
+  }
+
+  const options = parseOptionMap(rest, ["item-id", "title", "summary", "badge", "tags", "disabled", "after"], []);
+  const itemId = options.values.get("item-id");
+  const title = options.values.get("title");
+  if (!itemId) {
+    throw new Error("interactions add-item requires --item-id <id>.");
+  }
+  if (!title) {
+    throw new Error("interactions add-item requires --title <title>.");
+  }
+
+  return {
+    input,
+    id,
+    item: createItemFromOptions(itemId, title, options.values),
+    ...(options.values.get("after") ? { afterId: options.values.get("after") } : {})
+  };
+}
+
+function parseRemoveItemArgs(args: string[]): ParsedRemoveItemArgs {
+  const [input, id, ...rest] = args;
+  if (!input) {
+    throw new Error("interactions remove-item requires a .mdx file path.");
+  }
+  if (!id) {
+    throw new Error("interactions remove-item requires a component id.");
+  }
+
+  const options = parseOptionMap(rest, ["item-id"], []);
+  const itemId = options.values.get("item-id");
+  if (!itemId) {
+    throw new Error("interactions remove-item requires --item-id <id>.");
+  }
+
+  return { input, id, itemId };
+}
+
+function parseUpdateItemArgs(args: string[]): ParsedUpdateItemArgs {
+  const [input, id, ...rest] = args;
+  if (!input) {
+    throw new Error("interactions update-item requires a .mdx file path.");
+  }
+  if (!id) {
+    throw new Error("interactions update-item requires a component id.");
+  }
+
+  const options = parseOptionMap(
+    rest,
+    ["item-id", "title", "summary", "badge", "tags", "disabled"],
+    ["clear-summary", "clear-badge", "clear-tags"]
+  );
+  const itemId = options.values.get("item-id");
+  if (!itemId) {
+    throw new Error("interactions update-item requires --item-id <id>.");
+  }
+
+  const patch = createPatchFromOptions(options.values, options.flags);
+  if (Object.keys(patch).length === 0) {
+    throw new Error("interactions update-item requires at least one field update.");
+  }
+
+  return { input, id, itemId, patch };
+}
+
 function parseOrderedIds(args: string[]) {
   const flagIndex = args.indexOf("--ordered-ids");
   if (flagIndex < 0) {
@@ -281,116 +312,78 @@ function parseOrderedIds(args: string[]) {
   return orderedIds;
 }
 
-async function createArtifactFromInput(projectRoot: string, input: string): Promise<ArtifactRoute> {
-  const config = await loadConfig(projectRoot);
-  const mdxPath = path.resolve(projectRoot, input);
-  return createArtifactRoute(projectRoot, mdxPath, config.docsDir);
-}
+function parseOptionMap(args: string[], valueKeys: string[], flagKeys: string[]) {
+  const values = new Map<string, string>();
+  const flags = new Set<string>();
 
-async function loadSortableList(projectRoot: string, input: string, id: string) {
-  const artifact = await createArtifactFromInput(projectRoot, input);
-  const source = await readFile(artifact.sourcePath, "utf8");
-  const seeds = extractSortableListSeeds(source);
-  const component = seeds.find((seed) => seed.id === id);
-
-  if (!component) {
-    const availableIds = seeds.map((seed) => seed.id);
-    throw new Error(
-      availableIds.length > 0
-        ? `SortableList not found: ${id}. Available SortableList ids: ${availableIds.join(", ")}.`
-        : `SortableList not found: ${id}.`
-    );
-  }
-
-  return { artifact, component, source };
-}
-
-function validateOrderedIds(component: SortableListSeed, orderedIds: string[]) {
-  const itemIds = component.items.map((item) => item.id);
-  const expectedIds = new Set(itemIds);
-  const seenIds = new Set<string>();
-  const duplicateIds = new Set<string>();
-  const unknownIds = new Set<string>();
-
-  for (const orderedId of orderedIds) {
-    if (seenIds.has(orderedId)) {
-      duplicateIds.add(orderedId);
+  for (let index = 0; index < args.length; index += 1) {
+    const name = args[index];
+    if (!name?.startsWith("--")) {
+      throw new Error(`Unexpected interactions argument: ${name}`);
     }
-    seenIds.add(orderedId);
-    if (!expectedIds.has(orderedId)) {
-      unknownIds.add(orderedId);
+
+    const key = name.slice(2);
+    if (flagKeys.includes(key)) {
+      flags.add(key);
+      continue;
     }
+
+    if (!valueKeys.includes(key)) {
+      throw new Error(`Unknown interactions option: --${key}.`);
+    }
+
+    const value = args[index + 1];
+    if (value === undefined || value.startsWith("--")) {
+      throw new Error(`Missing value for --${key}.`);
+    }
+
+    values.set(key, value);
+    index += 1;
   }
 
-  const missingIds = itemIds.filter((itemId) => !seenIds.has(itemId));
-  const errors = [
-    duplicateIds.size > 0 ? `duplicate ids: ${Array.from(duplicateIds).join(", ")}` : undefined,
-    unknownIds.size > 0 ? `unknown ids: ${Array.from(unknownIds).join(", ")}` : undefined,
-    missingIds.length > 0 ? `missing ids: ${missingIds.join(", ")}` : undefined
-  ].filter(Boolean);
-
-  if (errors.length > 0) {
-    throw new Error(`Invalid orderedIds for SortableList ${component.id}: ${errors.join("; ")}.`);
-  }
+  return { flags, values };
 }
 
-function createSortableListInteraction(component: SortableListSeed, orderedIds: string[]): SortableListInteraction {
+function createItemFromOptions(itemId: string, title: string, options: Map<string, string>): SortableListItem {
   return {
-    type: "sortable-list",
-    id: component.id,
-    title: component.title,
-    orderedIds,
-    orderedItems: orderedIds.map((itemId) => {
-      const item = component.items.find((candidate) => candidate.id === itemId);
-      if (!item) {
-        throw new Error(`SortableList item not found: ${itemId}`);
-      }
-      return item;
-    }),
-    updatedAt: new Date().toISOString()
+    id: itemId,
+    title,
+    ...createPatchFromOptions(options, new Set())
   };
 }
 
-function readPersistedOrder(interaction: unknown) {
-  if (!isRecord(interaction) || !Array.isArray(interaction.orderedIds)) {
-    return undefined;
-  }
-
-  const orderedIds = interaction.orderedIds.filter((itemId): itemId is string => typeof itemId === "string");
-  return orderedIds.length > 0 ? orderedIds : undefined;
-}
-
-function resolveOrder(component: SortableListSeed, persistedOrder: string[] | undefined) {
-  const itemIds = component.items.map((item) => item.id);
-  if (!persistedOrder) {
-    return {
-      source: "mdx" as const,
-      orderedIds: itemIds,
-      staleIds: [],
-      appendedIds: []
-    };
-  }
-
-  const knownIds = new Set(itemIds);
-  const staleIds = persistedOrder.filter((itemId) => !knownIds.has(itemId));
-  const retainedIds = persistedOrder.filter((itemId) => knownIds.has(itemId));
-  const retainedIdSet = new Set(retainedIds);
-  const appendedIds = itemIds.filter((itemId) => !retainedIdSet.has(itemId));
-
+function createPatchFromOptions(
+  options: Map<string, string>,
+  flags: Set<string>
+): Partial<Omit<SortableListItem, "id">> {
   return {
-    source: "state" as const,
-    orderedIds: [...retainedIds, ...appendedIds],
-    staleIds,
-    appendedIds
+    ...(options.has("title") ? { title: options.get("title") ?? "" } : {}),
+    ...(flags.has("clear-summary")
+      ? { summary: undefined }
+      : options.has("summary")
+        ? { summary: options.get("summary") ?? "" }
+        : {}),
+    ...(flags.has("clear-badge")
+      ? { badge: undefined }
+      : options.has("badge")
+        ? { badge: options.get("badge") ?? "" }
+        : {}),
+    ...(flags.has("clear-tags") ? { tags: undefined } : options.has("tags") ? { tags: parseTags(options.get("tags") ?? "") } : {}),
+    ...(options.has("disabled") ? { disabled: parseBooleanOption(options.get("disabled") ?? "", "disabled") } : {})
   };
 }
 
-function createInspectWarnings(id: string, staleIds: string[]) {
-  if (staleIds.length === 0) {
-    return [];
-  }
+function parseTags(value: string) {
+  return value
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+}
 
-  return [`SortableList ${id} state contains stale orderedIds ignored by inspect: ${staleIds.join(", ")}.`];
+function parseBooleanOption(value: string, name: string) {
+  if (value === "true") return true;
+  if (value === "false") return false;
+  throw new Error(`--${name} must be true or false.`);
 }
 
 function formatInspectResult(result: InteractionsInspectResult) {
@@ -411,6 +404,31 @@ function formatInspectResult(result: InteractionsInspectResult) {
   ].join("\n");
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
+function formatMutationResult(result: InteractionMutationResult) {
+  if (result.action === "promote" && result.status === "noop") {
+    return [
+      "interactions promote noop",
+      `source: ${result.sourcePath}`,
+      `component: ${result.component}`,
+      `reason: ${result.reason ?? "no runtime overlay"}`
+    ].join("\n");
+  }
+
+  const lines = [
+    `interactions ${result.action} ok`,
+    ...(result.action === "reset" || result.action === "set-order" ? [] : [`source: ${result.sourcePath}`]),
+    `state: ${result.statePath}`,
+    `component: ${result.component}`
+  ];
+
+  if (result.itemId) {
+    lines.push(`item: ${result.itemId}`);
+  }
+
+  if (result.orderedIds) {
+    lines.push(`items: ${result.orderedIds.length}`);
+    lines.push(`orderedIds: ${result.orderedIds.join(", ")}`);
+  }
+
+  return lines.join("\n");
 }

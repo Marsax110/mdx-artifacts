@@ -16,7 +16,14 @@ import {
   writeArtifactState,
   type ArtifactRoute
 } from "./artifact-state";
-import { promoteInteraction, resetInteraction, setInteractionOrder } from "./interactions";
+import {
+  addInteractionItemService,
+  promoteInteractionService,
+  removeInteractionItemService,
+  resetInteractionService,
+  setInteractionOrderService,
+  updateInteractionItemService
+} from "./interaction-service";
 import type { ArtifactKitConfig } from "./types";
 
 const packageCliDir = path.dirname(fileURLToPath(import.meta.url));
@@ -230,22 +237,45 @@ async function handleArtifactInteraction(
   try {
     if (pathname === "/__artifact/interactions/set-order") {
       const body = parseSetOrderRequest(value);
-      const output = await setInteractionOrder(projectRoot, artifact.sourceRelativePath, body.id, body.orderedIds);
-      sendJson(response, 200, { ok: true, output, state: await readArtifactState(artifact) });
+      const result = await setInteractionOrderService(projectRoot, artifact.sourceRelativePath, body.id, body.orderedIds);
+      sendJson(response, 200, { ok: true, result, state: result.state });
       return;
     }
 
     if (pathname === "/__artifact/interactions/reset") {
       const body = parseInteractionIdRequest(value, "reset");
-      const output = await resetInteraction(projectRoot, artifact.sourceRelativePath, body.id);
-      sendJson(response, 200, { ok: true, output, state: await readArtifactState(artifact) });
+      const result = await resetInteractionService(projectRoot, artifact.sourceRelativePath, body.id);
+      sendJson(response, 200, { ok: true, result, state: result.state });
       return;
     }
 
     if (pathname === "/__artifact/interactions/promote") {
       const body = parseInteractionIdRequest(value, "promote");
-      const output = await promoteInteraction(projectRoot, artifact.sourceRelativePath, body.id);
-      sendJson(response, 200, { ok: true, output, state: await readArtifactState(artifact) });
+      const result = await promoteInteractionService(projectRoot, artifact.sourceRelativePath, body.id);
+      sendJson(response, 200, { ok: true, result, state: result.state });
+      return;
+    }
+
+    if (pathname === "/__artifact/interactions/add-item") {
+      const body = parseAddItemRequest(value);
+      const result = await addInteractionItemService(projectRoot, artifact.sourceRelativePath, body.id, body.item, {
+        afterId: body.afterId
+      });
+      sendJson(response, 200, { ok: true, result, state: result.state });
+      return;
+    }
+
+    if (pathname === "/__artifact/interactions/remove-item") {
+      const body = parseItemIdRequest(value, "remove-item");
+      const result = await removeInteractionItemService(projectRoot, artifact.sourceRelativePath, body.id, body.itemId);
+      sendJson(response, 200, { ok: true, result, state: result.state });
+      return;
+    }
+
+    if (pathname === "/__artifact/interactions/update-item") {
+      const body = parseUpdateItemRequest(value);
+      const result = await updateInteractionItemService(projectRoot, artifact.sourceRelativePath, body.id, body.itemId, body.patch);
+      sendJson(response, 200, { ok: true, result, state: result.state });
       return;
     }
   } catch (error) {
@@ -254,6 +284,50 @@ async function handleArtifactInteraction(
   }
 
   sendJson(response, 404, { error: "Interaction endpoint not found." });
+}
+
+function parseAddItemRequest(value: unknown) {
+  const body = parseInteractionIdRequest(value, "add-item");
+  if (!isRecord(value) || !isRecord(value.item)) {
+    throw new Error("interactions add-item requires item.");
+  }
+  if (typeof value.item.id !== "string" || !value.item.id) {
+    throw new Error("interactions add-item requires item.id.");
+  }
+  if (typeof value.item.title !== "string" || !value.item.title) {
+    throw new Error("interactions add-item requires item.title.");
+  }
+
+  return {
+    id: body.id,
+    item: normalizeItem(value.item),
+    afterId: typeof value.afterId === "string" && value.afterId ? value.afterId : undefined
+  };
+}
+
+function parseUpdateItemRequest(value: unknown) {
+  const body = parseItemIdRequest(value, "update-item");
+  if (!isRecord(value) || !isRecord(value.patch)) {
+    throw new Error("interactions update-item requires patch.");
+  }
+
+  return {
+    id: body.id,
+    itemId: body.itemId,
+    patch: normalizeItemPatch(value.patch)
+  };
+}
+
+function parseItemIdRequest(value: unknown, action: string) {
+  const body = parseInteractionIdRequest(value, action);
+  if (!isRecord(value) || typeof value.itemId !== "string" || !value.itemId) {
+    throw new Error(`interactions ${action} requires itemId.`);
+  }
+
+  return {
+    id: body.id,
+    itemId: value.itemId
+  };
 }
 
 function parseSetOrderRequest(value: unknown) {
@@ -270,6 +344,26 @@ function parseSetOrderRequest(value: unknown) {
   return {
     id: body.id,
     orderedIds
+  };
+}
+
+function normalizeItem(value: Record<string, unknown>) {
+  return {
+    id: value.id as string,
+    title: value.title as string,
+    ...normalizeItemPatch(value)
+  };
+}
+
+function normalizeItemPatch(value: Record<string, unknown>) {
+  return {
+    ...(typeof value.title === "string" ? { title: value.title } : {}),
+    ...("summary" in value ? { summary: typeof value.summary === "string" ? value.summary : undefined } : {}),
+    ...("badge" in value ? { badge: typeof value.badge === "string" ? value.badge : undefined } : {}),
+    ...("tags" in value
+      ? { tags: Array.isArray(value.tags) ? value.tags.filter((tag): tag is string => typeof tag === "string") : undefined }
+      : {}),
+    ...(typeof value.disabled === "boolean" ? { disabled: value.disabled } : {})
   };
 }
 

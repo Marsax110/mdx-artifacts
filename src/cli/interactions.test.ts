@@ -4,11 +4,14 @@ import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { extractSortableListSeeds } from "./interaction-mdx";
 import {
+  addInteractionItem,
   inspectInteraction,
   interactionsCommand,
   promoteInteraction,
+  removeInteractionItem,
   resetInteraction,
-  setInteractionOrder
+  setInteractionOrder,
+  updateInteractionItem
 } from "./interactions";
 
 describe("interactions inspect", () => {
@@ -342,6 +345,143 @@ describe("interactions promote", () => {
 
     expect(output).toContain("interactions promote noop");
     await expect(readMdx(projectRoot)).resolves.toBe(originalSource);
+  });
+});
+
+describe("interactions item editing", () => {
+  it("adds, updates, and removes SortableList items while syncing the overlay", async () => {
+    const projectRoot = await createProject({
+      items: [
+        `{ id: "api", title: "Stabilize API" }`,
+        `{ id: "docs", title: "Update docs" }`
+      ],
+      state: {
+        version: 1,
+        source: "artifact-docs/examples/priorities.mdx",
+        threads: [{ id: "thr_list", anchorId: "list.priorities" }],
+        interactions: {
+          "list.priorities": {
+            type: "sortable-list",
+            orderedIds: ["docs", "api"]
+          }
+        }
+      }
+    });
+
+    await addInteractionItem(
+      projectRoot,
+      "artifact-docs/examples/priorities.mdx",
+      "list.priorities",
+      {
+        id: "adapter",
+        title: "Adapter design",
+        badge: "Later",
+        tags: ["adapter"]
+      },
+      { afterId: "api" }
+    );
+
+    let source = await readMdx(projectRoot);
+    expect(source).toContain(`id: "adapter"`);
+    expect(source.indexOf(`id: "api"`)).toBeLessThan(source.indexOf(`id: "adapter"`));
+    let result = await inspectInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
+    expect(result.order).toMatchObject({
+      source: "state",
+      orderedIds: ["docs", "api", "adapter"]
+    });
+
+    await updateInteractionItem(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities", "adapter", {
+      title: "Design adapter contract",
+      summary: "Keep this structured.",
+      tags: ["adapter", "contract"]
+    });
+
+    source = await readMdx(projectRoot);
+    expect(source).toContain(`title: "Design adapter contract"`);
+    expect(source).toContain(`summary: "Keep this structured."`);
+    result = await inspectInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
+    expect(result.component.items.find((item) => item.id === "adapter")).toMatchObject({
+      title: "Design adapter contract",
+      summary: "Keep this structured.",
+      tags: ["adapter", "contract"]
+    });
+
+    await removeInteractionItem(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities", "docs");
+
+    source = await readMdx(projectRoot);
+    expect(source).not.toContain(`id: "docs"`);
+    const state = await readState(projectRoot);
+    expect(state.interactions["list.priorities"].orderedIds).toEqual(["api", "adapter"]);
+    expect(state.threads).toEqual([{ id: "thr_list", anchorId: "list.priorities" }]);
+  });
+
+  it("supports add-item, update-item, and remove-item CLI command shape", async () => {
+    const projectRoot = await createProject({
+      items: [`{ id: "api", title: "Stabilize API" }`]
+    });
+    const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    try {
+      await interactionsCommand(projectRoot, [
+        "add-item",
+        "artifact-docs/examples/priorities.mdx",
+        "list.priorities",
+        "--item-id",
+        "docs",
+        "--title",
+        "Update docs",
+        "--tags",
+        "docs,protocol"
+      ]);
+      expect(log).toHaveBeenLastCalledWith(expect.stringContaining("interactions add-item ok"));
+
+      await interactionsCommand(projectRoot, [
+        "update-item",
+        "artifact-docs/examples/priorities.mdx",
+        "list.priorities",
+        "--item-id",
+        "docs",
+        "--summary",
+        "Document it",
+        "--disabled",
+        "true"
+      ]);
+      expect(log).toHaveBeenLastCalledWith(expect.stringContaining("interactions update-item ok"));
+
+      let result = await inspectInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
+      expect(result.component.items.find((item) => item.id === "docs")).toMatchObject({
+        disabled: true,
+        summary: "Document it",
+        tags: ["docs", "protocol"]
+      });
+
+      await interactionsCommand(projectRoot, [
+        "remove-item",
+        "artifact-docs/examples/priorities.mdx",
+        "list.priorities",
+        "--item-id",
+        "docs"
+      ]);
+      expect(log).toHaveBeenLastCalledWith(expect.stringContaining("interactions remove-item ok"));
+
+      result = await inspectInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
+      expect(result.component.items.map((item) => item.id)).toEqual(["api"]);
+    } finally {
+      log.mockRestore();
+    }
+  });
+
+  it("rejects duplicate add-item ids", async () => {
+    const projectRoot = await createProject({
+      items: [`{ id: "api", title: "Stabilize API" }`]
+    });
+
+    await expect(
+      addInteractionItem(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities", {
+        id: "api",
+        title: "Duplicate API"
+      })
+    ).rejects.toThrow("SortableList list.priorities already contains item: api.");
   });
 });
 

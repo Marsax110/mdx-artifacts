@@ -80,6 +80,10 @@ describe("createArtifactProject", () => {
     expect(setOrder.status).toBe(200);
     expect(await setOrder.json()).toMatchObject({
       ok: true,
+      result: {
+        action: "set-order",
+        component: "list.priorities"
+      },
       state: {
         interactions: {
           "list.priorities": {
@@ -113,6 +117,37 @@ describe("createArtifactProject", () => {
       id: "list.priorities"
     });
     expect(reset.status).toBe(200);
+
+    const addItem = await postJson(baseUrl, "/__artifact/interactions/add-item", {
+      id: "list.priorities",
+      item: {
+        id: "adapter",
+        title: "Adapter design",
+        tags: ["adapter"]
+      }
+    });
+    expect(addItem.status).toBe(200);
+    expect(await addItem.json()).toMatchObject({ ok: true });
+
+    const updateItem = await postJson(baseUrl, "/__artifact/interactions/update-item", {
+      id: "list.priorities",
+      itemId: "adapter",
+      patch: {
+        summary: "Patch through server"
+      }
+    });
+    expect(updateItem.status).toBe(200);
+
+    const removeItem = await postJson(baseUrl, "/__artifact/interactions/remove-item", {
+      id: "list.priorities",
+      itemId: "api"
+    });
+    expect(removeItem.status).toBe(200);
+
+    const nextSource = await readFile(mdxPath, "utf8");
+    expect(nextSource).toContain(`id: "adapter"`);
+    expect(nextSource).toContain(`summary: "Patch through server"`);
+    expect(nextSource).not.toContain(`id: "api"`);
   });
 });
 

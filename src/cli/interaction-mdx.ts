@@ -56,6 +56,67 @@ export function promoteSortableListOrder(source: string, listId: string, ordered
   return `${source.slice(0, absoluteStart)}${nextExpression}${source.slice(absoluteEnd)}`;
 }
 
+export function addSortableListItem(
+  source: string,
+  listId: string,
+  item: SortableListItem,
+  options: { afterId?: string } = {}
+) {
+  const context = createSortableListArrayContext(source, listId);
+  if (context.currentItems.some((currentItem) => currentItem.id === item.id)) {
+    throw new Error(`SortableList ${listId} already contains item: ${item.id}.`);
+  }
+
+  const objectChunk = formatSortableListItem(item);
+  const separator = createItemSeparator(context.expression, context.objectSpans);
+  const insertIndex = options.afterId
+    ? context.currentItems.findIndex((currentItem) => currentItem.id === options.afterId)
+    : context.currentItems.length - 1;
+
+  if (options.afterId && insertIndex < 0) {
+    throw new Error(`SortableList ${listId} item not found: ${options.afterId}.`);
+  }
+
+  const nextExpression =
+    context.objectSpans.length === 0
+      ? insertFirstItem(context.expression, objectChunk)
+      : insertItemAfterSpan(context.expression, context.objectSpans[insertIndex], separator, objectChunk);
+
+  return replaceExpression(source, context, nextExpression);
+}
+
+export function removeSortableListItem(source: string, listId: string, itemId: string) {
+  const context = createSortableListArrayContext(source, listId);
+  const itemIndex = context.currentItems.findIndex((item) => item.id === itemId);
+  if (itemIndex < 0) {
+    throw new Error(`SortableList ${listId} item not found: ${itemId}.`);
+  }
+
+  const nextExpression = removeItemSpan(context.expression, context.objectSpans, itemIndex);
+  return replaceExpression(source, context, nextExpression);
+}
+
+export function updateSortableListItem(
+  source: string,
+  listId: string,
+  itemId: string,
+  patch: Partial<Omit<SortableListItem, "id">>
+) {
+  const context = createSortableListArrayContext(source, listId);
+  const itemIndex = context.currentItems.findIndex((item) => item.id === itemId);
+  if (itemIndex < 0) {
+    throw new Error(`SortableList ${listId} item not found: ${itemId}.`);
+  }
+
+  const nextItem = {
+    ...context.currentItems[itemIndex],
+    ...patch
+  };
+  const span = context.objectSpans[itemIndex];
+  const nextExpression = `${context.expression.slice(0, span.start)}${formatSortableListItem(nextItem)}${context.expression.slice(span.end)}`;
+  return replaceExpression(source, context, nextExpression);
+}
+
 function parseSortableListTag(tagSource: string): SortableListSeed {
   const id = extractStringProp(tagSource, "id");
   const title = extractStringProp(tagSource, "title");
@@ -80,6 +141,103 @@ function parseSortableListTag(tagSource: string): SortableListSeed {
     ...(summary ? { summary } : {}),
     items: parseSortableListItems(itemsExpression, id)
   };
+}
+
+function createSortableListArrayContext(source: string, listId: string) {
+  const target = findSortableListTags(source).find((tag) => extractStringProp(tag.source, "id") === listId);
+  if (!target) {
+    throw new Error(`SortableList not found: ${listId}.`);
+  }
+
+  const itemsExpression = extractExpressionPropRange(target.source, "items");
+  if (!itemsExpression) {
+    throw new Error(`SortableList ${listId} is missing required items prop.`);
+  }
+
+  const expression = target.source.slice(itemsExpression.start, itemsExpression.end);
+  const currentItems = parseSortableListItems(expression, listId);
+  const objectSpans = extractTopLevelObjectSpans(expression);
+  if (objectSpans.length !== currentItems.length) {
+    throw new Error(`SortableList ${listId} items must be a static object array.`);
+  }
+
+  return {
+    absoluteEnd: target.start + itemsExpression.end,
+    absoluteStart: target.start + itemsExpression.start,
+    currentItems,
+    expression,
+    objectSpans
+  };
+}
+
+function replaceExpression(
+  source: string,
+  context: { absoluteStart: number; absoluteEnd: number },
+  nextExpression: string
+) {
+  return `${source.slice(0, context.absoluteStart)}${nextExpression}${source.slice(context.absoluteEnd)}`;
+}
+
+function formatSortableListItem(item: SortableListItem) {
+  const fields = [
+    `id: ${quoteString(item.id)}`,
+    `title: ${quoteString(item.title)}`,
+    item.summary !== undefined ? `summary: ${quoteString(item.summary)}` : undefined,
+    item.badge !== undefined ? `badge: ${quoteString(item.badge)}` : undefined,
+    item.tags !== undefined ? `tags: [${item.tags.map(quoteString).join(", ")}]` : undefined,
+    item.disabled !== undefined ? `disabled: ${String(item.disabled)}` : undefined
+  ].filter(Boolean);
+
+  return `{ ${fields.join(", ")} }`;
+}
+
+function quoteString(value: string) {
+  return JSON.stringify(value);
+}
+
+function createItemSeparator(expression: string, objectSpans: Array<{ start: number; end: number }>) {
+  if (objectSpans.length > 1) {
+    return expression.slice(objectSpans[0].end, objectSpans[1].start);
+  }
+
+  const leadingWhitespace = expression.slice(0, objectSpans[0]?.start ?? 0).match(/\n([ \t]*)$/)?.[1];
+  return `,\n${leadingWhitespace ?? "  "}`;
+}
+
+function insertFirstItem(expression: string, objectChunk: string) {
+  const arrayStart = expression.indexOf("[");
+  const arrayEnd = expression.lastIndexOf("]");
+  if (arrayStart < 0 || arrayEnd < arrayStart) {
+    throw new Error("SortableList items must be a static object array.");
+  }
+
+  const indentation = expression.slice(0, arrayEnd).match(/\n([ \t]*)$/)?.[1] ?? "  ";
+  return `${expression.slice(0, arrayStart + 1)}\n${indentation}  ${objectChunk}\n${indentation}${expression.slice(arrayEnd)}`;
+}
+
+function insertItemAfterSpan(
+  expression: string,
+  span: { start: number; end: number },
+  separator: string,
+  objectChunk: string
+) {
+  return `${expression.slice(0, span.end)}${separator}${objectChunk}${expression.slice(span.end)}`;
+}
+
+function removeItemSpan(expression: string, objectSpans: Array<{ start: number; end: number }>, itemIndex: number) {
+  const currentSpan = objectSpans[itemIndex];
+  const previousSpan = objectSpans[itemIndex - 1];
+  const nextSpan = objectSpans[itemIndex + 1];
+
+  if (!previousSpan && !nextSpan) {
+    return `${expression.slice(0, currentSpan.start)}${expression.slice(currentSpan.end)}`;
+  }
+
+  if (nextSpan) {
+    return `${expression.slice(0, currentSpan.start)}${expression.slice(nextSpan.start)}`;
+  }
+
+  return `${expression.slice(0, previousSpan.end)}${expression.slice(currentSpan.end)}`;
 }
 
 function parseSortableListItems(expression: string, listId: string): SortableListItem[] {

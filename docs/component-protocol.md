@@ -152,6 +152,18 @@ artifact-kit interactions reset artifact-docs/examples/decision-matrix.mdx \
 
 artifact-kit interactions promote artifact-docs/examples/decision-matrix.mdx \
   list.next-priorities
+
+artifact-kit interactions add-item artifact-docs/examples/decision-matrix.mdx \
+  list.next-priorities \
+  --item-id docs --title "Update docs" --tags docs,protocol
+
+artifact-kit interactions update-item artifact-docs/examples/decision-matrix.mdx \
+  list.next-priorities \
+  --item-id docs --summary "Document the workflow."
+
+artifact-kit interactions remove-item artifact-docs/examples/decision-matrix.mdx \
+  list.next-priorities \
+  --item-id docs
 ```
 
 `set-order` writes only the runtime overlay and requires the ordered ids to match the current MDX item ids exactly. `reset` removes the runtime overlay for that component and falls back to the MDX default order. Neither command edits MDX.
@@ -163,8 +175,13 @@ The local dev server exposes the same interaction writes through narrow JSON end
 - `POST /__artifact/interactions/set-order`
 - `POST /__artifact/interactions/reset`
 - `POST /__artifact/interactions/promote`
+- `POST /__artifact/interactions/add-item`
+- `POST /__artifact/interactions/update-item`
+- `POST /__artifact/interactions/remove-item`
 
 These endpoints are for local artifact tooling and reuse the same state and source write rules as the CLI.
+
+Item editing commands and endpoints are authored-truth writes. They patch the static MDX `items` array and keep any existing runtime order overlay synchronized. They only support short structured fields: `title`, `summary`, `badge`, `tags`, and `disabled`.
 
 ## Authoring Kinds
 
