@@ -22,8 +22,8 @@ src/cli/
 | `commands/` | Command-level orchestration for each public CLI command. | `build`, `components`, `dev`, `interactions`, `review`, `scaffold`, `validate` |
 | `config/` | Shared CLI config loading and public config types. | `loadArtifactKitConfig`, `ArtifactKitConfig` |
 | `dev-server/` | Vite dev server integration and browser-facing dev endpoints. | artifact dev server middleware |
-| `mdx/` | MDX source updates, parsing helpers, and document mutation helpers. | interaction state serialization into MDX |
-| `services/` | Reusable CLI workflows that sit below commands but above low-level helpers. | interaction operation handling |
+| `mdx/` | MDX source updates, parsing helpers, and document mutation helpers. | `sortable-list` source patching |
+| `services/` | Reusable CLI workflows that sit below commands but above low-level helpers. | interaction and review operation handling |
 | `state/` | Artifact state file IO and state-shape helpers. | artifact state snapshots |
 
 ## Boundaries
@@ -33,6 +33,14 @@ Command modules should stay thin. They may parse arguments, call shared services
 Service modules can own workflow behavior that is shared by commands, the dev server, or future automation entry points. A service should not print CLI output directly unless the output is part of its public contract.
 
 MDX modules should keep document-level mutations close to the syntax they operate on. When a behavior changes persisted artifact source, prefer placing that logic under `mdx/` and calling it from a command or service.
+
+Current examples:
+
+- `commands/interactions.ts` parses interaction CLI arguments and formats CLI output.
+- `services/interaction-service.ts` owns SortableList runtime overlay writes and source promotion.
+- `mdx/sortable-list.ts` owns SortableList-specific MDX source inspection and patching.
+- `commands/review.ts` parses review CLI arguments, formats review output, and owns validate exit-code behavior.
+- `services/review.ts` owns review thread add, reply, validation, state writes, and anchor discovery.
 
 State modules should own local state file formats and persistence helpers. They should not know about command names, terminal output, or Vite middleware.
 
@@ -84,8 +92,8 @@ The current structure is only a directory boundary. It does not require every la
 
 Good next split candidates:
 
-- Move review-specific data preparation from `commands/review.ts` into a dedicated service when it starts serving more than one entry point.
 - Keep interaction ordering and item mutation logic inside `services/` or `mdx/`, with commands and dev server endpoints calling that shared layer.
 - Keep dev server HTTP endpoint code inside `dev-server/`, but move reusable artifact operations out when they become useful from CLI commands.
+- Consider a dedicated interaction domain directory only after another interaction type, such as a board component, proves that `services/` plus focused `mdx/` modules are no longer enough.
 
 The goal is to keep the CLI queryable and agent-friendly without turning it into a framework. Add a new directory only when an existing boundary is no longer enough.

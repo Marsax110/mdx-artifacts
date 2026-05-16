@@ -1,8 +1,14 @@
 import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { describe, expect, it } from "vitest";
-import { addReviewThread, replyToReviewThread, replyToReviewThreads, validateReviewState } from "./review";
+import { describe, expect, it, vi } from "vitest";
+import {
+  addReviewThreadService,
+  replyToReviewThreadService,
+  replyToReviewThreadsService,
+  validateReviewStateService
+} from "../services/review";
+import { reviewCommand } from "./review";
 
 describe("review reply", () => {
   it("adds a review thread for an existing anchor", async () => {
@@ -14,14 +20,18 @@ describe("review reply", () => {
     await mkdir(docsDir, { recursive: true });
     await writeFile(mdxPath, `<Section id="section.context">\n\n## Context\n\n</Section>`, "utf8");
 
-    const output = await addReviewThread(projectRoot, "artifact-docs/feedback.mdx", {
+    const result = await addReviewThreadService(projectRoot, "artifact-docs/feedback.mdx", {
       anchorId: "section.context",
       title: "Context",
       body: "Tighten this section."
     });
     const state = JSON.parse(await readFile(statePath, "utf8"));
 
-    expect(output).toContain("review add ok");
+    expect(result).toMatchObject({
+      anchorId: "section.context",
+      statePath: "artifact-docs/feedback.state.json"
+    });
+    expect(result.threadId).toMatch(/^thr_section_context/);
     expect(state.threads).toHaveLength(1);
     expect(state.threads[0]).toMatchObject({
       anchorId: "section.context",
@@ -44,7 +54,7 @@ describe("review reply", () => {
     await writeFile(mdxPath, `<Section id="section.context">\n\n## Context\n\n</Section>`, "utf8");
 
     await expect(
-      addReviewThread(projectRoot, "artifact-docs/feedback.mdx", {
+      addReviewThreadService(projectRoot, "artifact-docs/feedback.mdx", {
         anchorId: "section.missing",
         body: "Tighten this section."
       })
@@ -71,7 +81,7 @@ describe("review reply", () => {
     );
 
     await expect(
-      addReviewThread(projectRoot, "artifact-docs/feedback.mdx", {
+      addReviewThreadService(projectRoot, "artifact-docs/feedback.mdx", {
         anchorId: "section.context",
         body: "Tighten this section."
       })
@@ -104,14 +114,15 @@ describe("review reply", () => {
       "utf8"
     );
 
-    const output = await replyToReviewThread(projectRoot, "artifact-docs/feedback.mdx", {
+    const result = await replyToReviewThreadService(projectRoot, "artifact-docs/feedback.mdx", {
       threadId: "thr_001",
       body: "Updated the section.",
       status: "resolved"
     });
     const state = JSON.parse(await readFile(statePath, "utf8"));
 
-    expect(output).toContain("review reply ok");
+    expect(result.messageRecords).toHaveLength(1);
+    expect(result.statePath).toBe("artifact-docs/feedback.state.json");
     expect(state.threads[0].status).toBe("resolved");
     expect(state.threads[0].messages).toHaveLength(2);
     expect(state.threads[0].messages[1]).toMatchObject({
@@ -154,7 +165,7 @@ describe("review reply", () => {
       "utf8"
     );
 
-    const output = await replyToReviewThreads(projectRoot, "artifact-docs/feedback.mdx", {
+    const result = await replyToReviewThreadsService(projectRoot, "artifact-docs/feedback.mdx", {
       replies: [
         { threadId: "thr_001", body: "Updated the opening." },
         { threadId: "thr_002", body: "Kept the detail as-is." }
@@ -163,7 +174,7 @@ describe("review reply", () => {
     });
     const state = JSON.parse(await readFile(statePath, "utf8"));
 
-    expect(output).toContain("messages: 2");
+    expect(result.messageRecords).toHaveLength(2);
     expect(state.threads[0].status).toBe("resolved");
     expect(state.threads[1].status).toBe("resolved");
     expect(state.threads[0].messages[0]).toMatchObject({
@@ -196,7 +207,7 @@ describe("review reply", () => {
     );
 
     await expect(
-      replyToReviewThread(projectRoot, "artifact-docs/feedback.mdx", {
+      replyToReviewThreadService(projectRoot, "artifact-docs/feedback.mdx", {
         threadId: "thr_missing",
         body: "Updated."
       })
@@ -250,11 +261,11 @@ describe("review reply", () => {
       "utf8"
     );
 
-    const result = await validateReviewState(projectRoot, "artifact-docs/feedback.mdx");
+    const result = await validateReviewStateService(projectRoot, "artifact-docs/feedback.mdx");
 
     expect(result.missingThreads).toEqual([]);
-    expect(result.output).toContain("review validate ok");
-    expect(result.output).toContain("threads: 3");
+    expect(result.anchorCount).toBeGreaterThanOrEqual(3);
+    expect(result.threadCount).toBe(3);
   });
 
   it("reports review state threads whose anchors are missing from MDX", async () => {
@@ -284,7 +295,7 @@ describe("review reply", () => {
       "utf8"
     );
 
-    const result = await validateReviewState(projectRoot, "artifact-docs/feedback.mdx");
+    const result = await validateReviewStateService(projectRoot, "artifact-docs/feedback.mdx");
 
     expect(result.missingThreads).toEqual([
       {
@@ -294,8 +305,55 @@ describe("review reply", () => {
         title: "Removed comparison"
       }
     ]);
-    expect(result.output).toContain("review validate failed");
-    expect(result.output).toContain("missing: 1");
-    expect(result.output).toContain("thread: thr_missing anchorId: comparison.removed");
+    expect(result.anchorCount).toBe(1);
+    expect(result.threadCount).toBe(1);
+  });
+
+  it("supports add, reply, and validate CLI command output", async () => {
+    const projectRoot = await mkdtemp(path.join(tmpdir(), "mdx-artifacts-review-"));
+    const docsDir = path.join(projectRoot, "artifact-docs");
+    const mdxPath = path.join(docsDir, "feedback.mdx");
+
+    await mkdir(docsDir, { recursive: true });
+    await writeFile(mdxPath, `<Section id="section.context">\n\n## Context\n\n</Section>`, "utf8");
+    const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    try {
+      await reviewCommand(projectRoot, [
+        "add",
+        "artifact-docs/feedback.mdx",
+        "--anchor",
+        "section.context",
+        "--body",
+        "Tighten this section.",
+        "--title",
+        "Context"
+      ]);
+      expect(log).toHaveBeenLastCalledWith(expect.stringContaining("review add ok"));
+
+      const state = JSON.parse(await readFile(path.join(docsDir, "feedback.state.json"), "utf8"));
+      const threadId = state.threads[0].id;
+
+      await reviewCommand(projectRoot, [
+        "reply",
+        "artifact-docs/feedback.mdx",
+        "--thread",
+        threadId,
+        "--body",
+        "Updated the section.",
+        "--status",
+        "resolved"
+      ]);
+      expect(log).toHaveBeenLastCalledWith(expect.stringContaining("review reply ok"));
+
+      const previousExitCode = process.exitCode;
+      process.exitCode = undefined;
+      await reviewCommand(projectRoot, ["validate", "artifact-docs/feedback.mdx"]);
+      expect(log).toHaveBeenLastCalledWith(expect.stringContaining("review validate ok"));
+      expect(process.exitCode).toBeUndefined();
+      process.exitCode = previousExitCode;
+    } finally {
+      log.mockRestore();
+    }
   });
 });
