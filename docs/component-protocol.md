@@ -149,9 +149,14 @@ artifact-kit interactions set-order artifact-docs/examples/decision-matrix.mdx \
 
 artifact-kit interactions reset artifact-docs/examples/decision-matrix.mdx \
   list.next-priorities
+
+artifact-kit interactions promote artifact-docs/examples/decision-matrix.mdx \
+  list.next-priorities
 ```
 
 `set-order` writes only the runtime overlay and requires the ordered ids to match the current MDX item ids exactly. `reset` removes the runtime overlay for that component and falls back to the MDX default order. Neither command edits MDX.
+
+`promote` is the explicit authored-truth write. It reorders the static MDX `items` array to match the current runtime overlay, then clears that component's overlay. It rejects stale or incomplete runtime ids instead of guessing.
 
 ## Authoring Kinds
 

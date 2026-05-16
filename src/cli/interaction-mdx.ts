@@ -11,6 +11,51 @@ export function extractSortableListSeeds(source: string): SortableListSeed[] {
   return findJsxOpeningTags(source, "SortableList").map((tagSource) => parseSortableListTag(tagSource));
 }
 
+export function promoteSortableListOrder(source: string, listId: string, orderedIds: string[]) {
+  const target = findSortableListTags(source).find((tag) => extractStringProp(tag.source, "id") === listId);
+  if (!target) {
+    throw new Error(`SortableList not found: ${listId}.`);
+  }
+
+  const itemsExpression = extractExpressionPropRange(target.source, "items");
+  if (!itemsExpression) {
+    throw new Error(`SortableList ${listId} is missing required items prop.`);
+  }
+
+  const expression = target.source.slice(itemsExpression.start, itemsExpression.end);
+  const currentItems = parseSortableListItems(expression, listId);
+  const objectSpans = extractTopLevelObjectSpans(expression);
+  if (objectSpans.length !== currentItems.length) {
+    throw new Error(`SortableList ${listId} items must be a static object array.`);
+  }
+
+  const chunksById = new Map(
+    currentItems.map((item, index) => [item.id, expression.slice(objectSpans[index].start, objectSpans[index].end)])
+  );
+  const firstSpan = objectSpans[0];
+  const lastSpan = objectSpans[objectSpans.length - 1];
+  if (!firstSpan || !lastSpan) {
+    throw new Error(`SortableList ${listId} items must contain at least one item.`);
+  }
+
+  const separator = objectSpans.length > 1 ? expression.slice(objectSpans[0].end, objectSpans[1].start) : ",\n";
+  const nextExpression = [
+    expression.slice(0, firstSpan.start),
+    orderedIds.map((itemId) => {
+      const chunk = chunksById.get(itemId);
+      if (!chunk) {
+        throw new Error(`SortableList ${listId} item not found: ${itemId}.`);
+      }
+      return chunk;
+    }).join(separator),
+    expression.slice(lastSpan.end)
+  ].join("");
+
+  const absoluteStart = target.start + itemsExpression.start;
+  const absoluteEnd = target.start + itemsExpression.end;
+  return `${source.slice(0, absoluteStart)}${nextExpression}${source.slice(absoluteEnd)}`;
+}
+
 function parseSortableListTag(tagSource: string): SortableListSeed {
   const id = extractStringProp(tagSource, "id");
   const title = extractStringProp(tagSource, "title");
@@ -72,18 +117,29 @@ function normalizeSortableListItem(value: unknown, listId: string, index: number
 }
 
 function findJsxOpeningTags(source: string, componentName: string) {
+  return findJsxOpeningTagSources(source, componentName).map((tag) => tag.source);
+}
+
+function findSortableListTags(source: string) {
+  return findJsxOpeningTagSources(source, "SortableList");
+}
+
+function findJsxOpeningTagSources(source: string, componentName: string) {
   const tags: string[] = [];
+  const locatedTags: Array<{ source: string; start: number; end: number }> = [];
   const startPattern = new RegExp(`<${componentName}(?=[\\s>/])`, "g");
 
   for (const match of source.matchAll(startPattern)) {
     const start = match.index ?? 0;
     const end = findJsxOpeningTagEnd(source, start);
     if (end >= 0) {
-      tags.push(source.slice(start, end + 1));
+      const tagSource = source.slice(start, end + 1);
+      tags.push(tagSource);
+      locatedTags.push({ source: tagSource, start, end: end + 1 });
     }
   }
 
-  return tags;
+  return locatedTags;
 }
 
 function findJsxOpeningTagEnd(source: string, start: number) {
@@ -120,6 +176,11 @@ function extractStringProp(source: string, propName: string) {
 }
 
 function extractExpressionProp(source: string, propName: string) {
+  const range = extractExpressionPropRange(source, propName);
+  return range ? source.slice(range.start, range.end) : undefined;
+}
+
+function extractExpressionPropRange(source: string, propName: string) {
   const propStart = source.search(new RegExp(`\\b${propName}\\s*=\\s*\\{`));
   if (propStart < 0) {
     return undefined;
@@ -131,7 +192,10 @@ function extractExpressionProp(source: string, propName: string) {
     return undefined;
   }
 
-  return source.slice(expressionStart + 1, expressionEnd);
+  return {
+    start: expressionStart + 1,
+    end: expressionEnd
+  };
 }
 
 function findMatchingBrace(source: string, start: number) {
@@ -157,6 +221,58 @@ function findMatchingBrace(source: string, start: number) {
   }
 
   return -1;
+}
+
+function extractTopLevelObjectSpans(expression: string) {
+  const trimmedStart = expression.search(/\S/);
+  if (trimmedStart < 0 || expression[trimmedStart] !== "[") {
+    throw new Error("SortableList items must be a static object array.");
+  }
+
+  const spans: Array<{ start: number; end: number }> = [];
+  const scanner = new SourceScanner(expression, trimmedStart + 1);
+  let arrayDepth = 1;
+  let braceDepth = 0;
+
+  while (!scanner.done() && arrayDepth > 0) {
+    const char = scanner.current();
+    if (scanner.consumeString()) {
+      continue;
+    }
+
+    if (char === "[" && braceDepth === 0) {
+      arrayDepth += 1;
+      scanner.advance();
+      continue;
+    }
+
+    if (char === "]" && braceDepth === 0) {
+      arrayDepth -= 1;
+      scanner.advance();
+      continue;
+    }
+
+    if (char === "{" && arrayDepth === 1 && braceDepth === 0) {
+      const start = scanner.index;
+      const end = findMatchingBrace(expression, scanner.index);
+      if (end < 0) {
+        throw new Error("SortableList items contain an unterminated object.");
+      }
+      spans.push({ start, end: end + 1 });
+      scanner.index = end + 1;
+      continue;
+    }
+
+    if (char === "{") {
+      braceDepth += 1;
+    } else if (char === "}") {
+      braceDepth -= 1;
+    }
+
+    scanner.advance();
+  }
+
+  return spans;
 }
 
 class StaticExpressionParser {

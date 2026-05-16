@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import {
   createArtifactMeta,
@@ -8,7 +8,7 @@ import {
   type ArtifactRoute
 } from "./artifact-state";
 import { loadConfig } from "./config";
-import { extractSortableListSeeds, type SortableListSeed } from "./interaction-mdx";
+import { extractSortableListSeeds, promoteSortableListOrder, type SortableListSeed } from "./interaction-mdx";
 import type { SortableListInteraction } from "../react";
 
 export type InteractionsInspectResult = {
@@ -46,6 +46,11 @@ type ParsedResetArgs = {
   id: string;
 };
 
+type ParsedPromoteArgs = {
+  input: string;
+  id: string;
+};
+
 export async function interactionsCommand(projectRoot: string, args: string[]) {
   const [subcommand] = args;
 
@@ -68,8 +73,14 @@ export async function interactionsCommand(projectRoot: string, args: string[]) {
     return;
   }
 
+  if (subcommand === "promote") {
+    const options = parsePromoteArgs(args.slice(1));
+    console.log(await promoteInteraction(projectRoot, options.input, options.id));
+    return;
+  }
+
   throw new Error(
-    "interactions requires a subcommand. Use `artifact-kit interactions inspect <file.mdx> <id> [--json]`, `artifact-kit interactions set-order <file.mdx> <id> --ordered-ids ...`, or `artifact-kit interactions reset <file.mdx> <id>`."
+    "interactions requires a subcommand. Use `artifact-kit interactions inspect <file.mdx> <id> [--json]`, `artifact-kit interactions set-order <file.mdx> <id> --ordered-ids ...`, `artifact-kit interactions reset <file.mdx> <id>`, or `artifact-kit interactions promote <file.mdx> <id>`."
   );
 }
 
@@ -148,6 +159,34 @@ export async function resetInteraction(projectRoot: string, input: string, id: s
   return ["interactions reset ok", `state: ${artifact.stateRelativePath}`, `component: ${id}`].join("\n");
 }
 
+export async function promoteInteraction(projectRoot: string, input: string, id: string) {
+  const { artifact, component, source } = await loadSortableList(projectRoot, input, id);
+  const state = await readArtifactState(artifact);
+  const orderedIds = readPersistedOrder(state.interactions[id]);
+
+  if (!orderedIds) {
+    return ["interactions promote noop", `source: ${artifact.sourceRelativePath}`, `component: ${id}`, "reason: no runtime overlay"].join("\n");
+  }
+
+  validateOrderedIds(component, orderedIds);
+  const nextSource = promoteSortableListOrder(source, id, orderedIds);
+  await writeFile(artifact.sourcePath, nextSource, "utf8");
+
+  const { [id]: _removed, ...interactions } = state.interactions;
+  await writeArtifactState(projectRoot, artifact, {
+    ...state,
+    interactions
+  });
+
+  return [
+    "interactions promote ok",
+    `source: ${artifact.sourceRelativePath}`,
+    `state: ${artifact.stateRelativePath}`,
+    `component: ${id}`,
+    `orderedIds: ${orderedIds.join(", ")}`
+  ].join("\n");
+}
+
 function parseInspectArgs(args: string[]): ParsedInspectArgs {
   const positional = args.filter((arg) => arg !== "--json");
   const json = args.includes("--json");
@@ -201,6 +240,24 @@ function parseResetArgs(args: string[]): ParsedResetArgs {
   return { input, id };
 }
 
+function parsePromoteArgs(args: string[]): ParsedPromoteArgs {
+  const [input, id, ...rest] = args;
+
+  if (!input) {
+    throw new Error("interactions promote requires a .mdx file path.");
+  }
+
+  if (!id) {
+    throw new Error("interactions promote requires a component id.");
+  }
+
+  if (rest.length > 0) {
+    throw new Error(`Unexpected interactions promote argument: ${rest[0]}`);
+  }
+
+  return { input, id };
+}
+
 function parseOrderedIds(args: string[]) {
   const flagIndex = args.indexOf("--ordered-ids");
   if (flagIndex < 0) {
@@ -245,7 +302,7 @@ async function loadSortableList(projectRoot: string, input: string, id: string) 
     );
   }
 
-  return { artifact, component };
+  return { artifact, component, source };
 }
 
 function validateOrderedIds(component: SortableListSeed, orderedIds: string[]) {

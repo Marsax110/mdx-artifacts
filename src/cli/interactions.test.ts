@@ -3,7 +3,13 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { extractSortableListSeeds } from "./interaction-mdx";
-import { inspectInteraction, interactionsCommand, resetInteraction, setInteractionOrder } from "./interactions";
+import {
+  inspectInteraction,
+  interactionsCommand,
+  promoteInteraction,
+  resetInteraction,
+  setInteractionOrder
+} from "./interactions";
 
 describe("interactions inspect", () => {
   it("reads the default SortableList order from MDX when state is missing", async () => {
@@ -221,6 +227,124 @@ describe("interactions set-order and reset", () => {
   });
 });
 
+describe("interactions promote", () => {
+  it("promotes the runtime order into MDX and clears only the target overlay", async () => {
+    const projectRoot = await createProject({
+      items: [
+        `{ id: "api", title: "Stabilize API", summary: "Keep this field." }`,
+        `{ id: "docs", title: "Update docs", tags: ["docs"] }`,
+        `{ id: "adapter", title: "Adapter design" }`
+      ],
+      state: {
+        version: 1,
+        source: "artifact-docs/examples/priorities.mdx",
+        threads: [{ id: "thr_list", anchorId: "list.priorities" }],
+        interactions: {
+          "list.priorities": {
+            type: "sortable-list",
+            orderedIds: ["adapter", "api", "docs"]
+          },
+          "other.component": { selected: true }
+        }
+      }
+    });
+
+    await promoteInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
+
+    const source = await readMdx(projectRoot);
+    expect(source.indexOf(`id: "adapter"`)).toBeLessThan(source.indexOf(`id: "api"`));
+    expect(source.indexOf(`id: "api"`)).toBeLessThan(source.indexOf(`id: "docs"`));
+    expect(source).toContain(`summary: "Keep this field."`);
+    expect(source).toContain(`tags: ["docs"]`);
+
+    const state = await readState(projectRoot);
+    expect(state.interactions).toEqual({
+      "other.component": { selected: true }
+    });
+    expect(state.threads).toEqual([{ id: "thr_list", anchorId: "list.priorities" }]);
+
+    const result = await inspectInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
+    expect(result.order).toEqual({
+      source: "mdx",
+      orderedIds: ["adapter", "api", "docs"],
+      staleIds: [],
+      appendedIds: []
+    });
+  });
+
+  it("supports the promote CLI command shape", async () => {
+    const projectRoot = await createProject({
+      items: [
+        `{ id: "api", title: "Stabilize API" }`,
+        `{ id: "docs", title: "Update docs" }`
+      ],
+      state: {
+        version: 1,
+        source: "artifact-docs/examples/priorities.mdx",
+        threads: [],
+        interactions: {
+          "list.priorities": {
+            type: "sortable-list",
+            orderedIds: ["docs", "api"]
+          }
+        }
+      }
+    });
+    const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    try {
+      await interactionsCommand(projectRoot, ["promote", "artifact-docs/examples/priorities.mdx", "list.priorities"]);
+      expect(log).toHaveBeenLastCalledWith(expect.stringContaining("interactions promote ok"));
+
+      const result = await inspectInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
+      expect(result.order.orderedIds).toEqual(["docs", "api"]);
+    } finally {
+      log.mockRestore();
+    }
+  });
+
+  it("rejects stale runtime order without changing MDX", async () => {
+    const projectRoot = await createProject({
+      items: [
+        `{ id: "api", title: "Stabilize API" }`,
+        `{ id: "docs", title: "Update docs" }`
+      ],
+      state: {
+        version: 1,
+        source: "artifact-docs/examples/priorities.mdx",
+        threads: [],
+        interactions: {
+          "list.priorities": {
+            type: "sortable-list",
+            orderedIds: ["docs", "missing", "api"]
+          }
+        }
+      }
+    });
+    const originalSource = await readMdx(projectRoot);
+
+    await expect(promoteInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities")).rejects.toThrow(
+      "Invalid orderedIds for SortableList list.priorities: unknown ids: missing."
+    );
+    await expect(readMdx(projectRoot)).resolves.toBe(originalSource);
+  });
+
+  it("does not write MDX when no runtime overlay exists", async () => {
+    const projectRoot = await createProject({
+      items: [
+        `{ id: "api", title: "Stabilize API" }`,
+        `{ id: "docs", title: "Update docs" }`
+      ]
+    });
+    const originalSource = await readMdx(projectRoot);
+
+    const output = await promoteInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
+
+    expect(output).toContain("interactions promote noop");
+    await expect(readMdx(projectRoot)).resolves.toBe(originalSource);
+  });
+});
+
 async function createProject(options: { items: string[]; state?: unknown }) {
   const projectRoot = await mkdtemp(path.join(tmpdir(), "mdx-artifacts-interactions-"));
   const docsDir = path.join(projectRoot, "artifact-docs", "examples");
@@ -250,4 +374,8 @@ async function createProject(options: { items: string[]; state?: unknown }) {
 async function readState(projectRoot: string) {
   const statePath = path.join(projectRoot, "artifact-docs", "examples", "priorities.state.json");
   return JSON.parse(await readFile(statePath, "utf8"));
+}
+
+async function readMdx(projectRoot: string) {
+  return readFile(path.join(projectRoot, "artifact-docs", "examples", "priorities.mdx"), "utf8");
 }
