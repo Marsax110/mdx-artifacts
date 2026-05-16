@@ -76,6 +76,7 @@
     "react-dom": ">=18.3.0 <20"
   },
   "devDependencies": {
+    "@storybook/addon-docs": "10.3.6",
     "@storybook/react-vite": "^10.3.6",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
