@@ -1,17 +1,52 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useEffect, type ReactNode } from "react";
 import { ArtifactStateProvider } from "./ArtifactState";
-import { SortableList } from "./SortableList";
+import { SortableList, type SortableListItem } from "./SortableList";
+
+const baseItems: SortableListItem[] = [
+  {
+    id: "contentset-api",
+    title: "Stabilize ContentSet API",
+    summary: "Must land before public examples.",
+    badge: "P0",
+    tags: ["api", "docs"]
+  },
+  {
+    id: "layout-guidance",
+    title: "Clarify layout guidance",
+    summary: "Explain Frame, Columns, Section, and ContentSet boundaries.",
+    badge: "P1",
+    tags: ["protocol"]
+  },
+  {
+    id: "artifact-export",
+    title: "Verify artifact export",
+    summary: "Confirm the final artifact carries the sorted priority result.",
+    badge: "P1",
+    tags: ["export"]
+  }
+];
 
 const meta = {
   title: "Artifact Components/SortableList",
   component: SortableList,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "SortableList presents a short structured item set that users can reorder. In a local writable artifact dev server it can also expose item editing controls; static artifacts remain read-only."
+      }
+    }
+  },
   decorators: [
-    (Story) => (
-      <StorybookArtifactDaemon>
+    (Story, context) =>
+      context.parameters.artifactDaemon === "off" ? (
         <Story />
-      </StorybookArtifactDaemon>
-    )
+      ) : (
+        <StorybookArtifactDaemon>
+          <Story />
+        </StorybookArtifactDaemon>
+      )
   ]
 } satisfies Meta<typeof SortableList>;
 
@@ -20,33 +55,104 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const LaunchPriority: Story = {
+  name: "Writable preview",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Shows the local writable artifact experience. Add, edit, and delete are mocked inside Storybook and do not write the source MDX file."
+      }
+    }
+  },
   args: {
     id: "list.launch-priority",
     title: "Launch priority",
-    summary: "Drag items or use the controls to change the handoff order.",
+    summary: "Drag items, use the controls, or edit short item metadata in a local writable preview.",
+    surface: "outlined",
+    items: baseItems
+  }
+};
+
+export const ReadOnlyArtifact: Story = {
+  name: "Read-only artifact",
+  parameters: {
+    artifactDaemon: "off",
+    docs: {
+      description: {
+        story: "Shows the static artifact behavior. Reordering controls are available, but item editing controls are hidden without a writable local daemon."
+      }
+    }
+  },
+  args: {
+    id: "list.read-only",
+    title: "Read-only handoff order",
+    summary: "Static artifacts do not expose item add, edit, or delete controls.",
+    surface: "outlined",
+    items: baseItems
+  }
+};
+
+export const PlainSurface: Story = {
+  name: "Plain surface",
+  parameters: {
+    artifactDaemon: "off",
+    docs: {
+      description: {
+        story: "Uses the plain surface when the list should sit quietly inside an already framed section."
+      }
+    }
+  },
+  args: {
+    id: "list.plain-surface",
+    title: "Plain priority list",
+    summary: "A low-emphasis list for dense artifact pages.",
+    surface: "plain",
+    items: baseItems
+  }
+};
+
+export const SubtleSurface: Story = {
+  name: "Subtle surface",
+  parameters: {
+    artifactDaemon: "off",
+    docs: {
+      description: {
+        story: "Uses the subtle surface for a light visual boundary without the weight of an outlined container."
+      }
+    }
+  },
+  args: {
+    id: "list.subtle-surface",
+    title: "Subtle priority list",
+    summary: "A moderate-emphasis list for mixed narrative and workflow pages.",
+    surface: "subtle",
+    items: baseItems
+  }
+};
+
+export const DisabledItem: Story = {
+  name: "Disabled item",
+  parameters: {
+    artifactDaemon: "off",
+    docs: {
+      description: {
+        story: "Shows a locked item that stays visible but cannot be moved by drag or keyboard-style controls."
+      }
+    }
+  },
+  args: {
+    id: "list.disabled-item",
+    title: "Priority list with a locked item",
+    summary: "Disabled items remain in the list but cannot be reordered.",
     surface: "outlined",
     items: [
+      baseItems[0],
       {
-        id: "contentset-api",
-        title: "Stabilize ContentSet API",
-        summary: "Must land before public examples.",
-        badge: "P0",
-        tags: ["api", "docs"]
+        ...baseItems[1],
+        disabled: true,
+        badge: "Locked"
       },
-      {
-        id: "layout-guidance",
-        title: "Clarify layout guidance",
-        summary: "Explain Frame, Columns, Section, and ContentSet boundaries.",
-        badge: "P1",
-        tags: ["protocol"]
-      },
-      {
-        id: "artifact-export",
-        title: "Verify artifact export",
-        summary: "Confirm the final artifact carries the sorted priority result.",
-        badge: "P1",
-        tags: ["export"]
-      }
+      baseItems[2]
     ]
   }
 };
