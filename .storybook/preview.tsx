@@ -1,5 +1,6 @@
 import "../src/react/styles.css";
 
+import { Description, Primary, Stories, Title } from "@storybook/addon-docs/blocks";
 import type { Preview } from "@storybook/react-vite";
 import { useEffect, type ReactNode } from "react";
 import { CommentLayer } from "../src/react";
@@ -22,7 +23,19 @@ const preview: Preview = {
     }
   },
   parameters: {
-    layout: "padded"
+    layout: "padded",
+    docs: {
+      page: () => (
+        <>
+          <Title />
+          <Description />
+          <Primary />
+          <h2>Variants</h2>
+          <p>Review the remaining stories for visual states, surface choices, and composition boundaries.</p>
+          <Stories includePrimary={false} />
+        </>
+      )
+    }
   },
   decorators: [
     (Story, context) => (
