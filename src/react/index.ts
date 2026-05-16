@@ -83,4 +83,4 @@ export type {
 } from "./components/SortableList";
 export { componentRegistry, findComponentMeta } from "./registry";
 export type { ComponentMeta, ComponentPropMeta } from "./registry";
-export type { ArtifactKitConfig } from "../cli/types";
+export type { ArtifactKitConfig } from "../cli/config/types";

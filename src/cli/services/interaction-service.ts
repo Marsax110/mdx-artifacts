@@ -7,8 +7,8 @@ import {
   writeArtifactState,
   type ArtifactRoute,
   type ArtifactState
-} from "./artifact-state";
-import { loadConfig } from "./config";
+} from "../state/artifact-state";
+import { loadConfig } from "../config/config";
 import {
   addSortableListItem as addSortableListItemSource,
   extractSortableListSeeds,
@@ -16,8 +16,8 @@ import {
   removeSortableListItem as removeSortableListItemSource,
   updateSortableListItem as updateSortableListItemSource,
   type SortableListSeed
-} from "./interaction-mdx";
-import type { SortableListInteraction, SortableListItem } from "../react";
+} from "../mdx/interaction-mdx";
+import type { SortableListInteraction, SortableListItem } from "../../react";
 
 export type InteractionsInspectResult = {
   component: SortableListSeed;

@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { componentRegistry } from "../react/registry";
+import { componentRegistry } from "../../react/registry";
 
 export type ValidationResult = {
   errors: string[];

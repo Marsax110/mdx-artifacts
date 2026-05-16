@@ -2,7 +2,7 @@ import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
-import { extractSortableListSeeds } from "./interaction-mdx";
+import { extractSortableListSeeds } from "../mdx/interaction-mdx";
 import {
   addInteractionItem,
   inspectInteraction,

@@ -1,7 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { loadConfig } from "./config";
-import { buildArtifact, createArtifactProject } from "./vite-artifact";
+import { loadConfig } from "../config/config";
+import { buildArtifact, createArtifactProject } from "../dev-server/vite-artifact";
 
 export async function buildCommand(projectRoot: string, input: string) {
   const config = await loadConfig(projectRoot);

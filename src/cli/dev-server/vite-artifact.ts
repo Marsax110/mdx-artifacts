@@ -15,7 +15,7 @@ import {
   readArtifactState,
   writeArtifactState,
   type ArtifactRoute
-} from "./artifact-state";
+} from "../state/artifact-state";
 import {
   addInteractionItemService,
   promoteInteractionService,
@@ -23,11 +23,11 @@ import {
   resetInteractionService,
   setInteractionOrderService,
   updateInteractionItemService
-} from "./interaction-service";
-import type { ArtifactKitConfig } from "./types";
+} from "../services/interaction-service";
+import type { ArtifactKitConfig } from "../config/types";
 
 const packageCliDir = path.dirname(fileURLToPath(import.meta.url));
-const defaultStylesPath = path.resolve(packageCliDir, "../react/styles.css");
+const defaultStylesPath = path.resolve(packageCliDir, "../../react/styles.css");
 
 export type ArtifactProject = {
   artifact: ArtifactRoute;
@@ -401,8 +401,8 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 async function resolveReactEntryPath() {
-  const builtEntryPath = path.resolve(packageCliDir, "../react/index.js");
-  const sourceEntryPath = path.resolve(packageCliDir, "../react/index.ts");
+  const builtEntryPath = path.resolve(packageCliDir, "../../react/index.js");
+  const sourceEntryPath = path.resolve(packageCliDir, "../../react/index.ts");
 
   try {
     await access(builtEntryPath);

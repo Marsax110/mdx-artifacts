@@ -1,6 +1,6 @@
 import path from "node:path";
-import { loadConfig } from "./config";
-import { createArtifactProject, startDevServer } from "./vite-artifact";
+import { loadConfig } from "../config/config";
+import { createArtifactProject, startDevServer } from "../dev-server/vite-artifact";
 
 export async function devCommand(projectRoot: string, input: string) {
   const config = await loadConfig(projectRoot);

@@ -1,4 +1,4 @@
-import { componentRegistry, findComponentMeta } from "../react/registry";
+import { componentRegistry, findComponentMeta } from "../../react/registry";
 
 export function componentsCommand(input?: string, options: { json?: boolean } = {}) {
   if (input) {

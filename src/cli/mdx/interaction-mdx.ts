@@ -1,4 +1,4 @@
-import type { SortableListItem } from "../react";
+import type { SortableListItem } from "../../react";
 
 export type SortableListSeed = {
   id: string;

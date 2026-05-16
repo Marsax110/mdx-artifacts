@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 import path from "node:path";
-import { buildCommand } from "./build";
-import { componentsCommand } from "./components";
-import { devCommand } from "./dev";
-import { interactionsCommand } from "./interactions";
-import { reviewCommand } from "./review";
-import { initProject } from "./scaffold";
-import { printValidationResult, validateMdx } from "./validate";
+import { buildCommand } from "./commands/build";
+import { componentsCommand } from "./commands/components";
+import { devCommand } from "./commands/dev";
+import { interactionsCommand } from "./commands/interactions";
+import { reviewCommand } from "./commands/review";
+import { initProject } from "./commands/scaffold";
+import { printValidationResult, validateMdx } from "./commands/validate";
 
 const projectRoot = process.cwd();
 const [command, input] = process.argv.slice(2);

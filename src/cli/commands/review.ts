@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { createArtifactRoute, readArtifactState, writeArtifactState, type ArtifactRoute } from "./artifact-state";
-import { loadConfig } from "./config";
+import { loadConfig } from "../config/config";
+import { createArtifactRoute, readArtifactState, writeArtifactState, type ArtifactRoute } from "../state/artifact-state";
 
 type ReviewStateMessage = {
   id?: string;

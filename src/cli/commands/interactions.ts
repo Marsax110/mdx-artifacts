@@ -8,10 +8,10 @@ import {
   updateInteractionItemService,
   type InteractionMutationResult,
   type InteractionsInspectResult
-} from "./interaction-service";
-import type { SortableListItem } from "../react";
+} from "../services/interaction-service";
+import type { SortableListItem } from "../../react";
 
-export type { InteractionsInspectResult } from "./interaction-service";
+export type { InteractionsInspectResult } from "../services/interaction-service";
 
 type ParsedInspectArgs = {
   input: string;
