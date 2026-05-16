@@ -4,6 +4,24 @@ This document describes how the CLI source tree is organized and where new code 
 
 The CLI entry remains `src/cli/index.ts`. It wires the command parser and delegates to command modules. Most implementation code should live below one of the focused subdirectories instead of growing inside the entry file.
 
+## Maintenance Summary
+
+The current CLI structure is the result of two stabilization passes:
+
+1. The source tree was moved from a flat `src/cli` directory into command, service, MDX, state, dev-server, and config boundaries.
+2. The interaction and review commands were split so command modules stay focused on argument parsing, terminal output, and exit-code behavior, while service modules own stateful workflow operations.
+
+This means future CLI changes should start by identifying the real owner of the behavior:
+
+- command shape and terminal output belong in `commands/`
+- artifact state mutation belongs in `services/`
+- persisted MDX source changes belong in `mdx/`
+- browser-local endpoint handling belongs in `dev-server/`
+- state file format and route helpers belong in `state/`
+- config loading and config types belong in `config/`
+
+Do not put reusable workflow logic into a command module just because the first caller is a CLI command. If the same behavior could be triggered by the dev server, an agent, or a future automation entry point, place it below `services/` and keep the command as a thin wrapper.
+
 ## Directory Map
 
 ```text
@@ -85,6 +103,14 @@ src/cli/dev-server/vite-artifact.test.ts
 ```
 
 Use focused CLI tests for command behavior and lower-level tests for state, MDX, and server helpers. Avoid testing the same behavior only through the CLI entry point when a narrower module test can cover it directly.
+
+For commands backed by services, prefer this test split:
+
+- Test the service directly for state mutations, MDX mutations, validation, and result shapes.
+- Test the command for argument parsing, output formatting, and exit-code behavior.
+- Test dev-server endpoints only for request validation, response shape, and whether they call the same service path as the CLI.
+
+This keeps behavior coverage close to the owner while still protecting the public command shape.
 
 ## Future Split Points
 
