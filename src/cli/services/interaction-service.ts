@@ -16,7 +16,7 @@ import {
   removeSortableListItem as removeSortableListItemSource,
   updateSortableListItem as updateSortableListItemSource,
   type SortableListSeed
-} from "../mdx/interaction-mdx";
+} from "../mdx/sortable-list";
 import type { SortableListInteraction, SortableListItem } from "../../react";
 
 export type InteractionsInspectResult = {

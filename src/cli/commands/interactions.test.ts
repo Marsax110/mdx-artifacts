@@ -2,17 +2,17 @@ import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
-import { extractSortableListSeeds } from "../mdx/interaction-mdx";
+import { extractSortableListSeeds } from "../mdx/sortable-list";
 import {
-  addInteractionItem,
-  inspectInteraction,
-  interactionsCommand,
-  promoteInteraction,
-  removeInteractionItem,
-  resetInteraction,
-  setInteractionOrder,
-  updateInteractionItem
-} from "./interactions";
+  addInteractionItemService,
+  inspectInteractionService,
+  promoteInteractionService,
+  removeInteractionItemService,
+  resetInteractionService,
+  setInteractionOrderService,
+  updateInteractionItemService
+} from "../services/interaction-service";
+import { interactionsCommand } from "./interactions";
 
 describe("interactions inspect", () => {
   it("reads the default SortableList order from MDX when state is missing", async () => {
@@ -23,7 +23,7 @@ describe("interactions inspect", () => {
       ]
     });
 
-    const result = await inspectInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
+    const result = await inspectInteractionService(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
 
     expect(result.order).toEqual({
       source: "mdx",
@@ -58,7 +58,7 @@ describe("interactions inspect", () => {
       }
     });
 
-    const result = await inspectInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
+    const result = await inspectInteractionService(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
 
     expect(result.order).toEqual({
       source: "state",
@@ -83,7 +83,7 @@ describe("interactions inspect", () => {
     });
 
     await expect(
-      inspectInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.missing")
+      inspectInteractionService(projectRoot, "artifact-docs/examples/priorities.mdx", "list.missing")
     ).rejects.toThrow("SortableList not found: list.missing. Available SortableList ids: list.priorities.");
   });
 });
@@ -108,13 +108,13 @@ describe("interactions set-order and reset", () => {
       ]);
       expect(log).toHaveBeenLastCalledWith(expect.stringContaining("interactions set-order ok"));
 
-      let result = await inspectInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
+      let result = await inspectInteractionService(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
       expect(result.order.orderedIds).toEqual(["docs", "api"]);
 
       await interactionsCommand(projectRoot, ["reset", "artifact-docs/examples/priorities.mdx", "list.priorities"]);
       expect(log).toHaveBeenLastCalledWith(expect.stringContaining("interactions reset ok"));
 
-      result = await inspectInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
+      result = await inspectInteractionService(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
       expect(result.order.orderedIds).toEqual(["api", "docs"]);
     } finally {
       log.mockRestore();
@@ -139,7 +139,7 @@ describe("interactions set-order and reset", () => {
       }
     });
 
-    await setInteractionOrder(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities", [
+    await setInteractionOrderService(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities", [
       "adapter",
       "api",
       "docs"
@@ -166,7 +166,7 @@ describe("interactions set-order and reset", () => {
     });
     expect(typeof state.interactions["list.priorities"].updatedAt).toBe("string");
 
-    const result = await inspectInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
+    const result = await inspectInteractionService(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
     expect(result.order).toMatchObject({
       source: "state",
       orderedIds: ["adapter", "api", "docs"]
@@ -182,7 +182,7 @@ describe("interactions set-order and reset", () => {
     });
 
     await expect(
-      setInteractionOrder(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities", [
+      setInteractionOrderService(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities", [
         "api",
         "api",
         "missing"
@@ -212,7 +212,7 @@ describe("interactions set-order and reset", () => {
       }
     });
 
-    await resetInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
+    await resetInteractionService(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
 
     const state = await readState(projectRoot);
     expect(state.interactions).toEqual({
@@ -220,7 +220,7 @@ describe("interactions set-order and reset", () => {
     });
     expect(state.threads).toEqual([{ id: "thr_list", anchorId: "list.priorities" }]);
 
-    const result = await inspectInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
+    const result = await inspectInteractionService(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
     expect(result.order).toEqual({
       source: "mdx",
       orderedIds: ["api", "docs"],
@@ -252,7 +252,7 @@ describe("interactions promote", () => {
       }
     });
 
-    await promoteInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
+    await promoteInteractionService(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
 
     const source = await readMdx(projectRoot);
     expect(source.indexOf(`id: "adapter"`)).toBeLessThan(source.indexOf(`id: "api"`));
@@ -266,7 +266,7 @@ describe("interactions promote", () => {
     });
     expect(state.threads).toEqual([{ id: "thr_list", anchorId: "list.priorities" }]);
 
-    const result = await inspectInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
+    const result = await inspectInteractionService(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
     expect(result.order).toEqual({
       source: "mdx",
       orderedIds: ["adapter", "api", "docs"],
@@ -299,7 +299,7 @@ describe("interactions promote", () => {
       await interactionsCommand(projectRoot, ["promote", "artifact-docs/examples/priorities.mdx", "list.priorities"]);
       expect(log).toHaveBeenLastCalledWith(expect.stringContaining("interactions promote ok"));
 
-      const result = await inspectInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
+      const result = await inspectInteractionService(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
       expect(result.order.orderedIds).toEqual(["docs", "api"]);
     } finally {
       log.mockRestore();
@@ -326,7 +326,7 @@ describe("interactions promote", () => {
     });
     const originalSource = await readMdx(projectRoot);
 
-    await expect(promoteInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities")).rejects.toThrow(
+    await expect(promoteInteractionService(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities")).rejects.toThrow(
       "Invalid orderedIds for SortableList list.priorities: unknown ids: missing."
     );
     await expect(readMdx(projectRoot)).resolves.toBe(originalSource);
@@ -341,9 +341,9 @@ describe("interactions promote", () => {
     });
     const originalSource = await readMdx(projectRoot);
 
-    const output = await promoteInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
+    const result = await promoteInteractionService(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
 
-    expect(output).toContain("interactions promote noop");
+    expect(result).toMatchObject({ action: "promote", status: "noop" });
     await expect(readMdx(projectRoot)).resolves.toBe(originalSource);
   });
 });
@@ -368,7 +368,7 @@ describe("interactions item editing", () => {
       }
     });
 
-    await addInteractionItem(
+    await addInteractionItemService(
       projectRoot,
       "artifact-docs/examples/priorities.mdx",
       "list.priorities",
@@ -384,13 +384,13 @@ describe("interactions item editing", () => {
     let source = await readMdx(projectRoot);
     expect(source).toContain(`id: "adapter"`);
     expect(source.indexOf(`id: "api"`)).toBeLessThan(source.indexOf(`id: "adapter"`));
-    let result = await inspectInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
+    let result = await inspectInteractionService(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
     expect(result.order).toMatchObject({
       source: "state",
       orderedIds: ["docs", "api", "adapter"]
     });
 
-    await updateInteractionItem(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities", "adapter", {
+    await updateInteractionItemService(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities", "adapter", {
       title: "Design adapter contract",
       summary: "Keep this structured.",
       tags: ["adapter", "contract"]
@@ -399,14 +399,14 @@ describe("interactions item editing", () => {
     source = await readMdx(projectRoot);
     expect(source).toContain(`title: "Design adapter contract"`);
     expect(source).toContain(`summary: "Keep this structured."`);
-    result = await inspectInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
+    result = await inspectInteractionService(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
     expect(result.component.items.find((item) => item.id === "adapter")).toMatchObject({
       title: "Design adapter contract",
       summary: "Keep this structured.",
       tags: ["adapter", "contract"]
     });
 
-    await removeInteractionItem(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities", "docs");
+    await removeInteractionItemService(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities", "docs");
 
     source = await readMdx(projectRoot);
     expect(source).not.toContain(`id: "docs"`);
@@ -448,7 +448,7 @@ describe("interactions item editing", () => {
       ]);
       expect(log).toHaveBeenLastCalledWith(expect.stringContaining("interactions update-item ok"));
 
-      let result = await inspectInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
+      let result = await inspectInteractionService(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
       expect(result.component.items.find((item) => item.id === "docs")).toMatchObject({
         disabled: true,
         summary: "Document it",
@@ -464,7 +464,7 @@ describe("interactions item editing", () => {
       ]);
       expect(log).toHaveBeenLastCalledWith(expect.stringContaining("interactions remove-item ok"));
 
-      result = await inspectInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
+      result = await inspectInteractionService(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
       expect(result.component.items.map((item) => item.id)).toEqual(["api"]);
     } finally {
       log.mockRestore();
@@ -477,7 +477,7 @@ describe("interactions item editing", () => {
     });
 
     await expect(
-      addInteractionItem(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities", {
+      addInteractionItemService(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities", {
         id: "api",
         title: "Duplicate API"
       })

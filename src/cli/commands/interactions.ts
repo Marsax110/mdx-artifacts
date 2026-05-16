@@ -60,90 +60,58 @@ export async function interactionsCommand(projectRoot: string, args: string[]) {
 
   if (subcommand === "inspect") {
     const options = parseInspectArgs(args.slice(1));
-    const result = await inspectInteraction(projectRoot, options.input, options.id);
+    const result = await inspectInteractionService(projectRoot, options.input, options.id);
     console.log(options.json ? JSON.stringify(result, null, 2) : formatInspectResult(result));
     return;
   }
 
   if (subcommand === "set-order") {
     const options = parseSetOrderArgs(args.slice(1));
-    console.log(await setInteractionOrder(projectRoot, options.input, options.id, options.orderedIds));
+    const result = await setInteractionOrderService(projectRoot, options.input, options.id, options.orderedIds);
+    console.log(formatMutationResult(result));
     return;
   }
 
   if (subcommand === "reset") {
     const options = parseResetArgs(args.slice(1));
-    console.log(await resetInteraction(projectRoot, options.input, options.id));
+    const result = await resetInteractionService(projectRoot, options.input, options.id);
+    console.log(formatMutationResult(result));
     return;
   }
 
   if (subcommand === "promote") {
     const options = parsePromoteArgs(args.slice(1));
-    console.log(await promoteInteraction(projectRoot, options.input, options.id));
+    const result = await promoteInteractionService(projectRoot, options.input, options.id);
+    console.log(formatMutationResult(result));
     return;
   }
 
   if (subcommand === "add-item") {
     const options = parseAddItemArgs(args.slice(1));
-    console.log(await addInteractionItem(projectRoot, options.input, options.id, options.item, { afterId: options.afterId }));
+    const result = await addInteractionItemService(projectRoot, options.input, options.id, options.item, {
+      afterId: options.afterId
+    });
+    console.log(formatMutationResult(result));
     return;
   }
 
   if (subcommand === "remove-item") {
     const options = parseRemoveItemArgs(args.slice(1));
-    console.log(await removeInteractionItem(projectRoot, options.input, options.id, options.itemId));
+    const result = await removeInteractionItemService(projectRoot, options.input, options.id, options.itemId);
+    console.log(formatMutationResult(result));
     return;
   }
 
   if (subcommand === "update-item") {
     const options = parseUpdateItemArgs(args.slice(1));
-    console.log(await updateInteractionItem(projectRoot, options.input, options.id, options.itemId, options.patch));
+    const result = await updateInteractionItemService(projectRoot, options.input, options.id, options.itemId, options.patch);
+    console.log(formatMutationResult(result));
     return;
   }
 
   throw new Error(
     "interactions requires a subcommand. Use inspect, set-order, reset, promote, add-item, remove-item, or update-item."
   );
-}
-
-export function inspectInteraction(projectRoot: string, input: string, id: string) {
-  return inspectInteractionService(projectRoot, input, id);
-}
-
-export async function setInteractionOrder(projectRoot: string, input: string, id: string, orderedIds: string[]) {
-  return formatMutationResult(await setInteractionOrderService(projectRoot, input, id, orderedIds));
-}
-
-export async function resetInteraction(projectRoot: string, input: string, id: string) {
-  return formatMutationResult(await resetInteractionService(projectRoot, input, id));
-}
-
-export async function promoteInteraction(projectRoot: string, input: string, id: string) {
-  return formatMutationResult(await promoteInteractionService(projectRoot, input, id));
-}
-
-export async function addInteractionItem(
-  projectRoot: string,
-  input: string,
-  id: string,
-  item: SortableListItem,
-  options: { afterId?: string } = {}
-) {
-  return formatMutationResult(await addInteractionItemService(projectRoot, input, id, item, options));
-}
-
-export async function removeInteractionItem(projectRoot: string, input: string, id: string, itemId: string) {
-  return formatMutationResult(await removeInteractionItemService(projectRoot, input, id, itemId));
-}
-
-export async function updateInteractionItem(
-  projectRoot: string,
-  input: string,
-  id: string,
-  itemId: string,
-  patch: Partial<Omit<SortableListItem, "id">>
-) {
-  return formatMutationResult(await updateInteractionItemService(projectRoot, input, id, itemId, patch));
 }
 
 function parseInspectArgs(args: string[]): ParsedInspectArgs {
