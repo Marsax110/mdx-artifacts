@@ -15,3 +15,4 @@ When creating an interactive report, option comparison, temporary tool, or visua
 11. Run `artifact-kit components --json` when machine-readable component metadata is needed.
 12. Run `artifact-kit validate <file.mdx>` before build.
 13. Run `artifact-kit build <file.mdx>` to produce standalone HTML.
+14. When changing CLI internals in this package, follow `docs/cli-structure.md`.

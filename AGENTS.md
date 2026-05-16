@@ -68,6 +68,7 @@ Public component rules live in:
 - `docs/naming.md`
 - `docs/component-protocol.md`
 - `docs/component-taxonomy.md`
+- `docs/cli-structure.md`
 - `docs/testing.md`
 - `ROADMAP.md`
 
@@ -96,6 +97,8 @@ When adding or changing a component:
 7. Follow `docs/testing.md` for the minimum required test layer.
 
 The component registry is the source of truth for CLI lookup, agent usage, and future generated docs.
+
+CLI source organization lives in `docs/cli-structure.md`. When changing CLI internals, keep command orchestration, services, MDX mutation, state persistence, dev server integration, and config code in their documented directories.
 
 For component API shape:
 

@@ -297,5 +297,6 @@ Custom styles are imported after the default styles, so they can override CSS va
 - [Naming conventions](docs/naming.md)
 - [Component protocol](docs/component-protocol.md)
 - [Component taxonomy](docs/component-taxonomy.md)
+- [CLI structure](docs/cli-structure.md)
 - [Testing](docs/testing.md)
 - [Chinese README](README.zh-CN.md)
