@@ -12,7 +12,15 @@ const sampleCode = `export function createArtifact(input: ArtifactInput) {
 
 const meta = {
   title: "Content Primitives/CodeBlock",
-  component: CodeBlock
+  component: CodeBlock,
+  tags: ["autodocs"],
+  parameters: {
+    docs: {
+      description: {
+        component: "CodeBlock renders static source snippets with optional filenames, line numbers, and highlighted lines."
+      }
+    }
+  }
 } satisfies Meta<typeof CodeBlock>;
 
 export default meta;

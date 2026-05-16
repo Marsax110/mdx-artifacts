@@ -3,7 +3,15 @@ import { DiffBlock } from "./DiffBlock";
 
 const meta = {
   title: "Content Primitives/DiffBlock",
-  component: DiffBlock
+  component: DiffBlock,
+  tags: ["autodocs"],
+  parameters: {
+    docs: {
+      description: {
+        component: "DiffBlock renders compact added, removed, and context lines for code review or implementation notes."
+      }
+    }
+  }
 } satisfies Meta<typeof DiffBlock>;
 
 export default meta;

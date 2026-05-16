@@ -1,3 +1,4 @@
+import { Description, Primary, Stories, Title } from "@storybook/addon-docs/blocks";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useEffect, type ReactNode } from "react";
 import { ArtifactStateProvider } from "./ArtifactState";
@@ -30,8 +31,10 @@ const baseItems: SortableListItem[] = [
 const meta = {
   title: "Artifact Components/SortableList",
   component: SortableList,
+  tags: ["autodocs"],
   parameters: {
     docs: {
+      page: SortableListDocsPage,
       description: {
         component:
           "SortableList presents a short structured item set that users can reorder. In a local writable artifact dev server it can also expose item editing controls; static artifacts remain read-only."
@@ -53,6 +56,35 @@ const meta = {
 export default meta;
 
 type Story = StoryObj<typeof meta>;
+
+function SortableListDocsPage() {
+  return (
+    <>
+      <Title />
+      <Description />
+
+      <p>
+        Use SortableList when an artifact needs a short, structured priority list whose order matters. Keep long
+        explanation in Markdown around the component, and keep item props focused on stable ids, concise titles, and short
+        metadata.
+      </p>
+
+      <h2>Primary workflow</h2>
+      <p>
+        The primary story shows the local writable artifact experience. Storybook mocks the artifact daemon so editing
+        controls are visible without writing the source MDX file.
+      </p>
+      <Primary />
+
+      <h2>Variants</h2>
+      <p>
+        The remaining stories show the static artifact behavior, surface variants, and disabled items in a vertical docs
+        flow.
+      </p>
+      <Stories includePrimary={false} />
+    </>
+  );
+}
 
 export const LaunchPriority: Story = {
   name: "Writable preview",

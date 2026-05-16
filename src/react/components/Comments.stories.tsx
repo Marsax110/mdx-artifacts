@@ -5,7 +5,15 @@ import { ExportPanel } from "./ExportPanel";
 
 const meta = {
   title: "Artifact Components/Comments",
-  component: CommentLayer
+  component: CommentLayer,
+  tags: ["autodocs"],
+  parameters: {
+    docs: {
+      description: {
+        component: "Comments provide local review targets and feedback state around explicit artifact regions."
+      }
+    }
+  }
 } satisfies Meta<typeof CommentLayer>;
 
 export default meta;

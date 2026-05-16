@@ -3,7 +3,15 @@ import { ExportPanel } from "./ExportPanel";
 
 const meta = {
   title: "Artifact Components/ExportPanel",
-  component: ExportPanel
+  component: ExportPanel,
+  tags: ["autodocs"],
+  parameters: {
+    docs: {
+      description: {
+        component: "ExportPanel exposes artifact results as copyable Markdown and JSON handoff payloads."
+      }
+    }
+  }
 } satisfies Meta<typeof ExportPanel>;
 
 export default meta;

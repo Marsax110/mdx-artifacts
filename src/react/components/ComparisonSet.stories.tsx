@@ -4,14 +4,27 @@ import { Frame } from "./Layout";
 import { MarkdownBody } from "./MarkdownBody";
 
 const meta = {
-  title: "Artifact Components/ComparisonSet"
-} satisfies Meta;
+  title: "Artifact Components/ComparisonSet",
+  component: ComparisonSet,
+  tags: ["autodocs"],
+  parameters: {
+    docs: {
+      description: {
+        component: "ComparisonSet presents parallel options or artifact forms with explicit, stable comparison items."
+      }
+    }
+  }
+} satisfies Meta<typeof ComparisonSet>;
 
 export default meta;
 
 type Story = StoryObj<typeof meta>;
 
 export const MixedContent: Story = {
+  args: {
+    children: null,
+    title: "Compare artifact forms"
+  },
   render: () => (
       <ComparisonSet title="Compare artifact forms" columns={3}>
         <ComparisonSet.Item title="Markdown explanation" value="markdown">

@@ -11,7 +11,15 @@ const sampleCode = `export function copyOutput(value: string) {
 
 const meta = {
   title: "Semantic Primitives/AnnotatedCode",
-  component: AnnotatedCode
+  component: AnnotatedCode,
+  tags: ["autodocs"],
+  parameters: {
+    docs: {
+      description: {
+        component: "AnnotatedCode displays code with line-level review notes for artifact handoff and implementation feedback."
+      }
+    }
+  }
 } satisfies Meta<typeof AnnotatedCode>;
 
 export default meta;

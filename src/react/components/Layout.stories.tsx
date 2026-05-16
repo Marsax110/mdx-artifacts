@@ -6,7 +6,15 @@ import { Columns, Frame, Grid, SplitPane, Stack } from "./Layout";
 import { MarkdownBody } from "./MarkdownBody";
 
 const meta = {
-  title: "Layout Primitives/Overview"
+  title: "Layout Primitives/Overview",
+  tags: ["autodocs"],
+  parameters: {
+    docs: {
+      description: {
+        component: "Layout primitives arrange semantic artifact components without owning workflow meaning."
+      }
+    }
+  }
 } satisfies Meta;
 
 export default meta;

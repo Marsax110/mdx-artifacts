@@ -3,7 +3,15 @@ import { InlineText } from "./InlineText";
 
 const meta = {
   title: "Text Components/InlineText",
-  component: InlineText
+  component: InlineText,
+  tags: ["autodocs"],
+  parameters: {
+    docs: {
+      description: {
+        component: "InlineText renders controlled inline Markdown for short titles, labels, and compact prose."
+      }
+    }
+  }
 } satisfies Meta<typeof InlineText>;
 
 export default meta;

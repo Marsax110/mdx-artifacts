@@ -4,7 +4,15 @@ import { Callout } from "./Callout";
 
 const meta = {
   title: "Semantic Primitives/Callout",
-  component: Callout
+  component: Callout,
+  tags: ["autodocs"],
+  parameters: {
+    docs: {
+      description: {
+        component: "Callout highlights short contextual notes, recommendations, warnings, and risks inside an artifact document."
+      }
+    }
+  }
 } satisfies Meta<typeof Callout>;
 
 export default meta;

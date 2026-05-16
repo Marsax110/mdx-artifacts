@@ -3,7 +3,15 @@ import { ContentItem, ContentSet } from "./ContentItem";
 
 const meta = {
   title: "Artifact Components/ContentSet",
-  component: ContentSet
+  component: ContentSet,
+  tags: ["autodocs"],
+  parameters: {
+    docs: {
+      description: {
+        component: "ContentSet groups short content items into stack or grid layouts while keeping rich prose in children."
+      }
+    }
+  }
 } satisfies Meta<typeof ContentSet>;
 
 export default meta;

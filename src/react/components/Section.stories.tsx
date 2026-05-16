@@ -4,7 +4,15 @@ import { Section } from "./Section";
 
 const meta = {
   title: "Artifact Components/Section",
-  component: Section
+  component: Section,
+  tags: ["autodocs"],
+  parameters: {
+    docs: {
+      description: {
+        component: "Section wraps native MDX prose in a stable artifact region that can be targeted by comments."
+      }
+    }
+  }
 } satisfies Meta<typeof Section>;
 
 export default meta;

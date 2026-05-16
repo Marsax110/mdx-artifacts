@@ -3,7 +3,15 @@ import { MarkdownBody } from "./MarkdownBody";
 
 const meta = {
   title: "Text Components/MarkdownBody",
-  component: MarkdownBody
+  component: MarkdownBody,
+  tags: ["autodocs"],
+  parameters: {
+    docs: {
+      description: {
+        component: "MarkdownBody renders a constrained Markdown subset for readable body text inside semantic components."
+      }
+    }
+  }
 } satisfies Meta<typeof MarkdownBody>;
 
 export default meta;

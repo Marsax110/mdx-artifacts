@@ -4,7 +4,15 @@ import { SeverityBadge } from "./SeverityBadge";
 
 const meta = {
   title: "Semantic Primitives/SeverityBadge",
-  component: SeverityBadge
+  component: SeverityBadge,
+  tags: ["autodocs"],
+  parameters: {
+    docs: {
+      description: {
+        component: "SeverityBadge labels risk or review levels with a compact semantic visual treatment."
+      }
+    }
+  }
 } satisfies Meta<typeof SeverityBadge>;
 
 export default meta;
