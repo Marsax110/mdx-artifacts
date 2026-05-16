@@ -211,7 +211,7 @@ Use MarkdownBody when a component needs controlled body copy:
     stability: "stable",
     authoring: { kind: "content-block", guidance: contentBlockGuidance },
     description:
-      "Groups same-kind content items in a grid or list while preserving item-level tone, emphasis, and comment anchors.",
+      "Groups same-kind content items in a grid or stack while preserving item-level tone, emphasis, and comment anchors.",
     useWhen: ["Option groups", "Risk groups", "Recommendation sets", "Finding lists", "Comparable content cards"],
     props: [
       {
@@ -235,13 +235,18 @@ Use MarkdownBody when a component needs controlled body copy:
       },
       {
         name: "layout",
-        type: "'grid' | 'list'",
+        type: "'grid' | 'stack'",
         description: "Item arrangement. Defaults to grid."
       },
       {
         name: "columns",
         type: "2 | 3 | 4 | 5",
-        description: "Grid column count on desktop. Defaults to 3. List layout ignores this."
+        description: "Grid column count on desktop. Defaults to 3. Stack layout ignores this."
+      },
+      {
+        name: "surface",
+        type: "'plain' | 'subtle' | 'outlined'",
+        description: "Container surface treatment. Defaults to plain. Use outlined when the set should read as a bounded section."
       },
       {
         name: "tone",
@@ -303,7 +308,7 @@ Use MarkdownBody when a component needs controlled body copy:
         ]
       }
     ],
-    example: `<ContentSet id="set.authoring-paths" title="Authoring paths" layout="grid" columns={3}>
+    example: `<ContentSet id="set.authoring-paths" title="Authoring paths" layout="grid" columns={3} surface="subtle">
   <ContentSet.Item
     id="component-first"
     title="Component-first"

@@ -32,7 +32,14 @@ describe("ContentSet", () => {
   it("renders compound items with inherited tone and parent-prefixed anchors", () => {
     const html = renderToStaticMarkup(
       <CommentLayer>
-        <ContentSet id="set.authoring" title="Authoring paths" layout="grid" columns={5} tone="positive">
+        <ContentSet
+          id="set.authoring"
+          title="Authoring paths"
+          layout="grid"
+          columns={5}
+          surface="outlined"
+          tone="positive"
+        >
           <ContentSet.Item id="component-first" title="Component-first" badge="Recommended">
             <p>Use stable components for interaction.</p>
           </ContentSet.Item>
@@ -42,6 +49,7 @@ describe("ContentSet", () => {
 
     expect(html).toContain('data-anchor-id="set.authoring.component-first"');
     expect(html).toContain("--ak-content-set-columns:5");
+    expect(html).toContain("ak-content-set-surface-outlined");
     expect(html).toContain("ak-content-set-items-grid");
     expect(html).toContain("ak-content-item-tone-positive");
     expect(html).toContain("Recommended");
@@ -49,17 +57,16 @@ describe("ContentSet", () => {
 
   it("allows item tone and emphasis to override the parent defaults", () => {
     const html = renderToStaticMarkup(
-      <ContentSet title="Risks" layout="list" tone="warning" emphasis="subtle">
+      <ContentSet title="Risks" layout="stack" tone="warning" emphasis="subtle">
         <ContentSet.Item title="Blocking risk" tone="danger" emphasis="primary">
           <p>Escalate before release.</p>
         </ContentSet.Item>
       </ContentSet>
     );
 
-    expect(html).toContain("ak-content-set-items-list");
+    expect(html).toContain("ak-content-set-items-stack");
     expect(html).toContain("ak-content-item-tone-danger");
     expect(html).toContain("ak-content-item-emphasis-primary");
     expect(html).not.toContain("ak-content-item-tone-warning");
   });
 });
-

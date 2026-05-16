@@ -4,8 +4,9 @@ import { InlineText } from "./InlineText";
 
 export type ContentItemTone = "neutral" | "info" | "positive" | "warning" | "danger" | "accent";
 export type ContentItemEmphasis = "default" | "primary" | "subtle";
-export type ContentSetLayout = "grid" | "list";
+export type ContentSetLayout = "grid" | "stack";
 export type ContentSetColumns = 2 | 3 | 4 | 5;
+export type ContentSetSurface = "plain" | "subtle" | "outlined";
 
 export type ContentItemProps = {
   id?: string;
@@ -24,6 +25,7 @@ export type ContentSetProps = {
   children?: ReactNode;
   layout?: ContentSetLayout;
   columns?: ContentSetColumns;
+  surface?: ContentSetSurface;
   tone?: ContentItemTone;
   emphasis?: ContentItemEmphasis;
   className?: string;
@@ -70,6 +72,7 @@ function ContentSetRoot({
   children,
   layout = "grid",
   columns = 3,
+  surface = "plain",
   tone,
   emphasis,
   className
@@ -83,7 +86,14 @@ function ContentSetRoot({
       targetId={targetId}
       title={title}
     >
-      <section className={classNames("ak-section", "ak-content-set", `ak-content-set-${layout}`)}>
+      <section
+        className={classNames(
+          "ak-section",
+          "ak-content-set",
+          `ak-content-set-${layout}`,
+          `ak-content-set-surface-${surface}`
+        )}
+      >
         <div className="ak-section-header">
           <p className="ak-eyebrow">Content Set</p>
           <InlineText as="h2" variant="title">

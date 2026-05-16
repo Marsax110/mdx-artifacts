@@ -77,7 +77,7 @@ Use `ContentItem` when one reusable content block needs display slots, tone colo
 Use `ContentSet` when multiple same-kind content items should be displayed together:
 
 ```mdx
-<ContentSet id="set.authoring-paths" title="Authoring paths" layout="grid" columns={3}>
+<ContentSet id="set.authoring-paths" title="Authoring paths" layout="grid" columns={3} surface="subtle">
   <ContentSet.Item
     id="component-first"
     title="Component-first"
@@ -97,10 +97,12 @@ Use `ContentSet` when multiple same-kind content items should be displayed toget
 
 `tone` and `emphasis` are separate:
 
+- `surface` controls the `ContentSet` container treatment: `plain`, `subtle`, or `outlined`.
+- `surface` is not semantic color. Use it to decide whether the group should read as document flow, a soft section, or a bounded section.
 - `tone` controls semantic color: `neutral`, `info`, `positive`, `warning`, `danger`, or `accent`.
 - `emphasis` controls structural weight: `default`, `primary`, or `subtle`.
 - `badge` is visible text only. It does not choose color by itself.
-- `subtle` may mute the badge and summary, but body children should remain readable.
+- `emphasis="subtle"` may mute the badge and summary, but body children should remain readable.
 
 `ContentSet` is not a workspace or large layout container. Use it for one group of same-kind items. Use layout primitives such as `SplitPane` or `Columns` for multi-region artifacts.
 
@@ -260,7 +262,7 @@ Content rendering primitives may grow beyond text and Markdown. Future candidate
 
 - Use for a group of same-kind content items.
 - Use `ContentSet.Item` children.
-- Use `layout="grid" | "list"` and `columns={2 | 3 | 4 | 5}` for arrangement.
+- Use `layout="grid" | "stack"` and `columns={2 | 3 | 4 | 5}` for arrangement.
 - Use `tone` for semantic color and `emphasis` for structural weight.
 
 `ExportPanel`

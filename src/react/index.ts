@@ -27,6 +27,7 @@ export type {
   ContentSetColumns,
   ContentSetItemProps,
   ContentSetLayout,
+  ContentSetSurface,
   ContentSetProps
 } from "./components/ContentItem";
 export { CodeBlock } from "./components/CodeBlock";

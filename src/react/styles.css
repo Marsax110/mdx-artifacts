@@ -510,11 +510,26 @@ body {
   gap: 14px;
 }
 
+.ak-content-set-surface-subtle,
+.ak-content-set-surface-outlined {
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.ak-content-set-surface-subtle {
+  background: var(--ak-surface-subtle);
+}
+
+.ak-content-set-surface-outlined {
+  border: 1px solid var(--ak-border);
+  background: var(--ak-surface);
+}
+
 .ak-content-set-items-grid {
   grid-template-columns: repeat(var(--ak-content-set-columns), minmax(0, 1fr));
 }
 
-.ak-content-set-items-list {
+.ak-content-set-items-stack {
   grid-template-columns: minmax(0, 1fr);
 }
 

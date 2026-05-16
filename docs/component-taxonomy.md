@@ -164,7 +164,7 @@ Workflow recipes represent artifact-level jobs. They are usually better expresse
 
 Already available:
 
-- `ContentSet`: group same-kind content items in a grid or list.
+- `ContentSet`: group same-kind content items in a grid or stack, with optional container surface treatment.
 - `ContentItem`: render a standalone readable content card.
 
 Candidate workflow recipes:

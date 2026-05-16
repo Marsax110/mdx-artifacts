@@ -15,10 +15,11 @@ export const Grid: Story = {
     id: "set.authoring-paths",
     title: "Authoring paths",
     layout: "grid",
-    columns: 3
+    columns: 3,
+    surface: "subtle"
   },
   render: () => (
-    <ContentSet id="set.authoring-paths" title="Authoring paths" layout="grid" columns={3}>
+    <ContentSet id="set.authoring-paths" title="Authoring paths" layout="grid" columns={3} surface="subtle">
       <ContentSet.Item
         id="component-first"
         title="Component-first"
@@ -50,14 +51,15 @@ export const Grid: Story = {
   )
 };
 
-export const List: Story = {
+export const Stack: Story = {
   args: {
     id: "set.release-risks",
     title: "Release risks",
-    layout: "list"
+    layout: "stack",
+    surface: "outlined"
   },
   render: () => (
-    <ContentSet id="set.release-risks" title="Release risks" layout="list" tone="warning">
+    <ContentSet id="set.release-risks" title="Release risks" layout="stack" surface="outlined" tone="warning">
       <ContentSet.Item id="api-drift" title="API drift" badge="Watch" summary="Docs and examples must match the exported API.">
         <p>Run validate and component metadata checks before publishing.</p>
       </ContentSet.Item>
