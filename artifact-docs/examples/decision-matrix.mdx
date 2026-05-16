@@ -1,15 +1,19 @@
-import { DecisionMatrix, ExportPanel, OptionGrid } from "mdx-artifacts/react";
+import { ContentSet, ExportPanel } from "mdx-artifacts/react";
 
-# Artifact Kit Stage One Decision
+# Artifact Kit Stage One Content Set
 
-<DecisionMatrix
-  id="decision.stage-one"
+<ContentSet
+  id="set.stage-one"
   title="Should stage one focus on a **Vite single HTML artifact** instead of starting with an Astro docs site?"
+  layout="grid"
+  columns={3}
 >
-  <DecisionMatrix.Option
+  <ContentSet.Item
     id="vite"
     title="**Vite** single HTML artifact"
     badge="Recommended"
+    tone="positive"
+    emphasis="primary"
     summary="Validate the shortest `MDX -> HTML` loop first."
   >
     ### Tradeoffs
@@ -19,11 +23,12 @@ import { DecisionMatrix, ExportPanel, OptionGrid } from "mdx-artifacts/react";
     - Fits one-off tool artifacts
     - No docs-site navigation yet
     - Weaker long-term archive experience
-  </DecisionMatrix.Option>
-  <DecisionMatrix.Option
+  </ContentSet.Item>
+  <ContentSet.Item
     id="astro"
     title="Astro docs site"
     badge="Later"
+    tone="info"
     summary="Turn the artifact-docs tree into a structured static docs site."
   >
     ### Tradeoffs
@@ -33,11 +38,13 @@ import { DecisionMatrix, ExportPanel, OptionGrid } from "mdx-artifacts/react";
     - Good for archives
     - Too heavy for stage one
     - Mixes component protocol work with docs-site engineering
-  </DecisionMatrix.Option>
-  <DecisionMatrix.Option
+  </ContentSet.Item>
+  <ContentSet.Item
     id="raw-html"
     title="Raw HTML"
     badge="Fallback"
+    tone="warning"
+    emphasis="subtle"
     summary="Let agents generate complete HTML directly."
   >
     ### Tradeoffs
@@ -47,45 +54,50 @@ import { DecisionMatrix, ExportPanel, OptionGrid } from "mdx-artifacts/react";
     - Duplicated code
     - Style drift
     - ~~Reusable~~ export behavior is hard to reuse
-  </DecisionMatrix.Option>
-</DecisionMatrix>
+  </ContentSet.Item>
+</ContentSet>
 
-<OptionGrid
-  id="option.first-components"
+<ContentSet
+  id="set.first-components"
   title="First component scope"
+  layout="grid"
+  columns={3}
 >
-  <OptionGrid.Item
-    id="decision-matrix"
-    title="DecisionMatrix"
+  <ContentSet.Item
+    id="content-set"
+    title="ContentSet"
     badge="Core"
-    summary="Compare options."
+    tone="accent"
+    emphasis="primary"
+    summary="Group reusable content items."
   >
-    Use for explicit tradeoff decisions and recommendations.
+    Use for comparable options, recommendations, risks, and findings.
 
-    - Stable **decision** structure
-    - Does not own complex interaction
-  </OptionGrid.Item>
-  <OptionGrid.Item
-    id="option-grid"
-    title="OptionGrid"
-    summary="Show alternatives side by side."
+    - Stable item slots
+    - Tone and emphasis styling
+  </ContentSet.Item>
+  <ContentSet.Item
+    id="content-item"
+    title="ContentItem"
+    summary="Render a standalone content card."
   >
-    Use for scannable component candidates or prototype directions.
+    Use when a single reusable content block is enough.
 
     - Easy to scan
-    - Can add selection later
-  </OptionGrid.Item>
-  <OptionGrid.Item
+    - Keeps Markdown body content readable
+  </ContentSet.Item>
+  <ContentSet.Item
     id="export-panel"
     title="ExportPanel"
+    tone="info"
     summary="Return conclusions or edits to the workflow."
   >
     Use when the artifact needs to hand structured results back to the agent.
 
     - Copy-only in v1
     - Can add file download later
-  </OptionGrid.Item>
-</OptionGrid>
+  </ContentSet.Item>
+</ContentSet>
 
 <ExportPanel
   title="Export recommendation"

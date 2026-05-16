@@ -37,8 +37,8 @@ HTML artifact 的价值不在于替代 Markdown，而在于把一些阅读、比
 
 - `InlineText`：单行短文本，支持受控 inline Markdown。
 - `MarkdownBody`：组件内部正文，支持受控 block Markdown。
-- `DecisionMatrix`：方案比较。
-- `OptionGrid`：多个方案并排展示。
+- `ContentItem`：独立可读内容卡片。
+- `ContentSet`：带 tone 和 emphasis 的成组内容卡片。
 - `ExportPanel`：导出 Markdown / JSON。
 
 后续组件：

@@ -8,8 +8,8 @@ Use `PascalCase`.
 
 Component names should describe the artifact workflow:
 
-- `DecisionMatrix`
-- `OptionGrid`
+- `ContentSet`
+- `ContentItem`
 - `ExportPanel`
 - `InlineText`
 - `MarkdownBody`

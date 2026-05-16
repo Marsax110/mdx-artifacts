@@ -805,9 +805,9 @@ Use MarkdownBody when a component needs controlled body copy:
     example: `// Usually provided by the artifact shell.
 <CommentLayer>
   <CommentableBlock blockId="decision" title="Decision">
-    <DecisionMatrix id="decision.path" title="Choose a path">
-      <DecisionMatrix.Option id="path-a" title="Path A">Readable option body.</DecisionMatrix.Option>
-    </DecisionMatrix>
+    <ContentSet id="set.path" title="Choose a path" columns={2}>
+      <ContentSet.Item id="path-a" title="Path A">Readable option body.</ContentSet.Item>
+    </ContentSet>
   </CommentableBlock>
   <CommentExport />
 </CommentLayer>`
@@ -885,11 +885,11 @@ This section can contain native MDX paragraphs, lists, and code fences.
     example: `<CommentableBlock
   blockId="component-menu"
   title="Component menu"
-  description="Feedback on the option grid"
+  description="Feedback on the content set"
 >
-  <OptionGrid id="option.components" title="Components">
-    <OptionGrid.Item id="export-panel" title="ExportPanel">Readable item body.</OptionGrid.Item>
-  </OptionGrid>
+  <ContentSet id="set.components" title="Components">
+    <ContentSet.Item id="export-panel" title="ExportPanel">Readable item body.</ContentSet.Item>
+  </ContentSet>
 </CommentableBlock>`
   },
   {
@@ -997,93 +997,6 @@ This section can contain native MDX paragraphs, lists, and code fences.
 />`
   },
   {
-    name: "DecisionMatrix",
-    category: "artifact",
-    stability: "stable",
-    authoring: { kind: "content-block", guidance: contentBlockGuidance },
-    description:
-      "Compares decision options with stable display slots: title, badge, summary, and Markdown-rich option bodies.",
-    useWhen: ["Architecture decisions", "Product tradeoffs", "Implementation planning", "Open-source roadmap"],
-    props: [
-      {
-        name: "id",
-        type: "string",
-        contentType: "plainText",
-        description: "Optional stable anchor id for comments and state. Prefer short semantic ids such as decision.comment-targets."
-      },
-      {
-        name: "title",
-        type: "string",
-        contentType: "inlineMarkdown",
-        required: true,
-        description: "Visible decision title or question."
-      },
-      {
-        name: "children",
-        type: "ReactNode",
-        required: true,
-        description:
-          "Preferred option content. Use `DecisionMatrix.Option` children when options need readable explanations, lists, or local prose. Do not encode long lists in props."
-      }
-    ],
-    types: [
-      {
-        name: "DecisionMatrix.Option",
-        description: "Compound child used inside DecisionMatrix for Markdown-native option bodies.",
-        fields: [
-          {
-            name: "id",
-            type: "string",
-            contentType: "plainText",
-            description: "Optional stable child anchor id. When the parent has id, child anchors become parentId.optionId."
-          },
-          {
-            name: "title",
-            type: "string",
-            contentType: "inlineMarkdown",
-            required: true,
-            description: "Option title."
-          },
-          {
-            name: "badge",
-            type: "string",
-            contentType: "plainText",
-            description: "Optional short display badge shown beside the title, such as Recommended, Later, or Fallback."
-          },
-          {
-            name: "summary",
-            type: "string",
-            contentType: "inlineMarkdown",
-            description: "Short one-line option summary. Use children for longer explanations, pros, cons, and lists."
-          },
-          {
-            name: "children",
-            type: "ReactNode",
-            contentType: "blockMarkdown",
-            description: "Markdown-rich option body. Use headings and lists here for pros, cons, risks, or detailed rationale."
-          }
-        ]
-      }
-    ],
-    example: `<DecisionMatrix
-  id="decision.stage-one"
-  title="Should the first stage focus on a Vite single HTML artifact?"
->
-  <DecisionMatrix.Option
-    id="vite"
-    title="Vite single HTML artifact"
-    badge="Recommended"
-    summary="Validate the shortest MDX-to-interactive-HTML loop first."
-  >
-    ### Tradeoffs
-
-    - Short feedback loop
-    - Direct component debugging
-    - No docs-site navigation yet
-  </DecisionMatrix.Option>
-</DecisionMatrix>`
-  },
-  {
     name: "ComparisonSet",
     category: "artifact",
     stability: "stable",
@@ -1158,88 +1071,6 @@ This section can contain native MDX paragraphs, lists, and code fences.
     <Frame surface="subtle">Code renderer or local component</Frame>
   </ComparisonSet.Item>
 </ComparisonSet>`
-  },
-  {
-    name: "OptionGrid",
-    category: "artifact",
-    stability: "stable",
-    authoring: { kind: "content-block", guidance: contentBlockGuidance },
-    description:
-      "Displays options or component candidates with stable display slots: title, badge, summary, and Markdown-rich item bodies.",
-    useWhen: ["Option exploration", "Component scope", "Prototype comparison"],
-    props: [
-      {
-        name: "id",
-        type: "string",
-        contentType: "plainText",
-        description: "Optional stable anchor id for comments and state. Prefer short semantic ids such as option.comment-flow."
-      },
-      {
-        name: "title",
-        type: "string",
-        contentType: "inlineMarkdown",
-        required: true,
-        description: "Grid title."
-      },
-      {
-        name: "children",
-        type: "ReactNode",
-        required: true,
-        description:
-          "Preferred item content. Use `OptionGrid.Item` children when options need readable explanations, lists, or local prose. Do not encode long lists in props."
-      }
-    ],
-    types: [
-      {
-        name: "OptionGrid.Item",
-        description: "Compound child used inside OptionGrid for Markdown-native item bodies.",
-        fields: [
-          {
-            name: "id",
-            type: "string",
-            contentType: "plainText",
-            description: "Optional stable child anchor id. When the parent has id, child anchors become parentId.itemId."
-          },
-          {
-            name: "title",
-            type: "string",
-            contentType: "inlineMarkdown",
-            required: true,
-            description: "Option title."
-          },
-          {
-            name: "badge",
-            type: "string",
-            contentType: "plainText",
-            description: "Optional short display badge shown beside the title."
-          },
-          {
-            name: "summary",
-            type: "string",
-            contentType: "inlineMarkdown",
-            description: "Short one-line item summary. Use children for longer explanations and lists."
-          },
-          {
-            name: "children",
-            type: "ReactNode",
-            contentType: "blockMarkdown",
-            description: "Markdown-rich item body. Use paragraphs, headings, and lists for detailed rationale."
-          }
-        ]
-      }
-    ],
-    example: `<OptionGrid id="option.first-components" title="First component scope">
-  <OptionGrid.Item
-    id="export"
-    title="ExportPanel"
-    summary="Return human edits to the workflow."
-  >
-    Use when an artifact needs a clear handoff path.
-
-    - Copy-only in v1
-    - Can add downloads later
-  </OptionGrid.Item>
-</OptionGrid>`
   },
   {
     name: "ExportPanel",

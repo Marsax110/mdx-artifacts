@@ -39,25 +39,28 @@ export default config;
 
   await writeFile(
     path.join(docsDir, "hello.mdx"),
-    `import { DecisionMatrix, ExportPanel } from "mdx-artifacts/react";
+    `import { ContentSet, ExportPanel } from "mdx-artifacts/react";
 
 # Hello Artifact
 
-<DecisionMatrix
-  id="decision.initialized"
+<ContentSet
+  id="set.initialized"
   title="Has Artifact Kit been initialized?"
+  columns={2}
 >
-  <DecisionMatrix.Option
+  <ContentSet.Item
     id="initialized"
     title="Initialized"
     badge="Ready"
+    tone="positive"
+    emphasis="primary"
     summary="Ready to continue generating artifacts."
   >
     - MDX source exists
     - Export panel exists
     - Real content still needs to be added
-  </DecisionMatrix.Option>
-</DecisionMatrix>
+  </ContentSet.Item>
+</ContentSet>
 
 <ExportPanel
   value={{

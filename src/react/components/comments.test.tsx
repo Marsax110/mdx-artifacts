@@ -15,10 +15,9 @@ import { AnnotatedCode } from "./AnnotatedCode";
 import { Callout } from "./Callout";
 import { CodeBlock } from "./CodeBlock";
 import { ComparisonSet } from "./ComparisonSet";
-import { DecisionMatrix } from "./DecisionMatrix";
+import { ContentSet } from "./ContentItem";
 import { DiffBlock } from "./DiffBlock";
 import { ExportPanel } from "./ExportPanel";
-import { OptionGrid } from "./OptionGrid";
 
 describe("Comment components", () => {
   it("renders a commentable block with a stable block target", () => {
@@ -47,39 +46,30 @@ describe("Comment components", () => {
     expect(html).not.toContain("ak-comment-target-block");
   });
 
-  it("adds fine-grained targets to decision and option items inside a layer", () => {
+  it("adds fine-grained targets to content set items inside a layer", () => {
     const html = renderToStaticMarkup(
       <CommentLayer>
-        <DecisionMatrix title="Comment target scope">
-          <DecisionMatrix.Option title="Explicit blocks" />
-        </DecisionMatrix>
-        <OptionGrid title="Comment workflow pieces">
-          <OptionGrid.Item title="CommentLayer" />
-        </OptionGrid>
+        <ContentSet title="Comment target scope">
+          <ContentSet.Item title="Explicit blocks" />
+        </ContentSet>
       </CommentLayer>
     );
 
-    expect(html).toContain('data-comment-target-id="decision:comment-target-scope:explicit-blocks"');
-    expect(html).toContain('data-comment-target-id="option:comment-workflow-pieces:commentlayer"');
+    expect(html).toContain('data-comment-target-id="content-set:comment-target-scope:explicit-blocks"');
   });
 
   it("uses explicit ids for shorter anchor targets when provided", () => {
     const html = renderToStaticMarkup(
       <CommentLayer>
-        <DecisionMatrix id="decision.comment-targets" title="Comment target scope">
-          <DecisionMatrix.Option id="explicit" title="Explicit blocks" />
-        </DecisionMatrix>
-        <OptionGrid id="option.comment-flow" title="Comment workflow pieces">
-          <OptionGrid.Item id="layer" title="CommentLayer" />
-        </OptionGrid>
+        <ContentSet id="set.comment-targets" title="Comment target scope">
+          <ContentSet.Item id="explicit" title="Explicit blocks" />
+        </ContentSet>
       </CommentLayer>
     );
 
-    expect(html).toContain('data-comment-target-id="decision.comment-targets"');
-    expect(html).toContain('data-anchor-id="decision.comment-targets"');
-    expect(html).toContain('data-comment-target-id="decision.comment-targets.explicit"');
-    expect(html).toContain('data-comment-target-id="option.comment-flow"');
-    expect(html).toContain('data-comment-target-id="option.comment-flow.layer"');
+    expect(html).toContain('data-comment-target-id="set.comment-targets"');
+    expect(html).toContain('data-anchor-id="set.comment-targets"');
+    expect(html).toContain('data-comment-target-id="set.comment-targets.explicit"');
   });
 
   it("uses explicit ids for semantic, code, diff, and comparison targets when provided", () => {

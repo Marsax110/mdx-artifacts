@@ -1,7 +1,7 @@
 import {
   Columns,
   ComparisonSet,
-  DecisionMatrix,
+  ContentSet,
   ExportPanel,
   Frame,
   Grid,
@@ -20,41 +20,47 @@ import {
         A composed artifact using **layout primitives** and text components
       </InlineText>
       <MarkdownBody>
-        {`This example shows how \`Stack\`, \`Columns\`, \`Grid\`, \`SplitPane\`, and \`Frame\` can arrange existing semantic components without replacing them.
+        {`This example shows how \`Stack\`, \`Columns\`, \`Grid\`, \`SplitPane\`, and \`Frame\` can arrange existing content components without replacing them.
 
-The layout components control placement and surface. Components such as \`DecisionMatrix\`, \`ComparisonSet\`, and \`ExportPanel\` still own the artifact meaning.`}
+The layout components control placement and surface. Components such as \`ContentSet\`, \`ComparisonSet\`, and \`ExportPanel\` still own reusable content structure and handoff behavior.`}
       </MarkdownBody>
     </Stack>
   </Frame>
 
   <SplitPane ratio="3:1" gap="lg">
-    <DecisionMatrix
-      id="decision.layout-authoring"
+    <ContentSet
+      id="set.layout-authoring"
       title="Should layout primitives become the default authoring path?"
+      layout="grid"
+      columns={2}
     >
-      <DecisionMatrix.Option
+      <ContentSet.Item
         id="semantic-first"
         title="Semantic-first authoring"
         badge="Recommended"
+        tone="positive"
+        emphasis="primary"
         summary="Agents choose task-oriented components first, then use layout only when composition needs it."
       >
         - Stable protocol
         - Less ad hoc JSX
         - Better validation path
         - Less free-form than raw HTML
-      </DecisionMatrix.Option>
-      <DecisionMatrix.Option
+      </ContentSet.Item>
+      <ContentSet.Item
         id="layout-first"
         title="Layout-first authoring"
         badge="Advanced"
+        tone="warning"
+        emphasis="subtle"
         summary="Agents assemble artifacts from generic layout blocks and arbitrary children."
       >
         - Maximum flexibility
         - Easy to recreate raw HTML
         - Harder to query through CLI
         - Harder to keep consistent
-      </DecisionMatrix.Option>
-    </DecisionMatrix>
+      </ContentSet.Item>
+    </ContentSet>
 
     <Frame surface="subtle">
       <Stack gap="sm">

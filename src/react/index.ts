@@ -48,8 +48,6 @@ export type {
   CommentLayerProps,
   CommentTargetProps
 } from "./components/Comments";
-export { DecisionMatrix } from "./components/DecisionMatrix";
-export type { DecisionMatrixOptionProps, DecisionMatrixProps } from "./components/DecisionMatrix";
 export { DiffBlock } from "./components/DiffBlock";
 export type { DiffBlockProps, DiffLine, DiffLineType } from "./components/DiffBlock";
 export { ExportPanel } from "./components/ExportPanel";
@@ -71,8 +69,6 @@ export type {
 } from "./components/Layout";
 export { MarkdownBody } from "./components/MarkdownBody";
 export type { MarkdownBodyProps, MarkdownBodyVariant } from "./components/MarkdownBody";
-export { OptionGrid } from "./components/OptionGrid";
-export type { OptionGridItemProps, OptionGridProps } from "./components/OptionGrid";
 export { Section } from "./components/Section";
 export type { SectionProps } from "./components/Section";
 export { SeverityBadge } from "./components/SeverityBadge";

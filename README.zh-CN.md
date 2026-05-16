@@ -5,16 +5,19 @@
 目标不是让模型每次生成一整份裸 HTML，也不是让模型在 MDX 里写一个 React app DSL。目标是让源文件保持 Markdown-native，同时用稳定的高阶组件表达语义岛：
 
 ```mdx
-import { DecisionMatrix, ExportPanel } from "mdx-artifacts/react";
+import { ContentSet, ExportPanel } from "mdx-artifacts/react";
 
-<DecisionMatrix
-  id="decision.stage-one"
+<ContentSet
+  id="set.stage-one"
   title="是否先用 Vite 跑通单 HTML artifact？"
+  columns={3}
 >
-  <DecisionMatrix.Option
+  <ContentSet.Item
     id="vite"
     title="先做 Vite 单页"
     badge="第一阶段推荐"
+    tone="positive"
+    emphasis="primary"
     summary="先验证从 Markdown-native source 到交互式 HTML 的最短闭环。"
   >
     ### 取舍
@@ -22,8 +25,8 @@ import { DecisionMatrix, ExportPanel } from "mdx-artifacts/react";
     - 闭环短
     - 更贴近交互工具
     - 暂时没有文档站导航
-  </DecisionMatrix.Option>
-</DecisionMatrix>
+  </ContentSet.Item>
+</ContentSet>
 
 <ExportPanel
   title="导出决策"
@@ -49,6 +52,34 @@ MDX Artifacts 是一个 Markdown-native 的 artifact system。
 - 不要把 artifact source 写成 React 应用源码。如果一个 artifact 需要任意状态 UI、项目级 CSS 或应用级交互，应使用专门的 web artifact builder 或项目本地组件。
 
 因此，新组件 API 默认应该是：人类可读内容 children-first，机器可读配置 props-first。
+
+## 0.2.0 破坏性变更
+
+`DecisionMatrix` 和 `OptionGrid` 已从公开 API 中移除。成组内容卡片请使用 `ContentSet`，独立内容卡片请使用 `ContentItem`。
+
+这次变更的目标是统一内容写作模型：解释、理由、优缺点、风险和取舍这类可读正文，应该放在 MDX children 中，而不是继续塞进对象数组 props。
+
+推荐写法：
+
+```mdx
+<ContentSet id="set.path" title="选择实现路径" columns={3}>
+  <ContentSet.Item
+    id="path-a"
+    title="路径 A"
+    badge="推荐"
+    tone="positive"
+    emphasis="primary"
+    summary="适合作为第一步。"
+  >
+    ### 取舍
+
+    - MDX source 更容易阅读
+    - 长解释可以继续保留 Markdown 结构
+  </ContentSet.Item>
+</ContentSet>
+```
+
+不要再使用 `DecisionMatrix`、`DecisionMatrix.Option`、`OptionGrid`、`OptionGrid.Item` 或 `options={[...]}`。`validate` 命令会对这些已移除组件，以及 `question`、`name`、`intent`、`pros`、`cons`、`risks`、`confidence`、`verdict`、`tradeoffs` 等旧 props 给出迁移 warning。
 
 ## 当前阶段
 

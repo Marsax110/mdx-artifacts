@@ -53,7 +53,7 @@ describe("componentsCommand", () => {
     const output: string[] = [];
     vi.spyOn(console, "log").mockImplementation((value = "") => output.push(String(value)));
 
-    componentsCommand("DecisionMatrix");
+    componentsCommand("ContentSet");
 
     const text = output.join("\n");
     expect(text).toContain("Authoring: content-block");

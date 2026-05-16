@@ -75,8 +75,8 @@ Local phase execution notes belong in `docs/local/*.local.md`. They are ignored 
 
 Good names:
 
-- `DecisionMatrix`
-- `OptionGrid`
+- `ContentSet`
+- `ContentItem`
 - `ExportPanel`
 
 Avoid primitive or vague names:
@@ -113,7 +113,7 @@ Layout primitives such as `Stack`, `Columns`, `Grid`, `SplitPane`, and `Frame` a
 
 Use semantic or workflow components first. Use layout primitives only when an artifact needs a custom arrangement that cannot be expressed cleanly with an existing semantic component.
 
-Layout primitives may control spacing, ratios, collapse behavior, and surface treatment. They must not be used to recreate domain semantics that belong in components such as `DecisionMatrix`, `ExportPanel`, or future code review components.
+Layout primitives may control spacing, ratios, collapse behavior, and surface treatment. They must not be used to recreate content or handoff structure that belongs in components such as `ContentSet`, `ExportPanel`, or future code review components.
 
 ## Styling Policy
 

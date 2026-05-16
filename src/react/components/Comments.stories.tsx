@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { CommentLayer } from "./Comments";
-import { DecisionMatrix } from "./DecisionMatrix";
+import { ContentSet } from "./ContentItem";
 import { ExportPanel } from "./ExportPanel";
-import { OptionGrid } from "./OptionGrid";
 
 const meta = {
   title: "Artifact Components/Comments",
@@ -19,14 +18,17 @@ export const BlockComments: Story = {
   },
   render: () => (
     <>
-      <DecisionMatrix
-        id="decision.comment-targets"
+      <ContentSet
+        id="set.comment-targets"
         title="Should comments target explicit blocks?"
+        columns={2}
       >
-        <DecisionMatrix.Option
+        <ContentSet.Item
           id="explicit-blocks"
           title="Explicit blocks"
           badge="Recommended"
+          tone="positive"
+          emphasis="primary"
           summary="Use stable block targets for prose and components."
         >
           <ul>
@@ -34,11 +36,13 @@ export const BlockComments: Story = {
             <li>Clear export context</li>
             <li>Authors must wrap reviewable regions</li>
           </ul>
-        </DecisionMatrix.Option>
-        <DecisionMatrix.Option
+        </ContentSet.Item>
+        <ContentSet.Item
           id="implicit-components"
           title="Implicit component comments"
           badge="Deferred"
+          tone="warning"
+          emphasis="subtle"
           summary="Let components create targets without explicit author wrappers."
         >
           <ul>
@@ -46,21 +50,23 @@ export const BlockComments: Story = {
             <li>Harder to comment on prose</li>
             <li>Harder to export stable targets</li>
           </ul>
-        </DecisionMatrix.Option>
-      </DecisionMatrix>
+        </ContentSet.Item>
+      </ContentSet>
 
-      <OptionGrid
-        id="option.comment-workflow"
+      <ContentSet
+        id="set.comment-workflow"
         title="Comment workflow components"
+        columns={3}
       >
-        <OptionGrid.Item id="comment-layer" title="CommentLayer" summary="Own shared local comment state." />
-        <OptionGrid.Item id="commentable-block" title="CommentableBlock" summary="Mark one stable review target." />
-        <OptionGrid.Item
+        <ContentSet.Item id="comment-layer" title="CommentLayer" tone="info" summary="Own shared local comment state." />
+        <ContentSet.Item id="commentable-block" title="CommentableBlock" tone="accent" summary="Mark one stable review target." />
+        <ContentSet.Item
           id="export-panel"
           title="ExportPanel"
+          tone="neutral"
           summary="Copy the result and current comments back to an agent."
         />
-      </OptionGrid>
+      </ContentSet>
 
       <ExportPanel
         title="Export artifact feedback"

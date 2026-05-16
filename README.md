@@ -7,16 +7,19 @@ MDX Artifacts lets an agent write structured MDX with reusable React components,
 The goal is not to make agents generate raw HTML from scratch or write a React app DSL inside MDX. The goal is to keep the source Markdown-native while using stable, high-level components as semantic islands:
 
 ```mdx
-import { DecisionMatrix, ExportPanel } from "mdx-artifacts/react";
+import { ContentSet, ExportPanel } from "mdx-artifacts/react";
 
-<DecisionMatrix
-  id="decision.stage-one"
+<ContentSet
+  id="set.stage-one"
   title="Should stage one focus on a Vite single HTML artifact?"
+  columns={3}
 >
-  <DecisionMatrix.Option
+  <ContentSet.Item
     id="vite"
     title="Vite single HTML artifact"
     badge="Recommended"
+    tone="positive"
+    emphasis="primary"
     summary="Validate the shortest Markdown-native source to interactive HTML loop first."
   >
     ### Tradeoffs
@@ -24,8 +27,8 @@ import { DecisionMatrix, ExportPanel } from "mdx-artifacts/react";
     - Short feedback loop
     - Fits one-off tool artifacts
     - No docs-site navigation yet
-  </DecisionMatrix.Option>
-</DecisionMatrix>
+  </ContentSet.Item>
+</ContentSet>
 
 <ExportPanel
   title="Export decision"
@@ -52,24 +55,33 @@ Use this product boundary when making component and authoring decisions:
 
 This means new component APIs should usually be children-first for human-readable content and props-first for machine-readable configuration.
 
-## Authoring Notes for 0.1.3
+## 0.2.0 Breaking Changes
 
-`DecisionMatrix` and `OptionGrid` now require compound children for options and items.
+`DecisionMatrix` and `OptionGrid` have been removed from the public API. Use `ContentSet` for grouped content cards and `ContentItem` for standalone content cards.
+
+This release makes the content authoring model more consistent: readable explanation, rationale, pros, cons, risks, and tradeoffs should live in MDX children instead of object-array props.
 
 Use:
 
 ```mdx
-<DecisionMatrix id="decision.path" title="Choose the implementation path">
-  <DecisionMatrix.Option id="path-a" title="Path A" badge="Recommended" summary="Best first step.">
+<ContentSet id="set.path" title="Choose the implementation path" columns={3}>
+  <ContentSet.Item
+    id="path-a"
+    title="Path A"
+    badge="Recommended"
+    tone="positive"
+    emphasis="primary"
+    summary="Best first step."
+  >
     ### Tradeoffs
 
     - Keeps the MDX source readable
     - Lets long rationale stay in Markdown
-  </DecisionMatrix.Option>
-</DecisionMatrix>
+  </ContentSet.Item>
+</ContentSet>
 ```
 
-Do not use `options={[...]}` for these content components. The `validate` command warns when older `options`, `question`, `name`, `intent`, `pros`, `cons`, `risks`, `confidence`, `verdict`, or `tradeoffs` props are found.
+Do not use `DecisionMatrix`, `DecisionMatrix.Option`, `OptionGrid`, `OptionGrid.Item`, or `options={[...]}`. The `validate` command warns when removed components or older props such as `question`, `name`, `intent`, `pros`, `cons`, `risks`, `confidence`, `verdict`, or `tradeoffs` are found.
 
 ## Current Scope
 
@@ -158,7 +170,7 @@ artifact-docs/examples/hello.state.json
 Use stable anchors in MDX so review threads can survive edits:
 
 ```mdx
-import { DecisionMatrix, Section } from "mdx-artifacts/react";
+import { ContentSet, Section } from "mdx-artifacts/react";
 
 <Section id="section.context">
 
@@ -168,25 +180,26 @@ Native MDX prose can be reviewed through the section anchor.
 
 </Section>
 
-<DecisionMatrix
-  id="decision.stage-one"
+<ContentSet
+  id="set.stage-one"
   title="Should this artifact use stable anchors?"
+  columns={2}
 >
-  <DecisionMatrix.Option id="yes" title="Use stable anchors" badge="Recommended">
+  <ContentSet.Item id="yes" title="Use stable anchors" badge="Recommended" tone="positive" emphasis="primary">
     Stable child anchors keep review threads attached across edits.
-  </DecisionMatrix.Option>
-</DecisionMatrix>
+  </ContentSet.Item>
+</ContentSet>
 ```
 
 Agents can add a user thread, append an assistant reply, and validate that saved threads still point at anchors in the current MDX:
 
 ```bash
 pnpm exec artifact-kit review add artifact-docs/examples/hello.mdx \
-  --anchor decision.stage-one \
+  --anchor set.stage-one \
   --body "Clarify this decision."
 
 pnpm exec artifact-kit review reply artifact-docs/examples/hello.mdx \
-  --thread thr_decision_stage_one \
+  --thread thr_set_stage_one \
   --body "Updated the decision copy." \
   --status resolved
 

@@ -56,9 +56,9 @@ const reviewAddOutput = run(
     "add",
     "artifact-docs/examples/hello.mdx",
     "--anchor",
-    "decision.initialized",
+    "set.initialized",
     "--body",
-    "Clarify the initialized decision."
+    "Clarify the initialized content set."
   ],
   projectDir
 );
@@ -74,7 +74,7 @@ run(
     "--thread",
     threadId,
     "--body",
-    "Updated the initialized decision.",
+    "Updated the initialized content set.",
     "--status",
     "resolved"
   ],

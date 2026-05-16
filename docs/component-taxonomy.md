@@ -59,7 +59,7 @@ Default slots:
 - `summary`: an optional one-line explanation below the title.
 - `children`: Markdown-rich body content for paragraphs, local headings, lists, quotes, risks, pros, cons, and rationale.
 
-This slot model applies to `ContentItem`, `ContentSet.Item`, and current content-oriented workflow components such as `DecisionMatrix.Option` and `OptionGrid.Item`. It should also be the default for future components such as `FindingCard`, `RiskList.Item`, `StatusReport.Section`, or `ImplementationPlan.Step`.
+This slot model applies to `ContentItem` and `ContentSet.Item`. It should also be the default for future components such as `FindingCard`, `RiskList.Item`, `StatusReport.Section`, or `ImplementationPlan.Step`.
 
 Do not apply the slot model blindly to every complex component:
 
@@ -76,7 +76,7 @@ The registry records the same distinction through `authoring.kind`. This makes t
 
 | Authoring Kind | Current Components | Guidance |
 |---|---|---|
-| `content-block` | `InlineText`, `MarkdownBody`, `ContentItem`, `ContentSet`, `SeverityBadge`, `Callout`, `DecisionMatrix`, `ComparisonSet`, `OptionGrid` | Use short display props plus Markdown-rich children for readable body content. |
+| `content-block` | `InlineText`, `MarkdownBody`, `ContentItem`, `ContentSet`, `SeverityBadge`, `Callout`, `ComparisonSet` | Use short display props plus Markdown-rich children for readable body content. |
 | `structured-renderer` | `CodeBlock`, `DiffBlock`, `AnnotatedCode` | Keep code, diff rows, and annotations in structured props. |
 | `layout-primitive` | `Stack`, `Columns`, `Grid`, `SplitPane`, `Frame` | Arrange content without owning workflow meaning. |
 | `export-editor` | `ExportPanel`, `CommentExport` | Keep handoff data structured and copy/export behavior explicit. |
@@ -164,8 +164,8 @@ Workflow recipes represent artifact-level jobs. They are usually better expresse
 
 Already available:
 
-- `DecisionMatrix`: compare options.
-- `OptionGrid`: show alternative directions side by side.
+- `ContentSet`: group same-kind content items in a grid or list.
+- `ContentItem`: render a standalone readable content card.
 
 Candidate workflow recipes:
 
@@ -174,7 +174,7 @@ Candidate workflow recipes:
 | `DiffExplainer` | PR review with files, diff hunks, annotations, and findings. | P1 | `AnnotatedCode`, `SeverityBadge`, `Callout` |
 | `PRWriteup` | Reviewer-facing PR explanation with motivation, file tour, and review focus. | P2 | `Callout`, `AnnotatedCode` |
 | `ModuleMap` | Explain a package or module through nodes, edges, entry points, and hot paths. | P2 | Future diagram primitives |
-| `ImplementationPlan` | Show milestones, risks, data flow, and handoff tasks. | P2 | `Timeline`, `Callout`, `DecisionMatrix` |
+| `ImplementationPlan` | Show milestones, risks, data flow, and handoff tasks. | P2 | `Timeline`, `Callout`, `ContentSet` |
 | `FeatureExplainer` | Explain how a repo feature works with TL;DR, files read, steps, code tabs, gotchas, and FAQ. | P2 | `DisclosureSteps`, `TabsPanel`, `AnnotatedCode`, `Callout` |
 | `StatusReport` | Weekly or project status summary with shipped/slipped/risks. | P3 | `MetricCard`, `Timeline`, `Callout` |
 | `IncidentReport` | Post-mortem with TL;DR, severity, timeline, root cause, impact, and action items. | P3 | `Timeline`, `AnnotatedCode`, `DataTable`, `ActionItemList`, `Callout` |

@@ -212,14 +212,14 @@ describe("review reply", () => {
     await mkdir(docsDir, { recursive: true });
     await writeFile(
       mdxPath,
-      `<DecisionMatrix
-  id="decision.text-model"
+      `<ContentSet
+  id="set.text-model"
   title="Choose a text model"
 >
-  <DecisionMatrix.Option id="native-mdx" title="Native MDX">
+  <ContentSet.Item id="native-mdx" title="Native MDX">
     Use native MDX for readable prose.
-  </DecisionMatrix.Option>
-</DecisionMatrix>
+  </ContentSet.Item>
+</ContentSet>
 <ContentSet
   id="set.authoring"
   title="Authoring paths"
@@ -242,7 +242,7 @@ describe("review reply", () => {
         source: "artifact-docs/feedback.mdx",
         threads: [
           { id: "thr_001", anchorId: "section.context", status: "open", messages: [] },
-          { id: "thr_002", anchorId: "decision.text-model.native-mdx", status: "open", messages: [] },
+          { id: "thr_002", anchorId: "set.text-model.native-mdx", status: "open", messages: [] },
           { id: "thr_003", anchorId: "set.authoring.component-first", status: "open", messages: [] }
         ],
         interactions: {}

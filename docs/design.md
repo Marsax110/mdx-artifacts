@@ -35,8 +35,8 @@ First-stage components:
 
 - `InlineText`: short text with controlled inline Markdown.
 - `MarkdownBody`: controlled component-local body Markdown.
-- `DecisionMatrix`: compare options.
-- `OptionGrid`: show alternatives side by side.
+- `ContentItem`: standalone readable content card.
+- `ContentSet`: grouped readable content cards with tone and emphasis.
 - `ExportPanel`: export Markdown or JSON.
 
 Planned components:
@@ -205,7 +205,7 @@ The data comes from `componentRegistry`. Future docs, Storybook docs, validation
 
 Component naming rules:
 
-- Names must be self-describing, such as `DecisionMatrix` and `ExportPanel`.
+- Names must be self-describing, such as `ContentSet` and `ExportPanel`.
 - Avoid generic names such as `Panel` or `CardList`.
 - A component should represent an artifact workflow, not a primitive UI element.
 - Text rendering is intentionally split into `InlineText`, `MarkdownBody`, and future long-form prose components.

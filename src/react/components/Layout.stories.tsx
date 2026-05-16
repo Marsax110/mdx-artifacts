@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { DecisionMatrix } from "./DecisionMatrix";
+import { ContentSet } from "./ContentItem";
 import { ExportPanel } from "./ExportPanel";
 import { InlineText } from "./InlineText";
 import { Columns, Frame, Grid, SplitPane, Stack } from "./Layout";
@@ -101,12 +101,17 @@ export const ComposedArtifact: Story = {
   render: () => (
     <Stack gap="lg">
       <SplitPane ratio="2:1">
-        <DecisionMatrix
+        <ContentSet
+          id="set.layout-position"
           title="Should layout primitives stay advanced?"
+          columns={2}
         >
-          <DecisionMatrix.Option
+          <ContentSet.Item
+            id="advanced-only"
             title="Advanced-only layout"
             badge="Recommended"
+            tone="positive"
+            emphasis="primary"
             summary="Use layout primitives for composition checks and unusual artifact structure."
           >
             <ul>
@@ -114,10 +119,13 @@ export const ComposedArtifact: Story = {
               <li>Avoids becoming a UI builder</li>
               <li>Agents need clearer examples when layout is needed</li>
             </ul>
-          </DecisionMatrix.Option>
-          <DecisionMatrix.Option
+          </ContentSet.Item>
+          <ContentSet.Item
+            id="layout-first"
             title="Layout-first authoring"
             badge="Avoid"
+            tone="warning"
+            emphasis="subtle"
             summary="Do not make this the default authoring model."
           >
             <ul>
@@ -125,8 +133,8 @@ export const ComposedArtifact: Story = {
               <li>Recreates raw HTML/React authoring</li>
               <li>Harder to validate</li>
             </ul>
-          </DecisionMatrix.Option>
-        </DecisionMatrix>
+          </ContentSet.Item>
+        </ContentSet>
         <Frame surface="subtle">
           <MarkdownBody>{`Layout primitives only control placement and surface.
 

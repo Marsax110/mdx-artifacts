@@ -9,24 +9,27 @@ Agents should write MDX that calls high-level components. They should not genera
 Typical source:
 
 ```mdx
-import { DecisionMatrix, ExportPanel } from "mdx-artifacts/react";
+import { ContentSet, ExportPanel } from "mdx-artifacts/react";
 
-<DecisionMatrix
-  id="decision.stage-one"
+<ContentSet
+  id="set.stage-one"
   title="Should stage one focus on a **single HTML artifact**?"
+  columns={3}
 >
-  <DecisionMatrix.Option
+  <ContentSet.Item
     id="vite"
     title="Vite artifact"
     badge="Recommended"
+    tone="positive"
+    emphasis="primary"
     summary="Validate the shortest artifact loop first."
   >
     ### Tradeoffs
 
     - Short feedback loop
     - No docs-site navigation yet
-  </DecisionMatrix.Option>
-</DecisionMatrix>
+  </ContentSet.Item>
+</ContentSet>
 
 <ExportPanel
   value={{ recommendation: "Start with the single artifact loop." }}
@@ -48,7 +51,7 @@ The CLI reads the same registry:
 
 ```bash
 artifact-kit components
-artifact-kit components DecisionMatrix
+artifact-kit components ContentSet
 artifact-kit components --json
 ```
 
@@ -198,11 +201,11 @@ Preferred public code components:
 
 Examples:
 
-- `DecisionMatrix`
-- `DiffExplainer`
-- `PriorityBoard`
-- `PromptWorkbench`
-- `FeatureFlagEditor`
+- `ContentSet`
+- `ContentItem`
+- `AnnotatedCode`
+- `ExportPanel`
+- future workflow recipes such as `DiffExplainer`, `PriorityBoard`, `PromptWorkbench`, and `FeatureFlagEditor`
 
 Workflow-level names such as `DiffExplainer`, `FeatureExplainer`, `StatusReport`, and `IncidentReport` do not need to start as large React components. They can first exist as agent recipes or MDX templates that explain which semantic primitives to combine.
 
@@ -248,17 +251,17 @@ Content rendering primitives may grow beyond text and Markdown. Future candidate
 - Does not support tables, HTML, math, or code blocks.
 - Prefer component title props for main artifact structure.
 
-`DecisionMatrix`
+`ContentItem`
 
-- Use for tradeoff comparison.
-- Use `title`, optional `badge`, optional `summary`, and Markdown-rich option children.
-- Keep pros, cons, risks, and detailed rationale in children rather than array props.
+- Use for standalone readable content cards.
+- Use `title`, optional `badge`, optional `summary`, `tone`, `emphasis`, and Markdown-rich children.
 
-`OptionGrid`
+`ContentSet`
 
-- Use for side-by-side alternatives.
-- Use `title`, optional `badge`, optional `summary`, and Markdown-rich item children.
-- Keep detailed tradeoffs and caveats in children rather than array props.
+- Use for a group of same-kind content items.
+- Use `ContentSet.Item` children.
+- Use `layout="grid" | "list"` and `columns={2 | 3 | 4 | 5}` for arrangement.
+- Use `tone` for semantic color and `emphasis` for structural weight.
 
 `ExportPanel`
 
@@ -271,7 +274,7 @@ Reviewable content should use stable anchors:
 
 - Native MDX prose uses `Section id="..."`.
 - Structured components use their own `id` prop.
-- Component sub-items may derive child anchors from the parent id and item id, such as `decision.stage-one.vite`.
+- Component sub-items may derive child anchors from the parent id and item id, such as `set.stage-one.vite`.
 
 The source MDX remains the content truth. Review state lives in a sibling `.state.json` file and references anchors through `anchorId`.
 

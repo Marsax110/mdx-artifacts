@@ -16,13 +16,13 @@ describe("validateMdx", () => {
     const filePath = path.join(dir, "missing-id.mdx");
     await writeFile(
       filePath,
-      `import { Callout, DecisionMatrix, ExportPanel } from "../../src/react";
+      `import { Callout, ContentSet, ExportPanel } from "../../src/react";
 
 <Callout title="Risk" body="Add a stable id." />
 
-<DecisionMatrix title="Choose?">
-  <DecisionMatrix.Option title="Missing id">Readable body.</DecisionMatrix.Option>
-</DecisionMatrix>
+<ContentSet title="Choose?">
+  <ContentSet.Item title="Missing id">Readable body.</ContentSet.Item>
+</ContentSet>
 
 <ExportPanel value={{ ok: true }} />`,
       "utf8"
@@ -34,24 +34,20 @@ describe("validateMdx", () => {
       "Callout should include a stable id prop so comments and state can use a durable anchorId."
     );
     expect(result.warnings).toContain(
-      "DecisionMatrix should include a stable id prop so comments and state can use a durable anchorId."
+      "ContentSet should include a stable id prop so comments and state can use a durable anchorId."
     );
   });
 
-  it("warns when compound option components omit stable ids", async () => {
+  it("warns when compound content set items omit stable ids", async () => {
     const dir = await mkdtemp(path.join(tmpdir(), "mdx-artifacts-"));
     const filePath = path.join(dir, "missing-compound-id.mdx");
     await writeFile(
       filePath,
-      `import { DecisionMatrix, ExportPanel, OptionGrid } from "../../src/react";
+      `import { ContentSet, ExportPanel } from "../../src/react";
 
-<DecisionMatrix id="decision.api" title="Choose?">
-  <DecisionMatrix.Option title="No stable child id">Readable body.</DecisionMatrix.Option>
-</DecisionMatrix>
-
-<OptionGrid id="option.api" title="Choose?">
-  <OptionGrid.Item title="No stable child id">Readable body.</OptionGrid.Item>
-</OptionGrid>
+<ContentSet id="set.api" title="Choose?">
+  <ContentSet.Item title="No stable child id">Readable body.</ContentSet.Item>
+</ContentSet>
 
 <ExportPanel value={{ ok: true }} />`,
       "utf8"
@@ -60,10 +56,7 @@ describe("validateMdx", () => {
     const result = await validateMdx(filePath);
 
     expect(result.warnings).toContain(
-      "DecisionMatrix.Option should include a stable id prop so comments and state can use a durable anchorId."
-    );
-    expect(result.warnings).toContain(
-      "OptionGrid.Item should include a stable id prop so comments and state can use a durable anchorId."
+      "ContentSet.Item should include a stable id prop so comments and state can use a durable anchorId."
     );
   });
 
@@ -126,11 +119,13 @@ describe("validateMdx", () => {
     const result = await validateMdx(filePath);
 
     expect(result.warnings).toContain(
-      'DecisionMatrix prop "question" is deprecated. Use "title" for the visible decision title.'
+      "DecisionMatrix has been removed from the public API. Use ContentSet with ContentSet.Item children."
     );
+    expect(result.warnings).toContain("DecisionMatrix.Option has been removed from the public API. Use ContentSet.Item.");
     expect(result.warnings).toContain(
-      'DecisionMatrix prop "options" is deprecated. Use DecisionMatrix.Option children.'
+      'DecisionMatrix prop "question" is deprecated. Use ContentSet prop "title".'
     );
+    expect(result.warnings).toContain('DecisionMatrix prop "options" is deprecated. Use ContentSet.Item children.');
     expect(result.warnings).toContain('DecisionMatrix.Option prop "name" is deprecated. Use "title".');
     expect(result.warnings).toContain(
       'DecisionMatrix.Option prop "pros" is deprecated. Move long lists into MDX children.'
@@ -138,7 +133,11 @@ describe("validateMdx", () => {
     expect(result.warnings).toContain(
       'OptionGrid.Item prop "intent" is deprecated. Use "summary" for short intent text.'
     );
-    expect(result.warnings).toContain('OptionGrid prop "options" is deprecated. Use OptionGrid.Item children.');
+    expect(result.warnings).toContain(
+      "OptionGrid has been removed from the public API. Use ContentSet with ContentSet.Item children."
+    );
+    expect(result.warnings).toContain("OptionGrid.Item has been removed from the public API. Use ContentSet.Item.");
+    expect(result.warnings).toContain('OptionGrid prop "options" is deprecated. Use ContentSet.Item children.');
     expect(result.warnings).toContain(
       'OptionGrid.Item prop "tradeoffs" is deprecated. Move tradeoff lists into MDX children.'
     );

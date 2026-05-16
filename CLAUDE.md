@@ -27,7 +27,7 @@ When asked to create or modify an artifact:
 5. Run `pnpm artifact:validate` before building.
 6. Run `pnpm artifact:build` to verify standalone HTML output.
 
-For complex props such as `CodeAnnotation[]`, `DiffLine[]`, or `DecisionMatrixOption[]`, use the CLI metadata instead of guessing object fields. The component registry should expose nested type fields in the `types` metadata.
+For complex props such as `CodeAnnotation[]` or `DiffLine[]`, use the CLI metadata instead of guessing object fields. The component registry should expose nested type fields in the `types` metadata.
 
 For new public component APIs, prefer children-first or slot-first design for human-readable body content. Keep props for ids, titles, enum-like settings, layout controls, code strings, export values, and structured data. Existing props-first APIs may remain compatible, but new examples should prefer the Markdown-native form when available.
 

@@ -9,10 +9,6 @@ export type ValidationResult = {
 
 const componentsRequiringStableId = [
   "Section",
-  "DecisionMatrix",
-  "DecisionMatrix.Option",
-  "OptionGrid",
-  "OptionGrid.Item",
   "ComparisonSet",
   "ComparisonSet.Item",
   "AnnotatedCode",
@@ -24,16 +20,35 @@ const componentsRequiringStableId = [
   "ContentSet.Item"
 ];
 
+const deprecatedAuthoringComponents = [
+  {
+    componentName: "DecisionMatrix",
+    warning: "DecisionMatrix has been removed from the public API. Use ContentSet with ContentSet.Item children."
+  },
+  {
+    componentName: "DecisionMatrix.Option",
+    warning: "DecisionMatrix.Option has been removed from the public API. Use ContentSet.Item."
+  },
+  {
+    componentName: "OptionGrid",
+    warning: "OptionGrid has been removed from the public API. Use ContentSet with ContentSet.Item children."
+  },
+  {
+    componentName: "OptionGrid.Item",
+    warning: "OptionGrid.Item has been removed from the public API. Use ContentSet.Item."
+  }
+];
+
 const deprecatedAuthoringProps = [
   {
     componentName: "DecisionMatrix",
     propName: "question",
-    warning: 'DecisionMatrix prop "question" is deprecated. Use "title" for the visible decision title.'
+    warning: 'DecisionMatrix prop "question" is deprecated. Use ContentSet prop "title".'
   },
   {
     componentName: "DecisionMatrix",
     propName: "options",
-    warning: 'DecisionMatrix prop "options" is deprecated. Use DecisionMatrix.Option children.'
+    warning: 'DecisionMatrix prop "options" is deprecated. Use ContentSet.Item children.'
   },
   {
     componentName: "DecisionMatrix.Option",
@@ -73,7 +88,7 @@ const deprecatedAuthoringProps = [
   {
     componentName: "OptionGrid",
     propName: "options",
-    warning: 'OptionGrid prop "options" is deprecated. Use OptionGrid.Item children.'
+    warning: 'OptionGrid prop "options" is deprecated. Use ContentSet.Item children.'
   },
   {
     componentName: "OptionGrid.Item",
@@ -135,6 +150,12 @@ export async function validateMdx(filePath: string): Promise<ValidationResult> {
     }
   }
 
+  for (const deprecatedComponent of deprecatedAuthoringComponents) {
+    if (hasOpeningTag(sourceWithoutStringLiterals, deprecatedComponent.componentName)) {
+      result.warnings.push(deprecatedComponent.warning);
+    }
+  }
+
   for (const deprecatedProp of deprecatedAuthoringProps) {
     if (
       hasOpeningTagWithProp(
@@ -184,6 +205,12 @@ function hasOpeningTagWithoutProp(source: string, componentName: string, propNam
   }
 
   return false;
+}
+
+function hasOpeningTag(source: string, componentName: string) {
+  const escapedName = componentName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const tagPattern = new RegExp(`<${escapedName}(?=[\\s>/])`);
+  return tagPattern.test(source);
 }
 
 function hasOpeningTagWithProp(source: string, componentName: string, propName: string) {
