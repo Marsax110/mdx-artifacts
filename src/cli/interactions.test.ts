@@ -1,9 +1,9 @@
-import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { extractSortableListSeeds } from "./interaction-mdx";
-import { inspectInteraction } from "./interactions";
+import { inspectInteraction, interactionsCommand, resetInteraction, setInteractionOrder } from "./interactions";
 
 describe("interactions inspect", () => {
   it("reads the default SortableList order from MDX when state is missing", async () => {
@@ -79,6 +79,148 @@ describe("interactions inspect", () => {
   });
 });
 
+describe("interactions set-order and reset", () => {
+  it("supports the set-order and reset CLI command shape", async () => {
+    const projectRoot = await createProject({
+      items: [
+        `{ id: "api", title: "Stabilize API" }`,
+        `{ id: "docs", title: "Update docs" }`
+      ]
+    });
+    const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    try {
+      await interactionsCommand(projectRoot, [
+        "set-order",
+        "artifact-docs/examples/priorities.mdx",
+        "list.priorities",
+        "--ordered-ids",
+        "docs,api"
+      ]);
+      expect(log).toHaveBeenLastCalledWith(expect.stringContaining("interactions set-order ok"));
+
+      let result = await inspectInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
+      expect(result.order.orderedIds).toEqual(["docs", "api"]);
+
+      await interactionsCommand(projectRoot, ["reset", "artifact-docs/examples/priorities.mdx", "list.priorities"]);
+      expect(log).toHaveBeenLastCalledWith(expect.stringContaining("interactions reset ok"));
+
+      result = await inspectInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
+      expect(result.order.orderedIds).toEqual(["api", "docs"]);
+    } finally {
+      log.mockRestore();
+    }
+  });
+
+  it("writes a SortableList order overlay and inspect reads it back", async () => {
+    const projectRoot = await createProject({
+      items: [
+        `{ id: "api", title: "Stabilize API" }`,
+        `{ id: "docs", title: "Update docs" }`,
+        `{ id: "adapter", title: "Adapter design" }`
+      ],
+      state: {
+        version: 1,
+        source: "artifact-docs/examples/priorities.mdx",
+        threads: [{ id: "thr_list", anchorId: "list.priorities" }],
+        interactions: {
+          "other.component": { selected: true }
+        },
+        customField: "keep"
+      }
+    });
+
+    await setInteractionOrder(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities", [
+      "adapter",
+      "api",
+      "docs"
+    ]);
+
+    const state = await readState(projectRoot);
+    expect(state).toMatchObject({
+      threads: [{ id: "thr_list", anchorId: "list.priorities" }],
+      interactions: {
+        "other.component": { selected: true },
+        "list.priorities": {
+          type: "sortable-list",
+          id: "list.priorities",
+          title: "Priorities",
+          orderedIds: ["adapter", "api", "docs"],
+          orderedItems: [
+            { id: "adapter", title: "Adapter design" },
+            { id: "api", title: "Stabilize API" },
+            { id: "docs", title: "Update docs" }
+          ]
+        }
+      },
+      customField: "keep"
+    });
+    expect(typeof state.interactions["list.priorities"].updatedAt).toBe("string");
+
+    const result = await inspectInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
+    expect(result.order).toMatchObject({
+      source: "state",
+      orderedIds: ["adapter", "api", "docs"]
+    });
+  });
+
+  it("rejects unknown, duplicate, and missing ordered ids", async () => {
+    const projectRoot = await createProject({
+      items: [
+        `{ id: "api", title: "Stabilize API" }`,
+        `{ id: "docs", title: "Update docs" }`
+      ]
+    });
+
+    await expect(
+      setInteractionOrder(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities", [
+        "api",
+        "api",
+        "missing"
+      ])
+    ).rejects.toThrow(
+      "Invalid orderedIds for SortableList list.priorities: duplicate ids: api; unknown ids: missing; missing ids: docs."
+    );
+  });
+
+  it("resets only the requested interaction overlay", async () => {
+    const projectRoot = await createProject({
+      items: [
+        `{ id: "api", title: "Stabilize API" }`,
+        `{ id: "docs", title: "Update docs" }`
+      ],
+      state: {
+        version: 1,
+        source: "artifact-docs/examples/priorities.mdx",
+        threads: [{ id: "thr_list", anchorId: "list.priorities" }],
+        interactions: {
+          "list.priorities": {
+            type: "sortable-list",
+            orderedIds: ["docs", "api"]
+          },
+          "other.component": { selected: true }
+        }
+      }
+    });
+
+    await resetInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
+
+    const state = await readState(projectRoot);
+    expect(state.interactions).toEqual({
+      "other.component": { selected: true }
+    });
+    expect(state.threads).toEqual([{ id: "thr_list", anchorId: "list.priorities" }]);
+
+    const result = await inspectInteraction(projectRoot, "artifact-docs/examples/priorities.mdx", "list.priorities");
+    expect(result.order).toEqual({
+      source: "mdx",
+      orderedIds: ["api", "docs"],
+      staleIds: [],
+      appendedIds: []
+    });
+  });
+});
+
 async function createProject(options: { items: string[]; state?: unknown }) {
   const projectRoot = await mkdtemp(path.join(tmpdir(), "mdx-artifacts-interactions-"));
   const docsDir = path.join(projectRoot, "artifact-docs", "examples");
@@ -103,4 +245,9 @@ async function createProject(options: { items: string[]; state?: unknown }) {
   }
 
   return projectRoot;
+}
+
+async function readState(projectRoot: string) {
+  const statePath = path.join(projectRoot, "artifact-docs", "examples", "priorities.state.json");
+  return JSON.parse(await readFile(statePath, "utf8"));
 }

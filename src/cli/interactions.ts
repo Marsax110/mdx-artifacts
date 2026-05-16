@@ -1,8 +1,15 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { createArtifactMeta, createArtifactRoute, readArtifactState, type ArtifactRoute } from "./artifact-state";
+import {
+  createArtifactMeta,
+  createArtifactRoute,
+  readArtifactState,
+  writeArtifactState,
+  type ArtifactRoute
+} from "./artifact-state";
 import { loadConfig } from "./config";
 import { extractSortableListSeeds, type SortableListSeed } from "./interaction-mdx";
+import type { SortableListInteraction } from "../react";
 
 export type InteractionsInspectResult = {
   component: SortableListSeed;
@@ -28,6 +35,17 @@ type ParsedInspectArgs = {
   json: boolean;
 };
 
+type ParsedSetOrderArgs = {
+  input: string;
+  id: string;
+  orderedIds: string[];
+};
+
+type ParsedResetArgs = {
+  input: string;
+  id: string;
+};
+
 export async function interactionsCommand(projectRoot: string, args: string[]) {
   const [subcommand] = args;
 
@@ -38,7 +56,21 @@ export async function interactionsCommand(projectRoot: string, args: string[]) {
     return;
   }
 
-  throw new Error("interactions requires a subcommand. Use `artifact-kit interactions inspect <file.mdx> <id> [--json]`.");
+  if (subcommand === "set-order") {
+    const options = parseSetOrderArgs(args.slice(1));
+    console.log(await setInteractionOrder(projectRoot, options.input, options.id, options.orderedIds));
+    return;
+  }
+
+  if (subcommand === "reset") {
+    const options = parseResetArgs(args.slice(1));
+    console.log(await resetInteraction(projectRoot, options.input, options.id));
+    return;
+  }
+
+  throw new Error(
+    "interactions requires a subcommand. Use `artifact-kit interactions inspect <file.mdx> <id> [--json]`, `artifact-kit interactions set-order <file.mdx> <id> --ordered-ids ...`, or `artifact-kit interactions reset <file.mdx> <id>`."
+  );
 }
 
 export async function inspectInteraction(
@@ -80,6 +112,42 @@ export async function inspectInteraction(
   };
 }
 
+export async function setInteractionOrder(projectRoot: string, input: string, id: string, orderedIds: string[]) {
+  const { artifact, component } = await loadSortableList(projectRoot, input, id);
+  validateOrderedIds(component, orderedIds);
+
+  const state = await readArtifactState(artifact);
+  const interaction = createSortableListInteraction(component, orderedIds);
+  await writeArtifactState(projectRoot, artifact, {
+    ...state,
+    interactions: {
+      ...state.interactions,
+      [id]: interaction
+    }
+  });
+
+  return [
+    "interactions set-order ok",
+    `state: ${artifact.stateRelativePath}`,
+    `component: ${id}`,
+    `items: ${orderedIds.length}`,
+    `orderedIds: ${orderedIds.join(", ")}`
+  ].join("\n");
+}
+
+export async function resetInteraction(projectRoot: string, input: string, id: string) {
+  const { artifact } = await loadSortableList(projectRoot, input, id);
+  const state = await readArtifactState(artifact);
+  const { [id]: _removed, ...interactions } = state.interactions;
+
+  await writeArtifactState(projectRoot, artifact, {
+    ...state,
+    interactions
+  });
+
+  return ["interactions reset ok", `state: ${artifact.stateRelativePath}`, `component: ${id}`].join("\n");
+}
+
 function parseInspectArgs(args: string[]): ParsedInspectArgs {
   const positional = args.filter((arg) => arg !== "--json");
   const json = args.includes("--json");
@@ -100,10 +168,130 @@ function parseInspectArgs(args: string[]): ParsedInspectArgs {
   return { input, id, json };
 }
 
+function parseSetOrderArgs(args: string[]): ParsedSetOrderArgs {
+  const [input, id, ...rest] = args;
+
+  if (!input) {
+    throw new Error("interactions set-order requires a .mdx file path.");
+  }
+
+  if (!id) {
+    throw new Error("interactions set-order requires a component id.");
+  }
+
+  const orderedIds = parseOrderedIds(rest);
+  return { input, id, orderedIds };
+}
+
+function parseResetArgs(args: string[]): ParsedResetArgs {
+  const [input, id, ...rest] = args;
+
+  if (!input) {
+    throw new Error("interactions reset requires a .mdx file path.");
+  }
+
+  if (!id) {
+    throw new Error("interactions reset requires a component id.");
+  }
+
+  if (rest.length > 0) {
+    throw new Error(`Unexpected interactions reset argument: ${rest[0]}`);
+  }
+
+  return { input, id };
+}
+
+function parseOrderedIds(args: string[]) {
+  const flagIndex = args.indexOf("--ordered-ids");
+  if (flagIndex < 0) {
+    throw new Error("interactions set-order requires --ordered-ids <id> [...id].");
+  }
+
+  if (flagIndex > 0) {
+    throw new Error(`Unexpected interactions set-order argument: ${args[0]}`);
+  }
+
+  const orderedIds = args
+    .slice(flagIndex + 1)
+    .flatMap((value) => value.split(","))
+    .map((value) => value.trim())
+    .filter(Boolean);
+
+  if (orderedIds.length === 0) {
+    throw new Error("interactions set-order requires at least one ordered id.");
+  }
+
+  return orderedIds;
+}
+
 async function createArtifactFromInput(projectRoot: string, input: string): Promise<ArtifactRoute> {
   const config = await loadConfig(projectRoot);
   const mdxPath = path.resolve(projectRoot, input);
   return createArtifactRoute(projectRoot, mdxPath, config.docsDir);
+}
+
+async function loadSortableList(projectRoot: string, input: string, id: string) {
+  const artifact = await createArtifactFromInput(projectRoot, input);
+  const source = await readFile(artifact.sourcePath, "utf8");
+  const seeds = extractSortableListSeeds(source);
+  const component = seeds.find((seed) => seed.id === id);
+
+  if (!component) {
+    const availableIds = seeds.map((seed) => seed.id);
+    throw new Error(
+      availableIds.length > 0
+        ? `SortableList not found: ${id}. Available SortableList ids: ${availableIds.join(", ")}.`
+        : `SortableList not found: ${id}.`
+    );
+  }
+
+  return { artifact, component };
+}
+
+function validateOrderedIds(component: SortableListSeed, orderedIds: string[]) {
+  const itemIds = component.items.map((item) => item.id);
+  const expectedIds = new Set(itemIds);
+  const seenIds = new Set<string>();
+  const duplicateIds = new Set<string>();
+  const unknownIds = new Set<string>();
+
+  for (const orderedId of orderedIds) {
+    if (seenIds.has(orderedId)) {
+      duplicateIds.add(orderedId);
+    }
+    seenIds.add(orderedId);
+    if (!expectedIds.has(orderedId)) {
+      unknownIds.add(orderedId);
+    }
+  }
+
+  const missingIds = itemIds.filter((itemId) => !seenIds.has(itemId));
+  const errors = [
+    duplicateIds.size > 0 ? `duplicate ids: ${Array.from(duplicateIds).join(", ")}` : undefined,
+    unknownIds.size > 0 ? `unknown ids: ${Array.from(unknownIds).join(", ")}` : undefined,
+    missingIds.length > 0 ? `missing ids: ${missingIds.join(", ")}` : undefined
+  ].filter(Boolean);
+
+  if (errors.length > 0) {
+    throw new Error(`Invalid orderedIds for SortableList ${component.id}: ${errors.join("; ")}.`);
+  }
+}
+
+function createSortableListInteraction(component: SortableListSeed, orderedIds: string[]): SortableListInteraction {
+  return {
+    type: "sortable-list",
+    id: component.id,
+    title: component.title,
+    orderedIds,
+    orderedItems: orderedIds.map((itemId) => {
+      const item = component.items.find((candidate) => candidate.id === itemId);
+      if (!item) {
+        throw new Error(`SortableList item not found: ${itemId}`);
+      }
+      return item;
+    }),
+    updatedAt: new Date().toISOString()
+  };
 }
 
 function readPersistedOrder(interaction: unknown) {

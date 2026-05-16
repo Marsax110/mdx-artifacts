@@ -140,6 +140,19 @@ For interactive data components:
 
 `interactions inspect` is read-only. It reports the resolved order, ignores stale state ids that no longer exist in MDX, and appends new MDX item ids that are not yet present in the state overlay.
 
+Use narrow CLI writes for runtime interaction state:
+
+```bash
+artifact-kit interactions set-order artifact-docs/examples/decision-matrix.mdx \
+  list.next-priorities \
+  --ordered-ids example-output validate-build adapter-design
+
+artifact-kit interactions reset artifact-docs/examples/decision-matrix.mdx \
+  list.next-priorities
+```
+
+`set-order` writes only the runtime overlay and requires the ordered ids to match the current MDX item ids exactly. `reset` removes the runtime overlay for that component and falls back to the MDX default order. Neither command edits MDX.
+
 ## Authoring Kinds
 
 Every public component should declare an authoring kind in `src/react/registry.ts`. This keeps the component API aligned with the product philosophy and gives `artifact-kit components <ComponentName>` enough guidance for agents.

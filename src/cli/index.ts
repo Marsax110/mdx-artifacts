@@ -74,6 +74,8 @@ Usage:
   artifact-kit components [ComponentName] [--json]
   artifact-kit validate <file.mdx>
   artifact-kit interactions inspect <file.mdx> <id> [--json]
+  artifact-kit interactions set-order <file.mdx> <id> --ordered-ids <id> [...id]
+  artifact-kit interactions reset <file.mdx> <id>
   artifact-kit review add <file.mdx> --anchor <anchorId> --body <message> [--title <title>]
   artifact-kit review reply <file.mdx> --thread <threadId> --body <message> [...repeat] [--status <status>]
   artifact-kit review validate <file.mdx>
