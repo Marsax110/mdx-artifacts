@@ -16,6 +16,7 @@ import {
   writeArtifactState,
   type ArtifactRoute
 } from "./artifact-state";
+import { promoteInteraction, resetInteraction, setInteractionOrder } from "./interactions";
 import type { ArtifactKitConfig } from "./types";
 
 const packageCliDir = path.dirname(fileURLToPath(import.meta.url));
@@ -146,6 +147,11 @@ function artifactStatePlugin(projectRoot: string, artifact: ArtifactRoute): Plug
             await handleArtifactState(projectRoot, artifact, request, response);
             return;
           }
+
+          if (requestUrl.pathname.startsWith("/__artifact/interactions/")) {
+            await handleArtifactInteraction(projectRoot, artifact, requestUrl.pathname, request, response);
+            return;
+          }
         } catch (error) {
           sendJson(response, 500, {
             error: error instanceof Error ? error.message : String(error)
@@ -201,6 +207,82 @@ async function handleArtifactState(
   sendJson(response, 405, { error: "Method not allowed." });
 }
 
+async function handleArtifactInteraction(
+  projectRoot: string,
+  artifact: ArtifactRoute,
+  pathname: string,
+  request: IncomingMessage,
+  response: ServerResponse
+) {
+  if (request.method !== "POST") {
+    sendJson(response, 405, { error: "Method not allowed." });
+    return;
+  }
+
+  let value: unknown;
+  try {
+    value = JSON.parse(await readRequestBody(request));
+  } catch {
+    sendJson(response, 400, { error: "Request body must be valid JSON." });
+    return;
+  }
+
+  try {
+    if (pathname === "/__artifact/interactions/set-order") {
+      const body = parseSetOrderRequest(value);
+      const output = await setInteractionOrder(projectRoot, artifact.sourceRelativePath, body.id, body.orderedIds);
+      sendJson(response, 200, { ok: true, output, state: await readArtifactState(artifact) });
+      return;
+    }
+
+    if (pathname === "/__artifact/interactions/reset") {
+      const body = parseInteractionIdRequest(value, "reset");
+      const output = await resetInteraction(projectRoot, artifact.sourceRelativePath, body.id);
+      sendJson(response, 200, { ok: true, output, state: await readArtifactState(artifact) });
+      return;
+    }
+
+    if (pathname === "/__artifact/interactions/promote") {
+      const body = parseInteractionIdRequest(value, "promote");
+      const output = await promoteInteraction(projectRoot, artifact.sourceRelativePath, body.id);
+      sendJson(response, 200, { ok: true, output, state: await readArtifactState(artifact) });
+      return;
+    }
+  } catch (error) {
+    sendJson(response, 400, { error: error instanceof Error ? error.message : String(error) });
+    return;
+  }
+
+  sendJson(response, 404, { error: "Interaction endpoint not found." });
+}
+
+function parseSetOrderRequest(value: unknown) {
+  const body = parseInteractionIdRequest(value, "set-order");
+  if (!isRecord(value) || !Array.isArray(value.orderedIds)) {
+    throw new Error("interactions set-order requires orderedIds.");
+  }
+
+  const orderedIds = value.orderedIds.filter((itemId): itemId is string => typeof itemId === "string");
+  if (orderedIds.length !== value.orderedIds.length || orderedIds.length === 0) {
+    throw new Error("interactions set-order requires non-empty string orderedIds.");
+  }
+
+  return {
+    id: body.id,
+    orderedIds
+  };
+}
+
+function parseInteractionIdRequest(value: unknown, action: string) {
+  if (!isRecord(value) || typeof value.id !== "string" || !value.id) {
+    throw new Error(`interactions ${action} requires id.`);
+  }
+
+  return {
+    id: value.id
+  };
+}
+
 function readRequestBody(request: IncomingMessage) {
   return new Promise<string>((resolve, reject) => {
     let body = "";
@@ -218,6 +300,10 @@ function sendJson(response: ServerResponse, statusCode: number, value: unknown) 
   response.statusCode = statusCode;
   response.setHeader("content-type", "application/json; charset=utf-8");
   response.end(JSON.stringify(value, null, 2));
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 async function resolveReactEntryPath() {

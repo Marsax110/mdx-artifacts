@@ -158,6 +158,14 @@ artifact-kit interactions promote artifact-docs/examples/decision-matrix.mdx \
 
 `promote` is the explicit authored-truth write. It reorders the static MDX `items` array to match the current runtime overlay, then clears that component's overlay. It rejects stale or incomplete runtime ids instead of guessing.
 
+The local dev server exposes the same interaction writes through narrow JSON endpoints:
+
+- `POST /__artifact/interactions/set-order`
+- `POST /__artifact/interactions/reset`
+- `POST /__artifact/interactions/promote`
+
+These endpoints are for local artifact tooling and reuse the same state and source write rules as the CLI.
+
 ## Authoring Kinds
 
 Every public component should declare an authoring kind in `src/react/registry.ts`. This keeps the component API aligned with the product philosophy and gives `artifact-kit components <ComponentName>` enough guidance for agents.
