@@ -21,4 +21,11 @@ describe("CodeBlock", () => {
     expect(html).toContain("data-line=\"2\"");
     expect(html).toContain("ak-code-line-highlighted");
   });
+
+  it("renders an optional copy control", () => {
+    const html = renderToStaticMarkup(<CodeBlock code={"const value = 1;"} copyable />);
+
+    expect(html).toContain("ak-code-copy");
+    expect(html).toContain("Copy");
+  });
 });

@@ -505,6 +505,11 @@ Use MarkdownBody when a component needs controlled body copy:
         name: "highlightLines",
         type: "number[]",
         description: "One-based line numbers to visually emphasize."
+      },
+      {
+        name: "copyable",
+        type: "boolean",
+        description: "Shows a copy button when true."
       }
     ],
     example: `<CodeBlock

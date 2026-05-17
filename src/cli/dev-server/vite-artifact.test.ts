@@ -33,11 +33,11 @@ describe("createArtifactProject", () => {
 
     expect(project.artifact.routePath).toBe("/artifacts/entry");
     expect(project.artifact.statePath).toBe(mdxPath.replace(/\.mdx$/, ".state.json"));
-    expect(entry).toContain('import { ArtifactStateProvider, CommentLayer } from "');
+    expect(entry).toContain('import { ArtifactStateProvider, CommentLayer, artifactMdxComponents } from "');
     expect(entry).toContain('src/react/index.ts";');
     expect(entry).toContain("<ArtifactStateProvider>");
     expect(entry).toContain("<CommentLayer>");
-    expect(entry).toContain("<Doc />");
+    expect(entry).toContain("<Doc components={artifactMdxComponents} />");
   });
 
   it("serves narrow interaction state endpoints", async () => {

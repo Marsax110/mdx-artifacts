@@ -17,7 +17,8 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: "CodeBlock renders static source snippets with optional filenames, line numbers, and highlighted lines."
+        component:
+          "CodeBlock renders static source snippets with optional filenames, line numbers, copy controls, and highlighted lines."
       }
     }
   }
@@ -32,7 +33,8 @@ export const Basic: Story = {
     code: sampleCode,
     language: "ts",
     filename: "src/artifact.ts"
-  }
+  },
+  render: (args) => <CodeBlock {...args} />
 };
 
 export const WithLineNumbers: Story = {
@@ -41,7 +43,8 @@ export const WithLineNumbers: Story = {
     language: "ts",
     filename: "src/artifact.ts",
     showLineNumbers: true
-  }
+  },
+  render: (args) => <CodeBlock {...args} />
 };
 
 export const HighlightedLines: Story = {
@@ -51,5 +54,17 @@ export const HighlightedLines: Story = {
     filename: "src/artifact.ts",
     showLineNumbers: true,
     highlightLines: [2, 5]
-  }
+  },
+  render: (args) => <CodeBlock {...args} />
+};
+
+export const Copyable: Story = {
+  args: {
+    code: sampleCode,
+    language: "ts",
+    filename: "src/artifact.ts",
+    showLineNumbers: true,
+    copyable: true
+  },
+  render: (args) => <CodeBlock {...args} />
 };

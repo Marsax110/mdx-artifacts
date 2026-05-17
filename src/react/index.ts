@@ -30,8 +30,8 @@ export type {
   ContentSetSurface,
   ContentSetProps
 } from "./composites/content-set/ContentItem";
-export { CodeBlock } from "./primitives/code-block/CodeBlock";
-export type { CodeBlockProps } from "./primitives/code-block/CodeBlock";
+export { CodeBlock, CodeBlockView } from "./primitives/code-block/CodeBlock";
+export type { CodeBlockProps, CodeBlockViewProps } from "./primitives/code-block/CodeBlock";
 export {
   CommentableBlock,
   CommentExport,
@@ -70,6 +70,7 @@ export type {
 } from "./layout/layout-primitives/Layout";
 export { MarkdownBody } from "./primitives/markdown-body/MarkdownBody";
 export type { MarkdownBodyProps, MarkdownBodyVariant } from "./primitives/markdown-body/MarkdownBody";
+export { artifactMdxComponents, ArtifactCodePre } from "./mdx-components";
 export { Section } from "./composites/section/Section";
 export type { SectionProps } from "./composites/section/Section";
 export { SeverityBadge } from "./primitives/severity-badge/SeverityBadge";

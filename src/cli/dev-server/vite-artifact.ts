@@ -74,7 +74,7 @@ export async function createArtifactProject(
     entryPath,
     `import React from "react";
 import { createRoot } from "react-dom/client";
-import { ArtifactStateProvider, CommentLayer } from "${reactEntryImport}";
+import { ArtifactStateProvider, CommentLayer, artifactMdxComponents } from "${reactEntryImport}";
 import Doc from "${mdxImport}";
 ${styleImports}
 
@@ -84,7 +84,7 @@ function App() {
       <article className="ak-document">
         <ArtifactStateProvider>
           <CommentLayer>
-            <Doc />
+            <Doc components={artifactMdxComponents} />
           </CommentLayer>
         </ArtifactStateProvider>
       </article>
