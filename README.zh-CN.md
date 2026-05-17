@@ -199,13 +199,16 @@ const config = {
   docsDir: "artifact-docs",
   outDir: "dist/artifacts",
   includeDefaultStyles: true,
-  styles: ["artifact-theme.css"]
+  styles: ["artifact-theme.css"],
+  tailwindSources: ["artifact-docs/components/**/*.{ts,tsx}"]
 };
 
 export default config;
 ```
 
-`styles` 会在默认样式之后导入，因此可以覆盖 CSS variables 或 `ak-*` class。若要完全接管样式，可以设置 `includeDefaultStyles: false`。
+`styles` 会在默认样式之后导入，因此可以覆盖 CSS variables 或 `ak-*` class。若要关闭 Artifact Kit 默认样式，可以设置 `includeDefaultStyles: false`。
+
+CLI 会自动把当前 MDX 文件注册为 Tailwind source，因此本地 MDX 组件里的 Tailwind utility class 会在 artifact 构建时生成。若 MDX import 了项目本地组件，并且这些组件文件里也写了 Tailwind class，可以用 `tailwindSources` 显式注册这些路径。
 
 ## 设计原则
 

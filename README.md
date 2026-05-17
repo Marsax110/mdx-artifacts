@@ -266,13 +266,16 @@ const config = {
   docsDir: "artifact-docs",
   outDir: "dist/artifacts",
   includeDefaultStyles: true,
-  styles: ["artifact-theme.css"]
+  styles: ["artifact-theme.css"],
+  tailwindSources: ["artifact-docs/components/**/*.{ts,tsx}"]
 };
 
 export default config;
 ```
 
-Custom styles are imported after the default styles, so they can override CSS variables or `ak-*` classes. Set `includeDefaultStyles: false` to fully own the styling.
+Custom styles are imported after the default styles, so they can override CSS variables or `ak-*` classes. Set `includeDefaultStyles: false` to disable Artifact Kit default styles.
+
+The CLI automatically registers the current MDX file as a Tailwind source, so Tailwind utility classes inside local MDX components are generated during artifact builds. Use `tailwindSources` for project-local component files that are imported by MDX and also contain Tailwind classes.
 
 ## Design Principles
 

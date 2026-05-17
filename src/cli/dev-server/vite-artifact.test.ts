@@ -25,19 +25,48 @@ describe("createArtifactProject", () => {
       includeDefaultStyles: true,
       outDir: "dist/artifacts",
       port: 4321,
-      styles: []
+      styles: [],
+      tailwindSources: []
     });
     projects.push(project);
 
     const entry = await readFile(path.join(project.tmpDir, "src", "entry.tsx"), "utf8");
+    const tailwindSources = await readFile(path.join(project.tmpDir, "src", "artifact-tailwind-sources.css"), "utf8");
 
     expect(project.artifact.routePath).toBe("/artifacts/entry");
     expect(project.artifact.statePath).toBe(mdxPath.replace(/\.mdx$/, ".state.json"));
+    expect(tailwindSources).toContain('@import "tailwindcss";');
+    expect(tailwindSources).toContain('@source "../../../');
+    expect(tailwindSources).toContain('entry.mdx";');
     expect(entry).toContain('import { ArtifactStateProvider, CommentLayer, artifactMdxComponents } from "');
     expect(entry).toContain('src/react/index.ts";');
+    expect(entry).toContain('import "./artifact-tailwind-sources.css";');
     expect(entry).toContain("<ArtifactStateProvider>");
     expect(entry).toContain("<CommentLayer>");
     expect(entry).toContain("<Doc components={artifactMdxComponents} />");
+  });
+
+  it("registers configured Tailwind source globs relative to the project root", async () => {
+    const projectRoot = await mkdtemp(path.join(tmpdir(), "mdx-artifacts-tailwind-"));
+    const docsDir = path.join(projectRoot, "artifact-docs");
+    const mdxPath = path.join(docsDir, "entry.mdx");
+    await mkdir(docsDir, { recursive: true });
+    await writeFile(mdxPath, "# Tailwind sources", "utf8");
+
+    const project = await createArtifactProject(projectRoot, mdxPath, {
+      docsDir: "artifact-docs",
+      includeDefaultStyles: true,
+      outDir: "dist/artifacts",
+      port: 4321,
+      styles: [],
+      tailwindSources: ["artifact-docs/components/**/*.{ts,tsx}"]
+    });
+    projects.push(project);
+
+    const tailwindSources = await readFile(path.join(project.tmpDir, "src", "artifact-tailwind-sources.css"), "utf8");
+
+    expect(tailwindSources).toContain('entry.mdx";');
+    expect(tailwindSources).toContain('artifact-docs/components/**/*.{ts,tsx}";');
   });
 
   it("serves narrow interaction state endpoints", async () => {
@@ -66,7 +95,8 @@ describe("createArtifactProject", () => {
       includeDefaultStyles: true,
       outDir: "dist/artifacts",
       port: 0,
-      styles: []
+      styles: [],
+      tailwindSources: []
     });
     projects.push(project);
     const server = await startDevServer(project);

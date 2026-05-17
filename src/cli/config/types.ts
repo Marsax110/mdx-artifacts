@@ -4,4 +4,5 @@ export type ArtifactKitConfig = {
   outDir?: string;
   port?: number;
   styles?: string[];
+  tailwindSources?: string[];
 };

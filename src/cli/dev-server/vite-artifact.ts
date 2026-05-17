@@ -47,13 +47,15 @@ export async function createArtifactProject(
   const srcDir = path.join(tmpDir, "src");
   const distDir = path.join(tmpDir, "dist");
   const entryPath = path.join(srcDir, "entry.tsx");
+  const tailwindSourcePath = path.join(srcDir, "artifact-tailwind-sources.css");
   const mdxImport = toRelativeImport(entryPath, mdxPath);
-  const styleImports = createStyleImports(projectRoot, entryPath, config);
+  const styleImports = createStyleImports(projectRoot, entryPath, config, tailwindSourcePath);
   const reactEntryPath = await resolveReactEntryPath();
   const reactEntryImport = toRelativeImport(entryPath, reactEntryPath);
   const reactAliases = resolveReactAliases(projectRoot);
 
   await mkdir(srcDir, { recursive: true });
+  await writeFile(tailwindSourcePath, createTailwindSourceCss(projectRoot, tailwindSourcePath, mdxPath, config));
   await writeFile(
     path.join(tmpDir, "index.html"),
     `<!doctype html>
@@ -491,13 +493,39 @@ function toRelativeImport(fromFile: string, targetFile: string) {
   return relative.startsWith(".") ? relative : `./${relative}`;
 }
 
-function createStyleImports(projectRoot: string, entryPath: string, config: Required<ArtifactKitConfig>) {
+function createStyleImports(
+  projectRoot: string,
+  entryPath: string,
+  config: Required<ArtifactKitConfig>,
+  tailwindSourcePath: string
+) {
   const styles = [
+    tailwindSourcePath,
     ...(config.includeDefaultStyles ? [defaultStylesPath] : []),
     ...config.styles.map((stylePath) => path.resolve(projectRoot, stylePath))
   ];
 
   return styles.map((stylePath) => `import "${toRelativeImport(entryPath, stylePath)}";`).join("\n");
+}
+
+function createTailwindSourceCss(
+  projectRoot: string,
+  sourceStylesPath: string,
+  mdxPath: string,
+  config: Required<ArtifactKitConfig>
+) {
+  const sources = [
+    mdxPath,
+    ...config.tailwindSources.map((sourcePath) => path.resolve(projectRoot, sourcePath))
+  ];
+
+  return `@import "tailwindcss";\n${sources
+    .map((sourcePath) => `@source "${escapeCssString(toRelativeImport(sourceStylesPath, sourcePath))}";`)
+    .join("\n")}\n`;
+}
+
+function escapeCssString(value: string) {
+  return value.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 }
 
 async function replaceAsync(

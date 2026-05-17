@@ -15,7 +15,8 @@ const config = {
   docsDir: "artifact-docs",
   outDir: "dist/artifacts",
   includeDefaultStyles: true,
-  styles: []
+  styles: [],
+  tailwindSources: []
 };
 
 export default config;

@@ -112,7 +112,8 @@ const config = {
   docsDir: "artifact-docs",
   outDir: "dist/artifacts",
   includeDefaultStyles: true,
-  styles: ["artifact-theme.css"]
+  styles: ["artifact-theme.css"],
+  tailwindSources: ["artifact-docs/components/**/*.{ts,tsx}"]
 };
 ```
 
@@ -121,7 +122,9 @@ Rules:
 - `includeDefaultStyles: true` imports Artifact Kit default styles first.
 - `styles` are imported in array order after the default styles.
 - Users can override CSS variables or `ak-*` classes.
-- `includeDefaultStyles: false` means the user owns all styling.
+- `includeDefaultStyles: false` disables Artifact Kit default styles.
+- The current MDX file is always registered as a Tailwind source for local MDX components.
+- `tailwindSources` registers additional project-local component files that use Tailwind classes.
 - The final CSS is still inlined into the standalone HTML artifact.
 
 ## UI Dependencies

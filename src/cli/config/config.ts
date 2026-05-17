@@ -8,7 +8,8 @@ const defaultConfig: Required<ArtifactKitConfig> = {
   includeDefaultStyles: true,
   outDir: "dist/artifacts",
   port: 4321,
-  styles: []
+  styles: [],
+  tailwindSources: []
 };
 
 export async function loadConfig(projectRoot: string): Promise<Required<ArtifactKitConfig>> {
