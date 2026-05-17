@@ -7,6 +7,7 @@ import { interactionsCommand } from "./commands/interactions";
 import { reviewCommand } from "./commands/review";
 import { initProject } from "./commands/scaffold";
 import { formatValidationJson, printValidationResult, validateMdx } from "./commands/validate";
+import { loadConfig } from "./config/config";
 
 const projectRoot = process.cwd();
 const [command, input] = process.argv.slice(2);
@@ -47,7 +48,8 @@ async function main() {
   if (command === "validate") {
     const args = process.argv.slice(3);
     const json = args.includes("--json");
-    const result = await validateMdx(path.resolve(projectRoot, input));
+    const config = await loadConfig(projectRoot);
+    const result = await validateMdx(path.resolve(projectRoot, input), { projectRoot, config });
 
     if (json) {
       console.log(JSON.stringify(formatValidationJson(result), null, 2));

@@ -4,11 +4,20 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
 import { describe, expect, it } from "vitest";
+import type { ArtifactKitConfig } from "../config/types";
 import { validateMdx } from "./validate";
 
 const execFileAsync = promisify(execFile);
 const cli = path.resolve("src/cli/index.ts");
 const tsx = path.resolve("node_modules/.bin/tsx");
+const baseConfig: Required<ArtifactKitConfig> = {
+  docsDir: "artifact-docs",
+  includeDefaultStyles: true,
+  outDir: "dist/artifacts",
+  port: 4321,
+  styles: [],
+  tailwindSources: []
+};
 
 describe("validateMdx", () => {
   it("accepts the example artifact", async () => {
@@ -260,6 +269,33 @@ describe("validateMdx", () => {
       expect.objectContaining({
         severity: "error",
         code: "raw_script_blocked"
+      })
+    );
+  });
+
+  it("reports unsafe configured style resources", async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), "mdx-artifacts-"));
+    const filePath = path.join(dir, "unsafe-style.mdx");
+    await writeFile(
+      filePath,
+      `import { ExportPanel } from "../../src/react";
+
+<ExportPanel value={{ ok: true }} />`,
+      "utf8"
+    );
+
+    const result = await validateMdx(filePath, {
+      projectRoot: dir,
+      config: { ...baseConfig, styles: ["../outside.css"] }
+    });
+
+    expect(result.errors).toContain("style resource must stay inside the project root: ../outside.css");
+    expect(result.diagnostics).toContainEqual(
+      expect.objectContaining({
+        severity: "error",
+        code: "resource_path_escape",
+        sourcePath: filePath,
+        propName: "styles"
       })
     );
   });

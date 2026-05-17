@@ -1,23 +1,21 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { componentRegistry } from "../../react/registry";
+import type { ArtifactKitConfig } from "../config/types";
+import type { ArtifactDiagnostic } from "../diagnostics/diagnostics";
+import { validateResourceReferences } from "../resources/resource-policy";
 
-export type ArtifactDiagnostic = {
-  severity: "error" | "warning" | "info";
-  code: string;
-  message: string;
-  sourcePath: string;
-  line?: number;
-  componentName?: string;
-  propName?: string;
-  suggestion?: string;
-  example?: string;
-};
+export type { ArtifactDiagnostic } from "../diagnostics/diagnostics";
 
 export type ValidationResult = {
   diagnostics: ArtifactDiagnostic[];
   errors: string[];
   warnings: string[];
+};
+
+export type ValidateMdxOptions = {
+  projectRoot?: string;
+  config?: Required<ArtifactKitConfig>;
 };
 
 const componentsRequiringStableId = [
@@ -138,7 +136,7 @@ const deprecatedAuthoringProps = [
   }
 ];
 
-export async function validateMdx(filePath: string): Promise<ValidationResult> {
+export async function validateMdx(filePath: string, options: ValidateMdxOptions = {}): Promise<ValidationResult> {
   const result = createValidationResult();
 
   if (path.extname(filePath) !== ".mdx") {
@@ -175,6 +173,22 @@ export async function validateMdx(filePath: string): Promise<ValidationResult> {
       sourcePath: filePath,
       suggestion: "Move browser behavior into a controlled React component instead of inline script tags."
     });
+  }
+
+  if (options.config) {
+    const resourceDiagnostics = await validateResourceReferences({
+      projectRoot: options.projectRoot ?? process.cwd(),
+      references: options.config.styles.map((stylePath) => ({
+        type: "style",
+        path: stylePath,
+        sourcePath: filePath,
+        fieldName: "styles"
+      }))
+    });
+
+    for (const diagnostic of resourceDiagnostics) {
+      addDiagnostic(result, diagnostic);
+    }
   }
 
   if (!source.includes("ExportPanel") && !source.includes("CommentExport")) {
