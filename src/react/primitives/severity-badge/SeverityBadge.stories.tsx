@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Stack } from "../../components/Layout";
+import { Stack } from "../../layout/layout-primitives/Layout";
 import { SeverityBadge } from "./SeverityBadge";
 
 const meta = {

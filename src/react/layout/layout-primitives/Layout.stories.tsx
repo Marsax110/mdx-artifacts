@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { ContentSet } from "./ContentItem";
-import { ExportPanel } from "./ExportPanel";
-import { InlineText } from "../primitives/inline-text/InlineText";
+import { ContentSet } from "../../components/ContentItem";
+import { ExportPanel } from "../../components/ExportPanel";
+import { InlineText } from "../../primitives/inline-text/InlineText";
 import { Columns, Frame, Grid, SplitPane, Stack } from "./Layout";
-import { MarkdownBody } from "../primitives/markdown-body/MarkdownBody";
+import { MarkdownBody } from "../../primitives/markdown-body/MarkdownBody";
 
 const meta = {
   title: "Layout Primitives/Overview",

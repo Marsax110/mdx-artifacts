@@ -55,7 +55,7 @@ export { ExportPanel } from "./components/ExportPanel";
 export type { ExportFormat, ExportPanelProps } from "./components/ExportPanel";
 export { InlineText } from "./primitives/inline-text/InlineText";
 export type { InlineTextAs, InlineTextProps, InlineTextVariant } from "./primitives/inline-text/InlineText";
-export { Columns, Frame, Grid, SplitPane, Stack } from "./components/Layout";
+export { Columns, Frame, Grid, SplitPane, Stack } from "./layout/layout-primitives/Layout";
 export type {
   AkCollapseAt,
   AkGap,
@@ -67,7 +67,7 @@ export type {
   SplitPaneProps,
   SplitPaneRatio,
   StackProps
-} from "./components/Layout";
+} from "./layout/layout-primitives/Layout";
 export { MarkdownBody } from "./primitives/markdown-body/MarkdownBody";
 export type { MarkdownBodyProps, MarkdownBodyVariant } from "./primitives/markdown-body/MarkdownBody";
 export { Section } from "./components/Section";

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ComparisonSet } from "./ComparisonSet";
-import { Frame } from "./Layout";
+import { Frame } from "../layout/layout-primitives/Layout";
 import { MarkdownBody } from "../primitives/markdown-body/MarkdownBody";
 
 const meta = {
