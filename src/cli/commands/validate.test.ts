@@ -1,14 +1,21 @@
+import { execFile } from "node:child_process";
 import { mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import { promisify } from "node:util";
 import { describe, expect, it } from "vitest";
 import { validateMdx } from "./validate";
+
+const execFileAsync = promisify(execFile);
+const cli = path.resolve("src/cli/index.ts");
+const tsx = path.resolve("node_modules/.bin/tsx");
 
 describe("validateMdx", () => {
   it("accepts the example artifact", async () => {
     const result = await validateMdx(path.resolve("artifact-docs/examples/decision-matrix.mdx"));
 
     expect(result.errors).toEqual([]);
+    expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === "error")).toEqual([]);
   });
 
   it("warns when reviewable components omit stable ids", async () => {
@@ -41,6 +48,29 @@ describe("validateMdx", () => {
     expect(result.warnings).toContain(
       "SortableList should include a stable id prop so comments and state can use a durable anchorId."
     );
+    expect(result.diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          severity: "warning",
+          code: "stable_id_missing",
+          componentName: "Callout",
+          propName: "id",
+          suggestion: "Add a stable id prop to Callout."
+        }),
+        expect.objectContaining({
+          severity: "warning",
+          code: "stable_id_missing",
+          componentName: "ContentSet",
+          propName: "id"
+        }),
+        expect.objectContaining({
+          severity: "warning",
+          code: "stable_id_missing",
+          componentName: "SortableList",
+          propName: "id"
+        })
+      ])
+    );
   });
 
   it("warns when compound content set items omit stable ids", async () => {
@@ -62,6 +92,13 @@ describe("validateMdx", () => {
 
     expect(result.warnings).toContain(
       "ContentSet.Item should include a stable id prop so comments and state can use a durable anchorId."
+    );
+    expect(result.diagnostics).toContainEqual(
+      expect.objectContaining({
+        code: "stable_id_missing",
+        componentName: "ContentSet.Item",
+        propName: "id"
+      })
     );
   });
 
@@ -146,6 +183,25 @@ describe("validateMdx", () => {
     expect(result.warnings).toContain(
       'OptionGrid.Item prop "tradeoffs" is deprecated. Move tradeoff lists into MDX children.'
     );
+    expect(result.diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "deprecated_component",
+          componentName: "DecisionMatrix",
+          suggestion: "Replace DecisionMatrix with ContentSet and ContentSet.Item children."
+        }),
+        expect.objectContaining({
+          code: "deprecated_prop",
+          componentName: "DecisionMatrix",
+          propName: "options"
+        }),
+        expect.objectContaining({
+          code: "deprecated_prop",
+          componentName: "OptionGrid.Item",
+          propName: "tradeoffs"
+        })
+      ])
+    );
   });
 
   it("does not warn for deprecated authoring props inside string literals", async () => {
@@ -199,6 +255,43 @@ describe("validateMdx", () => {
 
     expect(result.errors).toContain(
       "Do not write <script> directly in MDX. Wrap behavior in a controlled component."
+    );
+    expect(result.diagnostics).toContainEqual(
+      expect.objectContaining({
+        severity: "error",
+        code: "raw_script_blocked"
+      })
+    );
+  });
+
+  it("prints structured diagnostics with validate --json", async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), "mdx-artifacts-"));
+    const filePath = path.join(dir, "json-output.mdx");
+    await writeFile(
+      filePath,
+      `import { Callout, ExportPanel } from "../../src/react";
+
+<Callout title="Risk" body="Add a stable id." />
+
+<ExportPanel value={{ ok: true }} />`,
+      "utf8"
+    );
+
+    const result = await execFileAsync(tsx, [cli, "validate", filePath, "--json"]);
+    const output = JSON.parse(result.stdout) as {
+      ok: boolean;
+      diagnostics: Array<{ code: string; componentName?: string; propName?: string }>;
+    };
+
+    expect(output.ok).toBe(true);
+    expect(output.diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "stable_id_missing",
+          componentName: "Callout",
+          propName: "id"
+        })
+      ])
     );
   });
 });

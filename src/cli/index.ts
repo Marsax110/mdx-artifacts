@@ -6,7 +6,7 @@ import { devCommand } from "./commands/dev";
 import { interactionsCommand } from "./commands/interactions";
 import { reviewCommand } from "./commands/review";
 import { initProject } from "./commands/scaffold";
-import { printValidationResult, validateMdx } from "./commands/validate";
+import { formatValidationJson, printValidationResult, validateMdx } from "./commands/validate";
 
 const projectRoot = process.cwd();
 const [command, input] = process.argv.slice(2);
@@ -45,8 +45,16 @@ async function main() {
   }
 
   if (command === "validate") {
+    const args = process.argv.slice(3);
+    const json = args.includes("--json");
     const result = await validateMdx(path.resolve(projectRoot, input));
-    printValidationResult(result);
+
+    if (json) {
+      console.log(JSON.stringify(formatValidationJson(result), null, 2));
+    } else {
+      printValidationResult(result);
+    }
+
     if (result.errors.length > 0) {
       process.exitCode = 1;
     }
@@ -72,7 +80,7 @@ function printHelp() {
 Usage:
   artifact-kit init
   artifact-kit components [ComponentName] [--json]
-  artifact-kit validate <file.mdx>
+  artifact-kit validate <file.mdx> [--json]
   artifact-kit interactions inspect <file.mdx> <id> [--json]
   artifact-kit interactions set-order <file.mdx> <id> --ordered-ids <id> [...id]
   artifact-kit interactions reset <file.mdx> <id>
