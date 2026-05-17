@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { CommentTarget } from "../../interactions/comments/Comments";
+import { CodeSurface } from "../code-surface/CodeSurface";
 
 export type CodeBlockProps = {
   id?: string;
@@ -61,71 +61,30 @@ export function CodeBlockView({
   highlightLines = [],
   copyable = false
 }: CodeBlockViewProps) {
-  const [copied, setCopied] = useState(false);
   const lines = splitCodeLines(code);
   const highlighted = new Set(highlightLines);
 
-  async function copyCode() {
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(code);
-    } else {
-      fallbackCopy(code);
-    }
-
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1200);
-  }
-
   return (
-    <figure className="ak-code-block">
-      {(filename || language || copyable) && (
-        <figcaption className="ak-code-header">
-          <span className="ak-code-meta">
-            {filename && <span className="ak-code-filename">{filename}</span>}
-            {language && <span className="ak-code-language">{language}</span>}
+    <CodeSurface copyable={copyable} copyText={code} filename={filename} language={language}>
+      {lines.map((line, index) => {
+        const lineNumber = index + 1;
+        return (
+          <span
+            className={classNames(
+              "ak-code-line",
+              showLineNumbers ? "ak-code-line-numbered" : undefined,
+              highlighted.has(lineNumber) ? "ak-code-line-highlighted" : undefined
+            )}
+            data-line={lineNumber}
+            key={lineNumber}
+          >
+            {showLineNumbers && <span className="ak-code-line-number">{lineNumber}</span>}
+            <span className="ak-code-line-content">{line || "\u00a0"}</span>
           </span>
-          {copyable ? (
-            <button className="ak-code-copy" onClick={() => void copyCode()} type="button">
-              {copied ? "Copied" : "Copy"}
-            </button>
-          ) : null}
-        </figcaption>
-      )}
-      <pre className="ak-code-pre">
-        <code className={language ? `language-${language}` : undefined}>
-          {lines.map((line, index) => {
-            const lineNumber = index + 1;
-            return (
-              <span
-                className={classNames(
-                  "ak-code-line",
-                  showLineNumbers ? "ak-code-line-numbered" : undefined,
-                  highlighted.has(lineNumber) ? "ak-code-line-highlighted" : undefined
-                )}
-                data-line={lineNumber}
-                key={lineNumber}
-              >
-                {showLineNumbers && <span className="ak-code-line-number">{lineNumber}</span>}
-                <span className="ak-code-line-content">{line || "\u00a0"}</span>
-              </span>
-            );
-          })}
-        </code>
-      </pre>
-    </figure>
+        );
+      })}
+    </CodeSurface>
   );
-}
-
-function fallbackCopy(value: string) {
-  const textarea = document.createElement("textarea");
-  textarea.value = value;
-  textarea.setAttribute("readonly", "true");
-  textarea.style.position = "fixed";
-  textarea.style.left = "-9999px";
-  document.body.appendChild(textarea);
-  textarea.select();
-  document.execCommand("copy");
-  document.body.removeChild(textarea);
 }
 
 function splitCodeLines(code: string) {

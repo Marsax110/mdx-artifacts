@@ -209,6 +209,8 @@ The kind is not a styling category. It tells an author where meaning belongs:
 - `export-editor`: keep handoff data structured.
 - `review-boundary`: keep anchors durable and review targets meaningful.
 
+Low-level shared rendering primitives, such as `CodeSurface`, may be exported for composition but should not be the primary authoring contract for agents. Native fenced code, `CodeBlock`, and `DiffBlock` can share one surface while keeping distinct semantics.
+
 Complex props must be self-describing through the registry. Do not rely on TypeScript LSP alone for agent usage. If a prop type references a named object or object array, such as `DiffLine[]` or `CodeAnnotation[]`, add a matching entry to the component's `types` metadata:
 
 ```ts

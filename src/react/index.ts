@@ -32,6 +32,8 @@ export type {
 } from "./composites/content-set/ContentItem";
 export { CodeBlock, CodeBlockView } from "./primitives/code-block/CodeBlock";
 export type { CodeBlockProps, CodeBlockViewProps } from "./primitives/code-block/CodeBlock";
+export { CodeSurface } from "./primitives/code-surface/CodeSurface";
+export type { CodeSurfaceProps } from "./primitives/code-surface/CodeSurface";
 export {
   CommentableBlock,
   CommentExport,

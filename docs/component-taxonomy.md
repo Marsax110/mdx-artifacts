@@ -137,6 +137,7 @@ Already available:
 - `MarkdownBody`: controlled block Markdown for component-local body copy.
 - `CodeBlock`: controlled code rendering with filename, language label, line numbers, and highlighted lines.
 - `DiffBlock`: structured diff rendering with add, remove, context rows, and compact effective line numbers.
+- `CodeSurface`: low-level shared code frame used by native fenced code, `CodeBlock`, and `DiffBlock`; prefer author-facing components or native Markdown in artifact source.
 - `Callout`: semantic note, warning, recommendation, or risk block with controlled Markdown body copy.
 - `SeverityBadge`: compact severity, confidence, status, or risk label.
 - `AnnotatedCode`: code block with line-level annotations and severity labels.
@@ -149,7 +150,7 @@ Candidate foundation components:
 | `Callout` | Highlight warnings, assumptions, gotchas, or decisions. | Shipped | Useful across reports, code review, research, and plans. |
 | `SeverityBadge` | Show severity, confidence, status, or risk. | Shipped | Small but widely reused by review/report components. |
 | `AnnotatedCode` | Render code with line notes and severity markers. | Shipped | First version uses a code block plus annotation list. |
-| `CodeBlock` | Render code with language, filename, line numbers, and highlighted lines. | Shipped | Syntax highlighting and copy affordance remain future enhancements. |
+| `CodeBlock` | Render code with language, filename, line numbers, copy affordance, and highlighted lines. | Shipped | Syntax highlighting can be added later without changing the authoring contract. |
 | `DiffBlock` | Render structured diff rows with compact effective line numbers. | Shipped | Accepts structured lines first; raw unified diff parsing can be a later helper. |
 | `Timeline` | Show ordered events, milestones, incidents, or plans. | P2 | Reusable for status reports, incidents, and implementation plans. |
 | `MetricCard` | Show compact numeric status with label and trend. | P2 | Useful for status reports and dashboards. |

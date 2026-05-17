@@ -1,4 +1,5 @@
 import { CommentTarget } from "../../interactions/comments/Comments";
+import { CodeSurface } from "../code-surface/CodeSurface";
 
 export type DiffLineType = "add" | "remove" | "context";
 
@@ -34,25 +35,15 @@ export function DiffBlock({ id, lines, filename, language, className }: DiffBloc
       targetId={targetId}
       title={title}
     >
-      <figure className="ak-code-block ak-diff-block">
-        {(filename || language) && (
-          <figcaption className="ak-code-header">
-            {filename && <span className="ak-code-filename">{filename}</span>}
-            {language && <span className="ak-code-language">{language}</span>}
-          </figcaption>
-        )}
-        <pre className="ak-code-pre">
-          <code className={language ? `language-${language}` : undefined}>
-            {lines.map((line, index) => (
-              <span className={classNames("ak-diff-line", `ak-diff-line-${line.type}`)} key={`${line.type}-${index}`}>
-                <span className="ak-diff-line-number">{line.newLine ?? line.oldLine ?? ""}</span>
-                <span className="ak-diff-marker">{markers[line.type]}</span>
-                <span className="ak-diff-line-content">{line.content || "\u00a0"}</span>
-              </span>
-            ))}
-          </code>
-        </pre>
-      </figure>
+      <CodeSurface className="ak-diff-block" filename={filename} language={language}>
+        {lines.map((line, index) => (
+          <span className={classNames("ak-diff-line", `ak-diff-line-${line.type}`)} key={`${line.type}-${index}`}>
+            <span className="ak-diff-line-number">{line.newLine ?? line.oldLine ?? ""}</span>
+            <span className="ak-diff-marker">{markers[line.type]}</span>
+            <span className="ak-diff-line-content">{line.content || "\u00a0"}</span>
+          </span>
+        ))}
+      </CodeSurface>
     </CommentTarget>
   );
 }

@@ -28,5 +28,6 @@ export const Basic: Story = {
       { type: "add", newLine: 13, content: "  return JSON.stringify(value, null, 2);" },
       { type: "context", oldLine: 14, newLine: 14, content: "}" }
     ]
-  }
+  },
+  render: (args) => <DiffBlock {...args} />
 };

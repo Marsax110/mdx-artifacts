@@ -469,7 +469,8 @@ Use MarkdownBody when a component needs controlled body copy:
     category: "content",
     stability: "stable",
     authoring: { kind: "structured-renderer", guidance: structuredRendererGuidance },
-    description: "Renders code text with optional filename, language label, line numbers, and highlighted lines.",
+    description:
+      "Renders code text with optional filename, language label, line numbers, copy control, and highlighted lines.",
     useWhen: ["Code examples", "Implementation notes", "Technical explanations", "Code review context"],
     props: [
       {
