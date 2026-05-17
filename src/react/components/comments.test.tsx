@@ -14,10 +14,10 @@ import { createArtifactStateFromComments } from "./ArtifactState";
 import { AnnotatedCode } from "../primitives/annotated-code/AnnotatedCode";
 import { Callout } from "../primitives/callout/Callout";
 import { CodeBlock } from "../primitives/code-block/CodeBlock";
-import { ComparisonSet } from "./ComparisonSet";
-import { ContentSet } from "./ContentItem";
+import { ComparisonSet } from "../composites/comparison-set/ComparisonSet";
+import { ContentSet } from "../composites/content-set/ContentItem";
 import { DiffBlock } from "../primitives/diff-block/DiffBlock";
-import { ExportPanel } from "./ExportPanel";
+import { ExportPanel } from "../composites/export-panel/ExportPanel";
 
 describe("Comment components", () => {
   it("renders a commentable block with a stable block target", () => {

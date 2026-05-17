@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ComparisonSet } from "./ComparisonSet";
-import { Frame } from "../layout/layout-primitives/Layout";
-import { MarkdownBody } from "../primitives/markdown-body/MarkdownBody";
+import { Frame } from "../../layout/layout-primitives/Layout";
+import { MarkdownBody } from "../../primitives/markdown-body/MarkdownBody";
 
 const meta = {
   title: "Artifact Components/ComparisonSet",
@@ -37,7 +37,7 @@ export const MixedContent: Story = {
 
       <ComparisonSet.Item title="Code path" value="code-path">
         <Frame surface="subtle">
-          <pre className="ak-export-output">{`src/react/components/ComparisonSet.tsx
+        <pre className="ak-export-output">{`src/react/composites/comparison-set/ComparisonSet.tsx
 src/react/registry.ts
 artifact-docs/examples/layout-composition.mdx`}</pre>
         </Frame>

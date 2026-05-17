@@ -1,7 +1,7 @@
 import { createContext, useContext, type ReactNode } from "react";
-import { Grid, type AkCollapseAt, type AkGap } from "../layout/layout-primitives/Layout";
-import { InlineText } from "../primitives/inline-text/InlineText";
-import { CommentTarget } from "./Comments";
+import { CommentTarget } from "../../components/Comments";
+import { Grid, type AkCollapseAt, type AkGap } from "../../layout/layout-primitives/Layout";
+import { InlineText } from "../../primitives/inline-text/InlineText";
 
 export type ComparisonSetProps = {
   id?: string;

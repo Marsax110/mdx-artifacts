@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { ContentSet } from "../../components/ContentItem";
-import { ExportPanel } from "../../components/ExportPanel";
+import { ContentSet } from "../../composites/content-set/ContentItem";
+import { ExportPanel } from "../../composites/export-panel/ExportPanel";
 import { InlineText } from "../../primitives/inline-text/InlineText";
 import { Columns, Frame, Grid, SplitPane, Stack } from "./Layout";
 import { MarkdownBody } from "../../primitives/markdown-body/MarkdownBody";

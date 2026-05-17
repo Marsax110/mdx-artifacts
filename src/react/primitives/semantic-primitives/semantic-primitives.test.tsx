@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { CommentLayer } from "../../components/Comments";
-import { Section } from "../../components/Section";
+import { Section } from "../../composites/section/Section";
 import { AnnotatedCode } from "../annotated-code/AnnotatedCode";
 import { Callout } from "../callout/Callout";
 import { SeverityBadge } from "../severity-badge/SeverityBadge";

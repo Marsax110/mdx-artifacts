@@ -17,9 +17,9 @@ export type {
 } from "./components/ArtifactState";
 export { Callout } from "./primitives/callout/Callout";
 export type { CalloutProps, CalloutTone } from "./primitives/callout/Callout";
-export { ComparisonSet } from "./components/ComparisonSet";
-export type { ComparisonSetItemProps, ComparisonSetProps } from "./components/ComparisonSet";
-export { ContentItem, ContentSet } from "./components/ContentItem";
+export { ComparisonSet } from "./composites/comparison-set/ComparisonSet";
+export type { ComparisonSetItemProps, ComparisonSetProps } from "./composites/comparison-set/ComparisonSet";
+export { ContentItem, ContentSet } from "./composites/content-set/ContentItem";
 export type {
   ContentItemEmphasis,
   ContentItemProps,
@@ -29,7 +29,7 @@ export type {
   ContentSetLayout,
   ContentSetSurface,
   ContentSetProps
-} from "./components/ContentItem";
+} from "./composites/content-set/ContentItem";
 export { CodeBlock } from "./primitives/code-block/CodeBlock";
 export type { CodeBlockProps } from "./primitives/code-block/CodeBlock";
 export {
@@ -51,8 +51,8 @@ export type {
 } from "./components/Comments";
 export { DiffBlock } from "./primitives/diff-block/DiffBlock";
 export type { DiffBlockProps, DiffLine, DiffLineType } from "./primitives/diff-block/DiffBlock";
-export { ExportPanel } from "./components/ExportPanel";
-export type { ExportFormat, ExportPanelProps } from "./components/ExportPanel";
+export { ExportPanel } from "./composites/export-panel/ExportPanel";
+export type { ExportFormat, ExportPanelProps } from "./composites/export-panel/ExportPanel";
 export { InlineText } from "./primitives/inline-text/InlineText";
 export type { InlineTextAs, InlineTextProps, InlineTextVariant } from "./primitives/inline-text/InlineText";
 export { Columns, Frame, Grid, SplitPane, Stack } from "./layout/layout-primitives/Layout";
@@ -70,8 +70,8 @@ export type {
 } from "./layout/layout-primitives/Layout";
 export { MarkdownBody } from "./primitives/markdown-body/MarkdownBody";
 export type { MarkdownBodyProps, MarkdownBodyVariant } from "./primitives/markdown-body/MarkdownBody";
-export { Section } from "./components/Section";
-export type { SectionProps } from "./components/Section";
+export { Section } from "./composites/section/Section";
+export type { SectionProps } from "./composites/section/Section";
 export { SeverityBadge } from "./primitives/severity-badge/SeverityBadge";
 export type { SeverityBadgeProps, SeverityLevel } from "./primitives/severity-badge/SeverityBadge";
 export { SortableList, createSortableListInteraction, reorderIds, resolveSortableListOrder } from "./components/SortableList";
