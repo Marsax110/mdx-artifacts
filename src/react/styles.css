@@ -559,6 +559,7 @@ body {
   gap: 14px;
 }
 
+.ak-content-set-surface-plain,
 .ak-content-set-surface-subtle,
 .ak-content-set-surface-outlined {
   border-radius: 10px;
@@ -1183,6 +1184,18 @@ body {
   border-radius: 8px;
 }
 
+.ak-comment-target-block::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: -6px;
+  border: 2px solid var(--ak-comment-accent);
+  border-radius: 12px;
+  box-shadow: 0 0 0 3px var(--ak-comment-accent-subtle);
+  opacity: 0;
+  pointer-events: none;
+}
+
 .ak-comment-target-card {
   height: 100%;
 }
@@ -1201,13 +1214,17 @@ body {
 .ak-comment-target-has-comments > .ak-comment-target-content,
 .ak-comment-target-selected > .ak-comment-target-content {
   border-radius: 8px;
-  box-shadow:
-    0 0 0 2px var(--ak-comment-accent),
-    0 0 0 6px var(--ak-comment-accent-subtle);
 }
 
-.ak-comment-target-block:has(.ak-comment-target-block:hover):not(.ak-comment-target-selected) > .ak-comment-target-content {
-  box-shadow: none;
+.ak-comment-target-block:hover::after,
+.ak-comment-target-block:focus-within::after,
+.ak-comment-target-has-comments::after,
+.ak-comment-target-selected::after {
+  opacity: 1;
+}
+
+.ak-comment-target-block:has(.ak-comment-target-block:hover):not(.ak-comment-target-selected)::after {
+  opacity: 0;
 }
 
 .ak-comment-marker-anchor,
