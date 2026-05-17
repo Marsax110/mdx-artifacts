@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { CommentTarget } from "../../components/Comments";
+import { CommentTarget } from "../../interactions/comments/Comments";
 import { InlineText } from "../inline-text/InlineText";
 import { MarkdownBody } from "../markdown-body/MarkdownBody";
 

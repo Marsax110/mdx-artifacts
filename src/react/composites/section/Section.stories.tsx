@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { CommentLayer } from "../../components/Comments";
+import { CommentLayer } from "../../interactions/comments/Comments";
 import { Section } from "./Section";
 
 const meta = {

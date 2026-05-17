@@ -5,7 +5,7 @@ export {
   createArtifactCommentsFromState,
   createArtifactStateFromComments,
   useOptionalArtifactState
-} from "./components/ArtifactState";
+} from "./interactions/artifact-state/ArtifactState";
 export type {
   ArtifactStateComment,
   ArtifactStateMessage,
@@ -14,7 +14,7 @@ export type {
   ArtifactStateStatus,
   ArtifactStateThread,
   ArtifactStateValue
-} from "./components/ArtifactState";
+} from "./interactions/artifact-state/ArtifactState";
 export { Callout } from "./primitives/callout/Callout";
 export type { CalloutProps, CalloutTone } from "./primitives/callout/Callout";
 export { ComparisonSet } from "./composites/comparison-set/ComparisonSet";
@@ -39,7 +39,7 @@ export {
   CommentTarget,
   serializeCommentsToMarkdown,
   useOptionalCommentExportValue
-} from "./components/Comments";
+} from "./interactions/comments/Comments";
 export type {
   ArtifactComment,
   CommentableBlockProps,
@@ -48,7 +48,7 @@ export type {
   CommentExportValue,
   CommentLayerProps,
   CommentTargetProps
-} from "./components/Comments";
+} from "./interactions/comments/Comments";
 export { DiffBlock } from "./primitives/diff-block/DiffBlock";
 export type { DiffBlockProps, DiffLine, DiffLineType } from "./primitives/diff-block/DiffBlock";
 export { ExportPanel } from "./composites/export-panel/ExportPanel";
@@ -74,13 +74,18 @@ export { Section } from "./composites/section/Section";
 export type { SectionProps } from "./composites/section/Section";
 export { SeverityBadge } from "./primitives/severity-badge/SeverityBadge";
 export type { SeverityBadgeProps, SeverityLevel } from "./primitives/severity-badge/SeverityBadge";
-export { SortableList, createSortableListInteraction, reorderIds, resolveSortableListOrder } from "./components/SortableList";
+export {
+  SortableList,
+  createSortableListInteraction,
+  reorderIds,
+  resolveSortableListOrder
+} from "./interactions/sortable-list/SortableList";
 export type {
   SortableListInteraction,
   SortableListItem,
   SortableListProps,
   SortableListSurface
-} from "./components/SortableList";
+} from "./interactions/sortable-list/SortableList";
 export { componentRegistry, findComponentMeta } from "./registry";
 export type { ComponentMeta, ComponentPropMeta } from "./registry";
 export type { ArtifactKitConfig } from "../cli/config/types";

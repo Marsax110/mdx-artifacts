@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { CommentLayer } from "../../components/Comments";
+import { CommentLayer } from "../../interactions/comments/Comments";
 import { Section } from "../../composites/section/Section";
 import { AnnotatedCode } from "../annotated-code/AnnotatedCode";
 import { Callout } from "../callout/Callout";

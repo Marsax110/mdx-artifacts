@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { CommentLayer } from "./Comments";
-import { ContentSet } from "../composites/content-set/ContentItem";
-import { ExportPanel } from "../composites/export-panel/ExportPanel";
+import { ContentSet } from "../../composites/content-set/ContentItem";
+import { ExportPanel } from "../../composites/export-panel/ExportPanel";
 
 const meta = {
   title: "Artifact Components/Comments",

@@ -1,5 +1,5 @@
 import { createContext, useContext, type CSSProperties, type ReactNode } from "react";
-import { CommentTarget } from "../../components/Comments";
+import { CommentTarget } from "../../interactions/comments/Comments";
 import { InlineText } from "../../primitives/inline-text/InlineText";
 
 export type ContentItemTone = "neutral" | "info" | "positive" | "warning" | "danger" | "accent";

@@ -1,6 +1,6 @@
 import * as Tabs from "@radix-ui/react-tabs";
 import { useMemo, useState } from "react";
-import { serializeCommentsToMarkdown, useOptionalCommentExportValue } from "../../components/Comments";
+import { serializeCommentsToMarkdown, useOptionalCommentExportValue } from "../../interactions/comments/Comments";
 import { InlineText } from "../../primitives/inline-text/InlineText";
 
 export type ExportFormat = "markdown" | "json";

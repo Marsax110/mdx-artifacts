@@ -1,4 +1,4 @@
-import { CommentTarget } from "../../components/Comments";
+import { CommentTarget } from "../../interactions/comments/Comments";
 import { CodeBlock } from "../code-block/CodeBlock";
 import { InlineText } from "../inline-text/InlineText";
 import { MarkdownBody } from "../markdown-body/MarkdownBody";

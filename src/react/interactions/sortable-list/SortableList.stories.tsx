@@ -1,7 +1,7 @@
 import { Description, Primary, Stories, Title } from "@storybook/addon-docs/blocks";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useEffect, type ReactNode } from "react";
-import { ArtifactStateProvider } from "./ArtifactState";
+import { ArtifactStateProvider } from "../artifact-state/ArtifactState";
 import { SortableList, type SortableListItem } from "./SortableList";
 
 const baseItems: SortableListItem[] = [

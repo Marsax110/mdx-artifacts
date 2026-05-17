@@ -1,5 +1,5 @@
 import { createContext, useContext, type ReactNode } from "react";
-import { CommentTarget } from "../../components/Comments";
+import { CommentTarget } from "../../interactions/comments/Comments";
 import { Grid, type AkCollapseAt, type AkGap } from "../../layout/layout-primitives/Layout";
 import { InlineText } from "../../primitives/inline-text/InlineText";
 

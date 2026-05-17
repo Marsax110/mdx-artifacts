@@ -6,10 +6,10 @@ import {
   type ArtifactStateMessage,
   type ArtifactStateReviewThread,
   useOptionalArtifactState
-} from "./ArtifactState";
-import { InlineText } from "../primitives/inline-text/InlineText";
+} from "../artifact-state/ArtifactState";
+import { InlineText } from "../../primitives/inline-text/InlineText";
 
-export { createArtifactCommentsFromState, createArtifactThreadsFromState } from "./ArtifactState";
+export { createArtifactCommentsFromState, createArtifactThreadsFromState } from "../artifact-state/ArtifactState";
 
 export type ArtifactComment = {
   id: string;

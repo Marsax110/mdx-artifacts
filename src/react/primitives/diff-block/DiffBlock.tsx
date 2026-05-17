@@ -1,4 +1,4 @@
-import { CommentTarget } from "../../components/Comments";
+import { CommentTarget } from "../../interactions/comments/Comments";
 
 export type DiffLineType = "add" | "remove" | "context";
 

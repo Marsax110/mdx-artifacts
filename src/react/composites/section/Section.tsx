@@ -1,5 +1,5 @@
 import { Children, isValidElement, type ReactNode } from "react";
-import { CommentTarget } from "../../components/Comments";
+import { CommentTarget } from "../../interactions/comments/Comments";
 
 export type SectionProps = {
   id: string;

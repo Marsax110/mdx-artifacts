@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { CommentLayer } from "./Comments";
+import { CommentLayer } from "../comments/Comments";
 import {
   SortableList,
   createSortableListInteraction,
