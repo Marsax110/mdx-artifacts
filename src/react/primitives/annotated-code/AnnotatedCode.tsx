@@ -1,8 +1,8 @@
-import { CodeBlock } from "./CodeBlock";
-import { CommentTarget } from "./Comments";
-import { InlineText } from "./InlineText";
-import { MarkdownBody } from "./MarkdownBody";
-import { SeverityBadge, type SeverityLevel } from "./SeverityBadge";
+import { CommentTarget } from "../../components/Comments";
+import { CodeBlock } from "../code-block/CodeBlock";
+import { InlineText } from "../inline-text/InlineText";
+import { MarkdownBody } from "../markdown-body/MarkdownBody";
+import { SeverityBadge, type SeverityLevel } from "../severity-badge/SeverityBadge";
 
 export type CodeAnnotation = {
   id?: string;

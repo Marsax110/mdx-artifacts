@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { InlineText } from "./InlineText";
+import { InlineText } from "../inline-text/InlineText";
 import { MarkdownBody } from "./MarkdownBody";
 
 describe("InlineText", () => {

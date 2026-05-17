@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
-import { CommentTarget } from "./Comments";
-import { InlineText } from "./InlineText";
-import { MarkdownBody } from "./MarkdownBody";
+import { CommentTarget } from "../../components/Comments";
+import { InlineText } from "../inline-text/InlineText";
+import { MarkdownBody } from "../markdown-body/MarkdownBody";
 
 export type CalloutTone = "info" | "success" | "warning" | "danger";
 

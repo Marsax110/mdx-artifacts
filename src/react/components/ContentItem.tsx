@@ -1,6 +1,6 @@
 import { createContext, useContext, type CSSProperties, type ReactNode } from "react";
 import { CommentTarget } from "./Comments";
-import { InlineText } from "./InlineText";
+import { InlineText } from "../primitives/inline-text/InlineText";
 
 export type ContentItemTone = "neutral" | "info" | "positive" | "warning" | "danger" | "accent";
 export type ContentItemEmphasis = "default" | "primary" | "subtle";

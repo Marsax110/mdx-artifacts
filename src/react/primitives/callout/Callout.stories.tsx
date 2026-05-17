@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Grid } from "./Layout";
+import { Grid } from "../../components/Layout";
 import { Callout } from "./Callout";
 
 const meta = {

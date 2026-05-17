@@ -1,10 +1,10 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { AnnotatedCode } from "./AnnotatedCode";
-import { Callout } from "./Callout";
-import { CommentLayer } from "./Comments";
-import { Section } from "./Section";
-import { SeverityBadge } from "./SeverityBadge";
+import { CommentLayer } from "../../components/Comments";
+import { Section } from "../../components/Section";
+import { AnnotatedCode } from "../annotated-code/AnnotatedCode";
+import { Callout } from "../callout/Callout";
+import { SeverityBadge } from "../severity-badge/SeverityBadge";
 
 describe("Callout", () => {
   it("renders a titled markdown callout", () => {

@@ -11,12 +11,12 @@ import {
   serializeCommentsToMarkdown
 } from "./Comments";
 import { createArtifactStateFromComments } from "./ArtifactState";
-import { AnnotatedCode } from "./AnnotatedCode";
-import { Callout } from "./Callout";
-import { CodeBlock } from "./CodeBlock";
+import { AnnotatedCode } from "../primitives/annotated-code/AnnotatedCode";
+import { Callout } from "../primitives/callout/Callout";
+import { CodeBlock } from "../primitives/code-block/CodeBlock";
 import { ComparisonSet } from "./ComparisonSet";
 import { ContentSet } from "./ContentItem";
-import { DiffBlock } from "./DiffBlock";
+import { DiffBlock } from "../primitives/diff-block/DiffBlock";
 import { ExportPanel } from "./ExportPanel";
 
 describe("Comment components", () => {

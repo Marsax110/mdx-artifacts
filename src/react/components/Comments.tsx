@@ -7,7 +7,7 @@ import {
   type ArtifactStateReviewThread,
   useOptionalArtifactState
 } from "./ArtifactState";
-import { InlineText } from "./InlineText";
+import { InlineText } from "../primitives/inline-text/InlineText";
 
 export { createArtifactCommentsFromState, createArtifactThreadsFromState } from "./ArtifactState";
 

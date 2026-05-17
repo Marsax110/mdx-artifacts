@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type DragEvent } from "react";
 import { useOptionalArtifactState, type ArtifactStateValue } from "./ArtifactState";
 import { CommentTarget } from "./Comments";
-import { InlineText } from "./InlineText";
+import { InlineText } from "../primitives/inline-text/InlineText";
 
 export type SortableListSurface = "plain" | "subtle" | "outlined";
 
