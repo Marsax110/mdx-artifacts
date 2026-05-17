@@ -26,7 +26,7 @@ Current test coverage:
 Current test files:
 
 - `src/react/registry.test.ts`
-- `src/react/components/text-components.test.tsx`
+- `src/react/primitives/markdown-body/text-components.test.tsx`
 - `src/cli/components.test.ts`
 - `src/cli/validate.test.ts`
 
