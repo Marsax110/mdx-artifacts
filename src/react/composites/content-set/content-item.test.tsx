@@ -13,6 +13,7 @@ describe("ContentItem", () => {
           badge="Focus"
           tone="accent"
           emphasis="primary"
+          icon="✅"
           summary="Keep the public API readable."
         >
           <p>Detailed rationale stays in children.</p>
@@ -23,8 +24,27 @@ describe("ContentItem", () => {
     expect(html).toContain('data-anchor-id="item.api-boundary"');
     expect(html).toContain("ak-content-item-tone-accent");
     expect(html).toContain("ak-content-item-emphasis-primary");
+    expect(html).toContain("ak-content-item-icon");
+    expect(html).toContain("✅");
     expect(html).toContain("Keep the public API readable.");
     expect(html).toContain("Detailed rationale stays in children.");
+  });
+
+  it("renders React element icons as decorative markers", () => {
+    const html = renderToStaticMarkup(
+      <ContentItem
+        title="Element icon"
+        icon={
+          <svg viewBox="0 0 16 16">
+            <path d="M2 8h12" />
+          </svg>
+        }
+      />
+    );
+
+    expect(html).toContain('aria-hidden="true"');
+    expect(html).toContain("ak-content-item-icon");
+    expect(html).toContain("<svg");
   });
 });
 
@@ -39,6 +59,7 @@ describe("ContentSet", () => {
           columns={5}
           surface="outlined"
           tone="positive"
+          icon="🧭"
         >
           <ContentSet.Item id="component-first" title="Component-first" badge="Recommended">
             <p>Use stable components for interaction.</p>
@@ -51,7 +72,9 @@ describe("ContentSet", () => {
     expect(html).toContain("--ak-content-set-columns:5");
     expect(html).toContain("ak-content-set-surface-outlined");
     expect(html).toContain("ak-content-set-items-grid");
+    expect(html).toContain("ak-content-set-icon");
     expect(html).toContain("ak-content-item-tone-positive");
+    expect(html).toContain("🧭");
     expect(html).toContain("Recommended");
   });
 

@@ -181,6 +181,12 @@ Use MarkdownBody when a component needs controlled body copy:
         description: "Optional one-line summary. Use children for longer explanations and lists."
       },
       {
+        name: "icon",
+        type: "ReactNode",
+        description:
+          "Optional decorative marker rendered in the component-defined title area. Emoji are recommended for agent-authored artifacts; project icon components may be passed when needed."
+      },
+      {
         name: "tone",
         type: "'neutral' | 'info' | 'positive' | 'warning' | 'danger' | 'accent'",
         description: "Semantic color tone. Defaults to neutral."
@@ -201,6 +207,7 @@ Use MarkdownBody when a component needs controlled body copy:
   id="item.component-first"
   title="Component-first authoring"
   badge="Recommended"
+  icon="✅"
   tone="positive"
   emphasis="primary"
   summary="Best when the artifact needs stable interaction and visual structure."
@@ -239,6 +246,12 @@ Use MarkdownBody when a component needs controlled body copy:
         type: "ReactNode",
         required: true,
         description: "Use ContentSet.Item children. Each item uses title, badge, summary, tone, emphasis, and Markdown body."
+      },
+      {
+        name: "icon",
+        type: "ReactNode",
+        description:
+          "Optional decorative marker rendered beside the set title. It describes the group and is not inherited by items."
       },
       {
         name: "layout",
@@ -297,6 +310,12 @@ Use MarkdownBody when a component needs controlled body copy:
             description: "Optional one-line summary. Use children for longer explanations and lists."
           },
           {
+            name: "icon",
+            type: "ReactNode",
+            description:
+              "Optional decorative marker rendered in the item title area. Use text props and tone for semantic meaning."
+          },
+          {
             name: "tone",
             type: "'neutral' | 'info' | 'positive' | 'warning' | 'danger' | 'accent'",
             description: "Optional item tone. Overrides the parent tone."
@@ -315,11 +334,12 @@ Use MarkdownBody when a component needs controlled body copy:
         ]
       }
     ],
-    example: `<ContentSet id="set.authoring-paths" title="Authoring paths" layout="grid" columns={3} surface="subtle">
+    example: `<ContentSet id="set.authoring-paths" title="Authoring paths" icon="🧭" layout="grid" columns={3} surface="subtle">
   <ContentSet.Item
     id="component-first"
     title="Component-first"
     badge="Recommended"
+    icon="✅"
     tone="positive"
     emphasis="primary"
     summary="Best for stable interaction and visual structure."

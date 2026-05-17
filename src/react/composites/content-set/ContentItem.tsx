@@ -13,6 +13,7 @@ export type ContentItemProps = {
   title: string;
   badge?: string;
   summary?: string;
+  icon?: ReactNode;
   tone?: ContentItemTone;
   emphasis?: ContentItemEmphasis;
   children?: ReactNode;
@@ -23,6 +24,7 @@ export type ContentSetProps = {
   id?: string;
   title: string;
   children?: ReactNode;
+  icon?: ReactNode;
   layout?: ContentSetLayout;
   columns?: ContentSetColumns;
   surface?: ContentSetSurface;
@@ -45,6 +47,7 @@ export function ContentItem({
   title,
   badge,
   summary,
+  icon,
   tone = "neutral",
   emphasis = "default",
   children,
@@ -56,6 +59,7 @@ export function ContentItem({
       className={className}
       description="ContentItem component"
       emphasis={emphasis}
+      icon={icon}
       summary={summary}
       targetId={id ?? `content:${slugify(title)}`}
       title={title}
@@ -70,6 +74,7 @@ function ContentSetRoot({
   id,
   title,
   children,
+  icon,
   layout = "grid",
   columns = 3,
   surface = "plain",
@@ -96,9 +101,16 @@ function ContentSetRoot({
       >
         <div className="ak-section-header">
           <p className="ak-eyebrow">Content Set</p>
-          <InlineText as="h2" variant="title">
-            {title}
-          </InlineText>
+          <div className="ak-content-set-title-row">
+            {icon ? (
+              <span aria-hidden="true" className="ak-content-set-icon">
+                {icon}
+              </span>
+            ) : null}
+            <InlineText as="h2" variant="title">
+              {title}
+            </InlineText>
+          </div>
         </div>
         <div
           className={classNames("ak-content-set-items", `ak-content-set-items-${layout}`)}
@@ -116,6 +128,7 @@ function ContentSetItem({
   title,
   badge,
   summary,
+  icon,
   tone,
   emphasis,
   children,
@@ -132,6 +145,7 @@ function ContentSetItem({
       className={className}
       description={context ? `ContentSet item in ${context.title}` : "ContentSet item"}
       emphasis={resolvedEmphasis}
+      icon={icon}
       summary={summary}
       targetId={targetId}
       title={title}
@@ -148,6 +162,7 @@ function ContentItemCard({
   className,
   description,
   emphasis,
+  icon,
   summary,
   targetId,
   title,
@@ -158,6 +173,7 @@ function ContentItemCard({
   className?: string;
   description: string;
   emphasis: ContentItemEmphasis;
+  icon?: ReactNode;
   summary?: string;
   targetId: string;
   title: string;
@@ -178,9 +194,16 @@ function ContentItemCard({
         )}
       >
         <div className="ak-content-item-header">
-          <InlineText as="h3" variant="subtitle">
-            {title}
-          </InlineText>
+          <div className="ak-content-item-title-row">
+            {icon ? (
+              <span aria-hidden="true" className="ak-content-item-icon">
+                {icon}
+              </span>
+            ) : null}
+            <InlineText as="h3" variant="subtitle">
+              {title}
+            </InlineText>
+          </div>
           {badge ? <span className="ak-content-item-badge">{badge}</span> : null}
         </div>
         {summary ? (

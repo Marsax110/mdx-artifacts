@@ -18,6 +18,14 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
+function SparkIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 16 16">
+      <path d="M8 1.5 9.7 6l4.8 2-4.8 2L8 14.5 6.3 10 1.5 8l4.8-2L8 1.5Z" fill="currentColor" />
+    </svg>
+  );
+}
+
 export const Grid: Story = {
   args: {
     id: "set.authoring-paths",
@@ -59,6 +67,44 @@ export const Grid: Story = {
   )
 };
 
+export const WithIcons: Story = {
+  args: {
+    id: "set.icon-slots",
+    title: "Icon slot paths",
+    layout: "grid",
+    columns: 3,
+    surface: "subtle",
+    icon: "🧭"
+  },
+  render: () => (
+    <ContentSet id="set.icon-slots" title="Icon slot paths" icon="🧭" layout="grid" columns={3} surface="subtle">
+      <ContentSet.Item
+        id="emoji"
+        title="Emoji marker"
+        badge="Default"
+        icon="✅"
+        tone="positive"
+        summary="Best for agent-authored artifacts."
+      >
+        <p>Emoji keep the authoring model light and avoid a package-level icon dependency.</p>
+      </ContentSet.Item>
+      <ContentSet.Item
+        id="react-node"
+        title="React node marker"
+        badge="Custom"
+        icon={<SparkIcon />}
+        tone="accent"
+        summary="Use project icons when a stricter visual system is needed."
+      >
+        <p>The component still owns placement, sizing, and spacing.</p>
+      </ContentSet.Item>
+      <ContentSet.Item id="none" title="No marker" badge="Optional" summary="Icons are never required.">
+        <p>Text slots and tone keep carrying the semantic meaning.</p>
+      </ContentSet.Item>
+    </ContentSet>
+  )
+};
+
 export const Stack: Story = {
   args: {
     id: "set.release-risks",
@@ -89,6 +135,7 @@ export const StandaloneItem: Story = {
       badge="Focus"
       tone="accent"
       emphasis="primary"
+      icon="🎯"
       summary="Use ContentItem when a single reusable content block is enough."
     >
       <p>Put detailed rationale, lists, and caveats in children.</p>

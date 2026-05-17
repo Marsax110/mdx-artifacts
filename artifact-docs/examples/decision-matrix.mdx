@@ -5,6 +5,7 @@ import { ContentSet, ExportPanel, SortableList } from "mdx-artifacts/react";
 <ContentSet
   id="set.stage-one"
   title="Should stage one focus on a **Vite single HTML artifact** instead of starting with an Astro docs site?"
+  icon="🧭"
   layout="grid"
   columns={3}
   surface="subtle"
@@ -13,6 +14,7 @@ import { ContentSet, ExportPanel, SortableList } from "mdx-artifacts/react";
     id="vite"
     title="**Vite** single HTML artifact"
     badge="Recommended"
+    icon="✅"
     tone="positive"
     emphasis="primary"
     summary="Validate the shortest `MDX -> HTML` loop first."
@@ -29,6 +31,7 @@ import { ContentSet, ExportPanel, SortableList } from "mdx-artifacts/react";
     id="astro"
     title="Astro docs site"
     badge="Later"
+    icon="🗂️"
     tone="info"
     summary="Turn the artifact-docs tree into a structured static docs site."
   >
@@ -44,6 +47,7 @@ import { ContentSet, ExportPanel, SortableList } from "mdx-artifacts/react";
     id="raw-html"
     title="Raw HTML"
     badge="Fallback"
+    icon="⚠️"
     tone="warning"
     emphasis="subtle"
     summary="Let agents generate complete HTML directly."

@@ -70,6 +70,8 @@ Use props for short display structure. Use `children` for long explanations, pro
 
 Do not parse headings inside `children` as a component protocol. Headings and lists in children are human-readable body structure, not machine-readable slot names.
 
+Content components may add decorative icon slots when the component owns the icon placement and the semantic meaning remains in text, tone, and body content. See [Content Icon Slots](./content-icon-slots/README.md) for the phased policy.
+
 ## Content Items
 
 Use `ContentItem` when one reusable content block needs display slots, tone color, emphasis weight, a stable comment anchor, and Markdown-rich body content.
