@@ -35,5 +35,6 @@ export const CustomLabel: Story = {
   args: {
     level: "high",
     label: "Regression risk"
-  }
+  },
+  render: (args) => <SeverityBadge {...args} />
 };

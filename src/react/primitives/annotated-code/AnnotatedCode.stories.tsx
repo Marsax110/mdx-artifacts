@@ -45,5 +45,6 @@ export const Basic: Story = {
         body: "This should stay small and synchronous because artifact pages run without a backend."
       }
     ]
-  }
+  },
+  render: (args) => <AnnotatedCode {...args} />
 };

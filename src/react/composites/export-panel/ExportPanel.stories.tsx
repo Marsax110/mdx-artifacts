@@ -30,7 +30,8 @@ export const MarkdownAndJson: Story = {
       ],
       nextSteps: ["Add Storybook component previews", "Add PriorityBoard"]
     }
-  }
+  },
+  render: (args) => <ExportPanel {...args} />
 };
 
 export const JsonOnly: Story = {
@@ -41,5 +42,6 @@ export const JsonOnly: Story = {
       component: "ExportPanel",
       purpose: "Copy human-edited results back to an agent or issue"
     }
-  }
+  },
+  render: (args) => <ExportPanel {...args} />
 };

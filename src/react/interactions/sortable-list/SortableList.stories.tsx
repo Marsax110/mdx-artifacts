@@ -102,7 +102,8 @@ export const LaunchPriority: Story = {
     summary: "Drag items, use the controls, or edit short item metadata in a local writable preview.",
     surface: "outlined",
     items: baseItems
-  }
+  },
+  render: (args) => <SortableList {...args} />
 };
 
 export const ReadOnlyArtifact: Story = {
@@ -121,7 +122,8 @@ export const ReadOnlyArtifact: Story = {
     summary: "Static artifacts do not expose item add, edit, or delete controls.",
     surface: "outlined",
     items: baseItems
-  }
+  },
+  render: (args) => <SortableList {...args} />
 };
 
 export const PlainSurface: Story = {
@@ -140,7 +142,8 @@ export const PlainSurface: Story = {
     summary: "A low-emphasis list for dense artifact pages.",
     surface: "plain",
     items: baseItems
-  }
+  },
+  render: (args) => <SortableList {...args} />
 };
 
 export const SubtleSurface: Story = {
@@ -159,7 +162,8 @@ export const SubtleSurface: Story = {
     summary: "A moderate-emphasis list for mixed narrative and workflow pages.",
     surface: "subtle",
     items: baseItems
-  }
+  },
+  render: (args) => <SortableList {...args} />
 };
 
 export const DisabledItem: Story = {
@@ -186,7 +190,8 @@ export const DisabledItem: Story = {
       },
       baseItems[2]
     ]
-  }
+  },
+  render: (args) => <SortableList {...args} />
 };
 
 let restoreStorybookFetch: (() => void) | undefined;
