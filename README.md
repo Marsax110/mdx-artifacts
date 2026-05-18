@@ -108,9 +108,24 @@ The first stage focuses on the smallest useful loop:
 
 Astro is intentionally not part of the core yet. It can become a later adapter for long-lived docs sites.
 
-## Install
+## Install From npm
 
-Install in a project that should build local artifacts:
+For npm users, the shortest first run is:
+
+```bash
+npm install --save-dev mdx-artifacts
+npx mdx-artifacts init
+npx mdx-artifacts validate artifact-docs/examples/hello.mdx
+npx mdx-artifacts build artifact-docs/examples/hello.mdx
+```
+
+The final command writes:
+
+```text
+dist/artifacts/examples/hello.html
+```
+
+Install with pnpm in a project that should build local artifacts:
 
 ```bash
 pnpm add -D mdx-artifacts
@@ -125,12 +140,14 @@ pnpm add -Dw mdx-artifacts
 React and React DOM are peer dependencies. Modern package managers usually install them automatically for this dev-tool workflow. If peer dependency auto-install is disabled in your project, install them explicitly:
 
 ```bash
+npm install --save-dev mdx-artifacts react react-dom
 pnpm add -D mdx-artifacts react react-dom
 ```
 
 Initialize a workspace:
 
 ```bash
+npx mdx-artifacts init
 pnpm exec mdx-artifacts init
 ```
 

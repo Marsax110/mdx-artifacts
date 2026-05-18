@@ -107,9 +107,24 @@ MDX Artifacts 是一个 Markdown-native 的 artifact system。
 
 暂不把核心绑定到 Astro。Astro 后续只作为“结构化文档站 adapter”加入。
 
-## 安装
+## 从 npm 安装
 
-在需要生成本地 artifacts 的项目中安装：
+对 npm 使用者来说，最短的首次使用路径是：
+
+```bash
+npm install --save-dev mdx-artifacts
+npx mdx-artifacts init
+npx mdx-artifacts validate artifact-docs/examples/hello.mdx
+npx mdx-artifacts build artifact-docs/examples/hello.mdx
+```
+
+最后一条命令会输出：
+
+```text
+dist/artifacts/examples/hello.html
+```
+
+如果使用 pnpm，在需要生成本地 artifacts 的项目中安装：
 
 ```bash
 pnpm add -D mdx-artifacts
@@ -124,12 +139,14 @@ pnpm add -Dw mdx-artifacts
 React 和 React DOM 是 peer dependencies。现代包管理器通常会为这个开发工具链自动安装它们；如果你的项目关闭了 peer dependency 自动安装，再显式补上：
 
 ```bash
+npm install --save-dev mdx-artifacts react react-dom
 pnpm add -D mdx-artifacts react react-dom
 ```
 
 初始化工作区：
 
 ```bash
+npx mdx-artifacts init
 pnpm exec mdx-artifacts init
 ```
 
