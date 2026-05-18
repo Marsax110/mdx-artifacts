@@ -46,7 +46,7 @@ export async function reviewCommand(projectRoot: string, args: string[]) {
   }
 
   throw new Error(
-    "review requires a subcommand. Use `artifact-kit review add <file.mdx>`, `artifact-kit review reply <file.mdx>`, or `artifact-kit review validate <file.mdx>`."
+    "review requires a subcommand. Use `mdx-artifacts review add <file.mdx>`, `mdx-artifacts review reply <file.mdx>`, or `mdx-artifacts review validate <file.mdx>`."
   );
 }
 

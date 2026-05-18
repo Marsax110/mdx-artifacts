@@ -28,8 +28,8 @@ export function componentsCommand(input?: string, options: { json?: boolean } = 
   console.log(
     "\nAuthoring rule: prefer MDX children for human-readable content; use props for stable ids, variants, layout controls, export values, and structured data."
   );
-  console.log("\nUse `artifact-kit components <ComponentName>` to inspect props, authoring guidance, and examples.");
-  console.log("Use `artifact-kit components --json` for machine-readable metadata.");
+  console.log("\nUse `mdx-artifacts components <ComponentName>` to inspect props, authoring guidance, and examples.");
+  console.log("Use `mdx-artifacts components --json` for machine-readable metadata.");
 }
 
 function printComponent(component: (typeof componentRegistry)[number]) {

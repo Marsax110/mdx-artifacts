@@ -67,8 +67,8 @@ Add `icon?: ReactNode` to `ContentItem`, `ContentSet`, and `ContentSet.Item` as 
 - Emoji icons render in server-side component tests.
 - React element icons render in server-side component tests.
 - Missing icons do not change current text output.
-- `artifact-kit components ContentItem` explains the icon slot.
-- `artifact-kit components ContentSet` explains the icon slot.
+- `mdx-artifacts components ContentItem` explains the icon slot.
+- `mdx-artifacts components ContentSet` explains the icon slot.
 - Storybook has focused icon examples.
 - No `lucide-react` dependency is added.
 
@@ -126,7 +126,7 @@ Verify that icon slots work without changing the package dependency boundary.
 
 - `pnpm typecheck` passes.
 - `pnpm test` passes.
-- `pnpm artifact:validate` passes.
+- `pnpm mdx-artifacts:validate` passes.
 - `package.json` has no new icon-library dependency.
 
 ### Suggested Files

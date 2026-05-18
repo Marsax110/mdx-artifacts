@@ -1,6 +1,6 @@
-import type { ArtifactKitConfig } from "./src/cli/config/types";
+import type { MdxArtifactsConfig } from "./src/cli/config/types";
 
-const config: ArtifactKitConfig = {
+const config: MdxArtifactsConfig = {
   docsDir: "artifact-docs",
   outDir: "dist/artifacts",
   includeDefaultStyles: true,

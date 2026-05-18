@@ -5,7 +5,7 @@ import { componentsCommand } from "./commands/components";
 import { devCommand } from "./commands/dev";
 import { interactionsCommand } from "./commands/interactions";
 import { reviewCommand } from "./commands/review";
-import { initProject } from "./commands/scaffold";
+import { initProject, parseInitAgent } from "./commands/scaffold";
 import { formatValidationJson, printValidationResult, validateMdx } from "./commands/validate";
 import { loadConfig } from "./config/config";
 
@@ -19,7 +19,13 @@ async function main() {
   }
 
   if (command === "init") {
-    await initProject(projectRoot);
+    const args = process.argv.slice(3);
+    const agentFlagIndex = args.indexOf("--agent");
+    if (agentFlagIndex >= 0 && !args[agentFlagIndex + 1]) {
+      throw new Error("mdx-artifacts init --agent requires a value: generic, codex, claude-code, cursor, or all.");
+    }
+    const agent = parseInitAgent(agentFlagIndex >= 0 ? args[agentFlagIndex + 1] : undefined);
+    await initProject(projectRoot, { agent });
     return;
   }
 
@@ -77,24 +83,24 @@ async function main() {
 }
 
 function printHelp() {
-  console.log(`artifact-kit
+  console.log(`mdx-artifacts
 
 Usage:
-  artifact-kit init
-  artifact-kit components [ComponentName] [--json]
-  artifact-kit validate <file.mdx> [--json]
-  artifact-kit interactions inspect <file.mdx> <id> [--json]
-  artifact-kit interactions set-order <file.mdx> <id> --ordered-ids <id> [...id]
-  artifact-kit interactions reset <file.mdx> <id>
-  artifact-kit interactions promote <file.mdx> <id>
-  artifact-kit interactions add-item <file.mdx> <id> --item-id <id> --title <title> [--summary <text>] [--badge <text>] [--tags <tag,tag>] [--disabled true|false] [--after <itemId>]
-  artifact-kit interactions remove-item <file.mdx> <id> --item-id <id>
-  artifact-kit interactions update-item <file.mdx> <id> --item-id <id> [--title <title>] [--summary <text>] [--badge <text>] [--tags <tag,tag>] [--disabled true|false]
-  artifact-kit review add <file.mdx> --anchor <anchorId> --body <message> [--title <title>]
-  artifact-kit review reply <file.mdx> --thread <threadId> --body <message> [...repeat] [--status <status>]
-  artifact-kit review validate <file.mdx>
-  artifact-kit dev <file.mdx>
-  artifact-kit build <file.mdx>
+  mdx-artifacts init [--agent <generic|codex|claude-code|cursor|all>]
+  mdx-artifacts components [ComponentName] [--json]
+  mdx-artifacts validate <file.mdx> [--json]
+  mdx-artifacts interactions inspect <file.mdx> <id> [--json]
+  mdx-artifacts interactions set-order <file.mdx> <id> --ordered-ids <id> [...id]
+  mdx-artifacts interactions reset <file.mdx> <id>
+  mdx-artifacts interactions promote <file.mdx> <id>
+  mdx-artifacts interactions add-item <file.mdx> <id> --item-id <id> --title <title> [--summary <text>] [--badge <text>] [--tags <tag,tag>] [--disabled true|false] [--after <itemId>]
+  mdx-artifacts interactions remove-item <file.mdx> <id> --item-id <id>
+  mdx-artifacts interactions update-item <file.mdx> <id> --item-id <id> [--title <title>] [--summary <text>] [--badge <text>] [--tags <tag,tag>] [--disabled true|false]
+  mdx-artifacts review add <file.mdx> --anchor <anchorId> --body <message> [--title <title>]
+  mdx-artifacts review reply <file.mdx> --thread <threadId> --body <message> [...repeat] [--status <status>]
+  mdx-artifacts review validate <file.mdx>
+  mdx-artifacts dev <file.mdx>
+  mdx-artifacts build <file.mdx>
 `);
 }
 

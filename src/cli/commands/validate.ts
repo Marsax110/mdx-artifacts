@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { componentRegistry } from "../../react/registry";
-import type { ArtifactKitConfig } from "../config/types";
+import type { MdxArtifactsConfig } from "../config/types";
 import type { ArtifactDiagnostic } from "../diagnostics/diagnostics";
 import { validateResourceReferences } from "../resources/resource-policy";
 
@@ -15,7 +15,7 @@ export type ValidationResult = {
 
 export type ValidateMdxOptions = {
   projectRoot?: string;
-  config?: Required<ArtifactKitConfig>;
+  config?: Required<MdxArtifactsConfig>;
 };
 
 const componentsRequiringStableId = [
@@ -145,8 +145,8 @@ export async function validateMdx(filePath: string, options: ValidateMdxOptions 
       code: "invalid_file_extension",
       message: "Input file must be .mdx.",
       sourcePath: filePath,
-      suggestion: "Pass a .mdx artifact source file to artifact-kit validate.",
-      example: "artifact-kit validate artifact-docs/examples/hello.mdx"
+      suggestion: "Pass a .mdx artifact source file to mdx-artifacts validate.",
+      example: "mdx-artifacts validate artifact-docs/examples/hello.mdx"
     });
     return result;
   }

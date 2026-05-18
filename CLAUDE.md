@@ -23,9 +23,9 @@ When asked to create or modify an artifact:
 1. Prefer creating or editing `.mdx` files under `artifact-docs/`.
 2. Keep the MDX source Markdown-native: prose in Markdown, semantic islands in components.
 3. Prefer existing high-level components from `src/react`.
-4. Run `pnpm artifact components <ComponentName>` when component props are unclear.
-5. Run `pnpm artifact:validate` before building.
-6. Run `pnpm artifact:build` to verify standalone HTML output.
+4. Run `pnpm mdx-artifacts components <ComponentName>` when component props are unclear.
+5. Run `pnpm mdx-artifacts:validate` before building.
+6. Run `pnpm mdx-artifacts:build` to verify standalone HTML output.
 
 For complex props such as `CodeAnnotation[]` or `DiffLine[]`, use the CLI metadata instead of guessing object fields. The component registry should expose nested type fields in the `types` metadata.
 
@@ -75,8 +75,8 @@ pnpm typecheck
 pnpm test
 pnpm check
 pnpm build:cli
-pnpm artifact:validate
-pnpm artifact:build
+pnpm mdx-artifacts:validate
+pnpm mdx-artifacts:build
 ```
 
 For package boundary checks:

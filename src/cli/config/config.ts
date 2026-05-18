@@ -1,9 +1,9 @@
 import { access } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import type { ArtifactKitConfig } from "./types";
+import type { MdxArtifactsConfig } from "./types";
 
-const defaultConfig: Required<ArtifactKitConfig> = {
+const defaultConfig: Required<MdxArtifactsConfig> = {
   docsDir: "artifact-docs",
   includeDefaultStyles: true,
   outDir: "dist/artifacts",
@@ -12,7 +12,7 @@ const defaultConfig: Required<ArtifactKitConfig> = {
   tailwindSources: []
 };
 
-export async function loadConfig(projectRoot: string): Promise<Required<ArtifactKitConfig>> {
+export async function loadConfig(projectRoot: string): Promise<Required<MdxArtifactsConfig>> {
   const configPath = await findConfigPath(projectRoot);
 
   if (!configPath) {
@@ -20,7 +20,7 @@ export async function loadConfig(projectRoot: string): Promise<Required<Artifact
   }
 
   try {
-    const imported = (await import(pathToFileURL(configPath).href)) as { default?: ArtifactKitConfig };
+    const imported = (await import(pathToFileURL(configPath).href)) as { default?: MdxArtifactsConfig };
     return { ...defaultConfig, ...(imported.default ?? {}) };
   } catch (error) {
     throw new Error(`Failed to read ${path.basename(configPath)}: ${String(error)}`);
@@ -28,7 +28,7 @@ export async function loadConfig(projectRoot: string): Promise<Required<Artifact
 }
 
 async function findConfigPath(projectRoot: string) {
-  for (const filename of ["artifact-kit.config.mjs", "artifact-kit.config.js", "artifact-kit.config.ts"]) {
+  for (const filename of ["mdx-artifacts.config.mjs", "mdx-artifacts.config.js", "mdx-artifacts.config.ts"]) {
     const configPath = path.join(projectRoot, filename);
     try {
       await access(configPath);

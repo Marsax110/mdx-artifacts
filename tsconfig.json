@@ -16,5 +16,5 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", "artifact-kit.config.ts"]
+  "include": ["src", "mdx-artifacts.config.ts"]
 }

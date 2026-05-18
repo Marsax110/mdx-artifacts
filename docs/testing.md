@@ -14,7 +14,7 @@ This runs:
 
 1. `pnpm typecheck`
 2. `pnpm test`
-3. `pnpm artifact:validate`
+3. `pnpm mdx-artifacts:validate`
 
 Current test coverage:
 
@@ -41,14 +41,14 @@ pnpm pack:smoke
 The smoke test creates an npm tarball, installs it into a temporary project, and verifies:
 
 - `import("mdx-artifacts/react")`
-- `artifact-kit components`
-- `artifact-kit init`
-- `artifact-kit validate artifact-docs/examples/hello.mdx`
-- `artifact-kit build artifact-docs/examples/hello.mdx`
-- `artifact-kit dev artifact-docs/examples/hello.mdx`
-- `artifact-kit review validate`
-- `artifact-kit review add`
-- `artifact-kit review reply`
+- `mdx-artifacts components`
+- `mdx-artifacts init`
+- `mdx-artifacts validate artifact-docs/examples/hello.mdx`
+- `mdx-artifacts build artifact-docs/examples/hello.mdx`
+- `mdx-artifacts dev artifact-docs/examples/hello.mdx`
+- `mdx-artifacts review validate`
+- `mdx-artifacts review add`
+- `mdx-artifacts review reply`
 
 It also checks that:
 
@@ -122,7 +122,7 @@ These checks are not part of the current default baseline:
 - visual regression
 - Storybook test runner
 - Astro adapter tests
-- `artifact:build`
+- `mdx-artifacts:build`
 - `npm pack --dry-run`
 
 Use them before npm publishing or when the changed behavior touches packaging, standalone HTML output, browser-only APIs, or future docs-site adapters.

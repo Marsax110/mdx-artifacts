@@ -27,7 +27,7 @@ Phase 3 decides whether published MDX examples should demonstrate content icon s
 - [x] Existing examples have been reviewed for icon-slot fit.
 - [x] A published MDX example demonstrates the emoji default path if it improves the workflow.
 - [x] Examples remain readable and text-first.
-- [x] `artifact:validate` passes for the changed example.
+- [x] `mdx-artifacts:validate` passes for the changed example.
 - [x] Phase 3 verification is recorded.
 
 ## Entry Conditions
@@ -43,7 +43,7 @@ Phase 3 decides whether published MDX examples should demonstrate content icon s
 - [x] Update the target MDX example.
   - Complete when icon usage is limited to content-scanning markers and does not replace text semantics.
 - [x] Validate the example.
-  - Complete when `rtk pnpm artifact:validate` passes.
+  - Complete when `rtk pnpm mdx-artifacts:validate` passes.
 - [x] Record the result.
   - Complete when this document includes the verification facts and rationale.
 
@@ -51,7 +51,7 @@ Phase 3 decides whether published MDX examples should demonstrate content icon s
 
 - 2026-05-17: Reviewed `commentable-feedback.mdx`, `layout-composition.mdx`, `streamlit-style-mixed.mdx`, and `decision-matrix.mdx`.
 - 2026-05-17: Updated only `artifact-docs/examples/decision-matrix.mdx` because it is the default validation example and its first `ContentSet` is a direct decision comparison where sparse markers improve scanning.
-- 2026-05-17: `rtk pnpm artifact:validate` passed with `validate ok`.
+- 2026-05-17: `rtk pnpm mdx-artifacts:validate` passed with `validate ok`.
 - 2026-05-17: `rtk grep "lucide-react" package.json pnpm-lock.yaml` returned no matches.
 
 ## Findings

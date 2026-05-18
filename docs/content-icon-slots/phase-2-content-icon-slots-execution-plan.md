@@ -60,10 +60,10 @@ Phase 2 implements the public icon-slot contract for content components.
 
 - 2026-05-17: `rtk pnpm test src/react/composites/content-set/content-item.test.tsx src/react/registry.test.ts` passed with 2 files and 9 tests.
 - 2026-05-17: `rtk pnpm typecheck` passed with no TypeScript errors.
-- 2026-05-17: `rtk pnpm artifact components ContentItem` showed the `icon: ReactNode` prop and emoji example.
-- 2026-05-17: `rtk pnpm artifact components ContentSet` showed the set-level and item-level `icon: ReactNode` metadata.
+- 2026-05-17: `rtk pnpm mdx-artifacts components ContentItem` showed the `icon: ReactNode` prop and emoji example.
+- 2026-05-17: `rtk pnpm mdx-artifacts components ContentSet` showed the set-level and item-level `icon: ReactNode` metadata.
 - 2026-05-17: `rtk grep "lucide-react" package.json pnpm-lock.yaml` returned no matches.
-- 2026-05-17: `rtk pnpm artifact:validate` passed with `validate ok`.
+- 2026-05-17: `rtk pnpm mdx-artifacts:validate` passed with `validate ok`.
 - 2026-05-17: `rtk pnpm test` passed with 17 files and 95 tests.
 
 ## Findings

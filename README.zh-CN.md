@@ -117,13 +117,13 @@ pnpm add -D mdx-artifacts react react-dom
 初始化工作区：
 
 ```bash
-pnpm exec artifact-kit init
+pnpm exec mdx-artifacts init
 ```
 
 这会创建：
 
 ```text
-artifact-kit.config.mjs
+mdx-artifacts.config.mjs
 artifact-docs/examples/hello.mdx
 agents/AGENTS.snippet.md
 ```
@@ -131,14 +131,14 @@ agents/AGENTS.snippet.md
 验证和构建示例：
 
 ```bash
-pnpm exec artifact-kit validate artifact-docs/examples/hello.mdx
-pnpm exec artifact-kit build artifact-docs/examples/hello.mdx
+pnpm exec mdx-artifacts validate artifact-docs/examples/hello.mdx
+pnpm exec mdx-artifacts build artifact-docs/examples/hello.mdx
 ```
 
 开发服务模式：
 
 ```bash
-pnpm exec artifact-kit dev artifact-docs/examples/hello.mdx
+pnpm exec mdx-artifacts dev artifact-docs/examples/hello.mdx
 ```
 
 ## 命令
@@ -147,24 +147,24 @@ pnpm exec artifact-kit dev artifact-docs/examples/hello.mdx
 
 ```bash
 pnpm check
-pnpm artifact:validate
-pnpm artifact:dev
-pnpm artifact:build
+pnpm mdx-artifacts:validate
+pnpm mdx-artifacts:dev
+pnpm mdx-artifacts:build
 pnpm storybook
 ```
 
 查询组件：
 
 ```bash
-pnpm artifact components
-pnpm artifact components ExportPanel
-pnpm artifact components --json
+pnpm mdx-artifacts components
+pnpm mdx-artifacts components ExportPanel
+pnpm mdx-artifacts components --json
 ```
 
 单文件构建：
 
 ```bash
-pnpm artifact build artifact-docs/examples/decision-matrix.mdx
+pnpm mdx-artifacts build artifact-docs/examples/decision-matrix.mdx
 ```
 
 默认输出：
@@ -179,22 +179,22 @@ dist/artifacts/examples/decision-matrix.html
 pnpm storybook
 ```
 
-Storybook 只用于隔离调试 React 组件；最终 artifact 闭环仍以 `artifact-kit validate/build` 为准。
+Storybook 只用于隔离调试 React 组件；最终 artifact 闭环仍以 `mdx-artifacts validate/build` 为准。
 
 基础测试：
 
 ```bash
 pnpm test
 pnpm typecheck
-pnpm artifact:validate
+pnpm mdx-artifacts:validate
 ```
 
 ## 样式注入
 
-默认情况下，Artifact Kit 会注入内置样式。使用者可以在 `artifact-kit.config.ts` 里追加自己的品牌 CSS：
+默认情况下，MDX Artifacts 会注入内置样式。使用者可以在 `mdx-artifacts.config.ts` 里追加自己的品牌 CSS：
 
 ```js
-/** @type {import("mdx-artifacts").ArtifactKitConfig} */
+/** @type {import("mdx-artifacts").MdxArtifactsConfig} */
 const config = {
   docsDir: "artifact-docs",
   outDir: "dist/artifacts",
@@ -206,7 +206,7 @@ const config = {
 export default config;
 ```
 
-`styles` 会在默认样式之后导入，因此可以覆盖 CSS variables 或 `ak-*` class。若要关闭 Artifact Kit 默认样式，可以设置 `includeDefaultStyles: false`。
+`styles` 会在默认样式之后导入，因此可以覆盖 CSS variables 或 `ak-*` class。若要关闭 MDX Artifacts 默认样式，可以设置 `includeDefaultStyles: false`。
 
 CLI 会自动把当前 MDX 文件注册为 Tailwind source，因此本地 MDX 组件里的 Tailwind utility class 会在 artifact 构建时生成。若 MDX import 了项目本地组件，并且这些组件文件里也写了 Tailwind class，可以用 `tailwindSources` 显式注册这些路径。
 

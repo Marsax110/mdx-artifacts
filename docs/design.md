@@ -102,12 +102,12 @@ Second target: Astro docs site
 
 ## Styling Protocol
 
-Artifact Kit provides default CSS, but the default theme is not part of the core artifact contract.
+MDX Artifacts provides default CSS, but the default theme is not part of the core artifact contract.
 
-Users can inject brand styles through `artifact-kit.config.mjs`:
+Users can inject brand styles through `mdx-artifacts.config.mjs`:
 
 ```js
-/** @type {import("mdx-artifacts").ArtifactKitConfig} */
+/** @type {import("mdx-artifacts").MdxArtifactsConfig} */
 const config = {
   docsDir: "artifact-docs",
   outDir: "dist/artifacts",
@@ -119,10 +119,10 @@ const config = {
 
 Rules:
 
-- `includeDefaultStyles: true` imports Artifact Kit default styles first.
+- `includeDefaultStyles: true` imports MDX Artifacts default styles first.
 - `styles` are imported in array order after the default styles.
 - Users can override CSS variables or `ak-*` classes.
-- `includeDefaultStyles: false` disables Artifact Kit default styles.
+- `includeDefaultStyles: false` disables MDX Artifacts default styles.
 - The current MDX file is always registered as a Tailwind source for local MDX components.
 - `tailwindSources` registers additional project-local component files that use Tailwind classes.
 - The final CSS is still inlined into the standalone HTML artifact.
@@ -157,8 +157,8 @@ Current workflow:
 
 ```text
 Component development: pnpm storybook
-Protocol verification: pnpm typecheck / pnpm test / pnpm artifact:validate
-Artifact verification: pnpm artifact:build
+Protocol verification: pnpm typecheck / pnpm test / pnpm mdx-artifacts:validate
+Artifact verification: pnpm mdx-artifacts:build
 ```
 
 ## Testing Protocol
@@ -189,20 +189,20 @@ When generating an artifact, agents should:
 2. Prefer existing high-level components.
 3. Provide an export path for interactive artifacts.
 4. Move bulky data into adjacent `.json` files.
-5. Run `artifact-kit components <ComponentName>` when props are unclear.
-6. Run `artifact-kit components --json` for machine-readable metadata.
-7. Run `artifact-kit validate <file.mdx>` before build.
-8. Run `artifact-kit build <file.mdx>` to produce standalone HTML.
+5. Run `mdx-artifacts components <ComponentName>` when props are unclear.
+6. Run `mdx-artifacts components --json` for machine-readable metadata.
+7. Run `mdx-artifacts validate <file.mdx>` before build.
+8. Run `mdx-artifacts build <file.mdx>` to produce standalone HTML.
 
 ## CLI Component Query
 
 To keep skills and agent instructions short, the CLI exposes component metadata:
 
 ```bash
-artifact-kit components
-artifact-kit components ExportPanel
-artifact-kit components --json
-artifact-kit components ExportPanel --json
+mdx-artifacts components
+mdx-artifacts components ExportPanel
+mdx-artifacts components --json
+mdx-artifacts components ExportPanel --json
 ```
 
 The data comes from `componentRegistry`. Future docs, Storybook docs, validation rules, and agent skills should derive from the same source.

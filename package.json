@@ -41,17 +41,17 @@
     "./styles.css": "./dist/lib/react/styles.css"
   },
   "bin": {
-    "artifact-kit": "dist/lib/cli/index.js"
+    "mdx-artifacts": "dist/lib/cli/index.js"
   },
   "scripts": {
-    "artifact": "tsx src/cli/index.ts",
-    "artifact:dev": "tsx src/cli/index.ts dev artifact-docs/examples/decision-matrix.mdx",
-    "artifact:build": "tsx src/cli/index.ts build artifact-docs/examples/decision-matrix.mdx",
-    "artifact:validate": "tsx src/cli/index.ts validate artifact-docs/examples/decision-matrix.mdx",
+    "mdx-artifacts": "tsx src/cli/index.ts",
+    "mdx-artifacts:dev": "tsx src/cli/index.ts dev artifact-docs/examples/decision-matrix.mdx",
+    "mdx-artifacts:build": "tsx src/cli/index.ts build artifact-docs/examples/decision-matrix.mdx",
+    "mdx-artifacts:validate": "tsx src/cli/index.ts validate artifact-docs/examples/decision-matrix.mdx",
     "storybook": "storybook dev -p 6106 --no-open",
     "test": "vitest run",
     "test:watch": "vitest",
-    "check": "pnpm typecheck && pnpm test && pnpm artifact:validate",
+    "check": "pnpm typecheck && pnpm test && pnpm mdx-artifacts:validate",
     "typecheck": "tsc --noEmit",
     "clean:lib": "rm -rf dist/lib",
     "build:lib": "tsc -p tsconfig.build.json",

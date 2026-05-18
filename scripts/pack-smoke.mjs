@@ -26,11 +26,11 @@ await writeFile(
 
 run("pnpm", ["add", "--offline", tarballPath], projectDir);
 run("node", ["-e", 'import("mdx-artifacts/react").then(() => console.log("import ok"))'], projectDir);
-run("pnpm", ["exec", "artifact-kit", "components"], projectDir);
-run("pnpm", ["exec", "artifact-kit", "init"], projectDir);
+run("pnpm", ["exec", "mdx-artifacts", "components"], projectDir);
+run("pnpm", ["exec", "mdx-artifacts", "init"], projectDir);
 await writeFile(
-  path.join(projectDir, "artifact-kit.config.mjs"),
-  `/** @type {import("mdx-artifacts").ArtifactKitConfig} */
+  path.join(projectDir, "mdx-artifacts.config.mjs"),
+  `/** @type {import("mdx-artifacts").MdxArtifactsConfig} */
 const config = {
   docsDir: "artifact-docs",
   outDir: "dist/artifacts",
@@ -43,15 +43,15 @@ export default config;
 `,
   "utf8"
 );
-run("pnpm", ["exec", "artifact-kit", "validate", "artifact-docs/examples/hello.mdx"], projectDir);
-run("pnpm", ["exec", "artifact-kit", "build", "artifact-docs/examples/hello.mdx"], projectDir);
+run("pnpm", ["exec", "mdx-artifacts", "validate", "artifact-docs/examples/hello.mdx"], projectDir);
+run("pnpm", ["exec", "mdx-artifacts", "build", "artifact-docs/examples/hello.mdx"], projectDir);
 await runDevSmoke(projectDir);
-run("pnpm", ["exec", "artifact-kit", "review", "validate", "artifact-docs/examples/hello.mdx"], projectDir);
+run("pnpm", ["exec", "mdx-artifacts", "review", "validate", "artifact-docs/examples/hello.mdx"], projectDir);
 const reviewAddOutput = run(
   "pnpm",
   [
     "exec",
-    "artifact-kit",
+    "mdx-artifacts",
     "review",
     "add",
     "artifact-docs/examples/hello.mdx",
@@ -67,7 +67,7 @@ run(
   "pnpm",
   [
     "exec",
-    "artifact-kit",
+    "mdx-artifacts",
     "review",
     "reply",
     "artifact-docs/examples/hello.mdx",
@@ -80,7 +80,7 @@ run(
   ],
   projectDir
 );
-run("pnpm", ["exec", "artifact-kit", "review", "validate", "artifact-docs/examples/hello.mdx"], projectDir);
+run("pnpm", ["exec", "mdx-artifacts", "review", "validate", "artifact-docs/examples/hello.mdx"], projectDir);
 
 console.log(`pack smoke ok: ${tarballPath}`);
 
@@ -93,7 +93,7 @@ function run(command, args, cwd) {
 }
 
 async function runDevSmoke(cwd) {
-  const server = spawn("pnpm", ["exec", "artifact-kit", "dev", "artifact-docs/examples/hello.mdx"], {
+  const server = spawn("pnpm", ["exec", "mdx-artifacts", "dev", "artifact-docs/examples/hello.mdx"], {
     cwd,
     stdio: ["ignore", "pipe", "pipe"]
   });
@@ -135,7 +135,7 @@ function waitForDevServer(server) {
   return new Promise((resolve, reject) => {
     let output = "";
     const timer = setTimeout(() => {
-      reject(new Error(`Timed out waiting for artifact-kit dev server.\n${output}`));
+      reject(new Error(`Timed out waiting for mdx-artifacts dev server.\n${output}`));
     }, 15_000);
 
     const handleChunk = (chunk) => {
@@ -157,7 +157,7 @@ function waitForDevServer(server) {
     server.on("exit", (code) => {
       if (code !== null && code !== 0) {
         clearTimeout(timer);
-        reject(new Error(`artifact-kit dev exited before ready with code ${code}.\n${output}`));
+        reject(new Error(`mdx-artifacts dev exited before ready with code ${code}.\n${output}`));
       }
     });
   });

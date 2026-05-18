@@ -108,9 +108,9 @@ Astro 的代价：
 
 ## 样式协议
 
-Artifact Kit 提供默认 CSS，但默认样式不是闭环的一部分。
+MDX Artifacts 提供默认 CSS，但默认样式不是闭环的一部分。
 
-使用者可以通过 `artifact-kit.config.ts` 注入品牌样式：
+使用者可以通过 `mdx-artifacts.config.ts` 注入品牌样式：
 
 ```ts
 const config = {
@@ -124,17 +124,17 @@ const config = {
 
 约定：
 
-- `includeDefaultStyles: true` 时，先导入 Artifact Kit 默认样式。
+- `includeDefaultStyles: true` 时，先导入 MDX Artifacts 默认样式。
 - `styles` 按数组顺序在默认样式之后导入。
 - 使用者可以通过覆盖 CSS variables 或 `ak-*` class 调整品牌。
-- `includeDefaultStyles: false` 表示关闭 Artifact Kit 默认样式。
+- `includeDefaultStyles: false` 表示关闭 MDX Artifacts 默认样式。
 - 当前 MDX 文件会自动注册为 Tailwind source，用于支持本地 MDX 组件。
 - `tailwindSources` 用于注册额外的项目本地组件文件。
 - CLI 构建仍会把最终 CSS 内联到单文件 HTML。
 
 ### Tailwind 的角色
 
-Tailwind 是 artifact-kit 内部的样式生产工具，不要求用户项目自己配置 Tailwind。
+Tailwind 是 mdx-artifacts 内部的样式生产工具，不要求用户项目自己配置 Tailwind。
 
 ### Radix 的角色
 
@@ -157,8 +157,8 @@ Storybook 不负责：
 
 ```text
 组件开发：pnpm storybook
-协议验证：pnpm typecheck / pnpm test / pnpm artifact:validate
-artifact 验证：pnpm artifact:build
+协议验证：pnpm typecheck / pnpm test / pnpm mdx-artifacts:validate
+artifact 验证：pnpm mdx-artifacts:build
 ```
 
 ## 测试协议
@@ -189,20 +189,20 @@ Agent 生成 artifact 时应该遵守：
 2. 优先使用已有高阶组件，不临时重写同类 UI。
 3. 交互型 artifact 必须提供导出入口。
 4. 大型数据后续应拆到相邻 `.json`。
-5. 不确定组件参数时运行 `artifact-kit components <ComponentName>`。
-6. 需要机器可读元数据时运行 `artifact-kit components --json`。
-7. 构建前运行 `artifact-kit validate <file.mdx>`。
-8. 单页输出运行 `artifact-kit build <file.mdx>`。
+5. 不确定组件参数时运行 `mdx-artifacts components <ComponentName>`。
+6. 需要机器可读元数据时运行 `mdx-artifacts components --json`。
+7. 构建前运行 `mdx-artifacts validate <file.mdx>`。
+8. 单页输出运行 `mdx-artifacts build <file.mdx>`。
 
 ## CLI 查询协议
 
 为了减少 skill、AGENTS.md、CLAUDE.md 中的冗余组件说明，CLI 提供组件查询能力：
 
 ```bash
-artifact-kit components
-artifact-kit components ExportPanel
-artifact-kit components --json
-artifact-kit components ExportPanel --json
+mdx-artifacts components
+mdx-artifacts components ExportPanel
+mdx-artifacts components --json
+mdx-artifacts components ExportPanel --json
 ```
 
 查询数据来自 `componentRegistry`，未来应同时服务 CLI 查询、Storybook docs、validate 规则和 Agent skill 说明。

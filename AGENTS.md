@@ -47,8 +47,8 @@ pnpm typecheck
 pnpm test
 pnpm check
 pnpm build:cli
-pnpm artifact:validate
-pnpm artifact:build
+pnpm mdx-artifacts:validate
+pnpm mdx-artifacts:build
 ```
 
 Use Storybook only for isolated component development:
@@ -57,7 +57,7 @@ Use Storybook only for isolated component development:
 pnpm storybook
 ```
 
-Storybook is not the artifact build path. The final artifact loop is still verified through `artifact-kit validate/build`.
+Storybook is not the artifact build path. The final artifact loop is still verified through `mdx-artifacts validate/build`.
 
 ## Component Protocol
 
@@ -93,7 +93,7 @@ When adding or changing a component:
 3. Add registry `types` metadata for complex object props such as `Foo[]` or `Foo`.
 4. Add or update Storybook stories.
 5. Add or update an MDX example if it changes the artifact workflow.
-6. Run `pnpm artifact components <ComponentName>` to confirm the CLI metadata is useful.
+6. Run `pnpm mdx-artifacts components <ComponentName>` to confirm the CLI metadata is useful.
 7. Follow `docs/testing.md` for the minimum required test layer.
 
 The component registry is the source of truth for CLI lookup, agent usage, and future generated docs.
@@ -120,7 +120,7 @@ Layout primitives may control spacing, ratios, collapse behavior, and surface tr
 
 ## Styling Policy
 
-Artifact Kit provides default CSS, but users can inject custom styles through `artifact-kit.config.ts`.
+MDX Artifacts provides default CSS, but users can inject custom styles through `mdx-artifacts.config.ts`.
 
 Default behavior:
 
@@ -146,9 +146,9 @@ CLI output must be concise and English.
 The CLI should help agents reduce prompt instructions:
 
 ```bash
-artifact-kit components
-artifact-kit components ExportPanel
-artifact-kit components --json
+mdx-artifacts components
+mdx-artifacts components ExportPanel
+mdx-artifacts components --json
 ```
 
 Prefer making information queryable through the CLI instead of duplicating long component docs in agent instructions.
@@ -162,8 +162,8 @@ Before the first public commit or npm publish:
 3. Run `pnpm typecheck`.
 4. Run `pnpm test`.
 5. Run `pnpm build:cli`.
-6. Run `pnpm artifact:validate`.
-7. Run `pnpm artifact:build`.
+6. Run `pnpm mdx-artifacts:validate`.
+7. Run `pnpm mdx-artifacts:build`.
 8. Run `npm pack --dry-run --cache /private/tmp/mdx-artifacts-npm-cache`.
 9. Confirm `npm pack` does not include `src/`, `.storybook/`, stories, sourcemaps, `node_modules/`, or `dist/artifacts`.
 

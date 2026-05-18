@@ -38,7 +38,7 @@ src/cli/
 | Directory | Responsibility | Examples |
 |---|---|---|
 | `commands/` | Command-level orchestration for each public CLI command. | `build`, `components`, `dev`, `interactions`, `review`, `scaffold`, `validate` |
-| `config/` | Shared CLI config loading and public config types. | `loadArtifactKitConfig`, `ArtifactKitConfig` |
+| `config/` | Shared CLI config loading and public config types. | `loadMdxArtifactsConfig`, `MdxArtifactsConfig` |
 | `dev-server/` | Vite dev server integration and browser-facing dev endpoints. | artifact dev server middleware |
 | `mdx/` | MDX source updates, parsing helpers, and document mutation helpers. | `sortable-list` source patching |
 | `services/` | Reusable CLI workflows that sit below commands but above low-level helpers. | interaction and review operation handling |

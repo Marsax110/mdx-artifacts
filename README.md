@@ -118,13 +118,13 @@ pnpm add -D mdx-artifacts react react-dom
 Initialize a workspace:
 
 ```bash
-pnpm exec artifact-kit init
+pnpm exec mdx-artifacts init
 ```
 
 This creates:
 
 ```text
-artifact-kit.config.mjs
+mdx-artifacts.config.mjs
 artifact-docs/examples/hello.mdx
 agents/AGENTS.snippet.md
 ```
@@ -132,8 +132,8 @@ agents/AGENTS.snippet.md
 Build the initialized example:
 
 ```bash
-pnpm exec artifact-kit validate artifact-docs/examples/hello.mdx
-pnpm exec artifact-kit build artifact-docs/examples/hello.mdx
+pnpm exec mdx-artifacts validate artifact-docs/examples/hello.mdx
+pnpm exec mdx-artifacts build artifact-docs/examples/hello.mdx
 ```
 
 Default output:
@@ -147,20 +147,20 @@ dist/artifacts/examples/hello.html
 Inspect available components:
 
 ```bash
-pnpm exec artifact-kit components
-pnpm exec artifact-kit components ExportPanel
-pnpm exec artifact-kit components --json
+pnpm exec mdx-artifacts components
+pnpm exec mdx-artifacts components ExportPanel
+pnpm exec mdx-artifacts components --json
 ```
 
 Build one MDX file:
 
 ```bash
-pnpm exec artifact-kit build artifact-docs/examples/hello.mdx
+pnpm exec mdx-artifacts build artifact-docs/examples/hello.mdx
 ```
 
 ## Review State
 
-Artifact Kit can keep local review threads beside an MDX file while the dev server is running. Review state is stored in a sibling `.state.json` file:
+MDX Artifacts can keep local review threads beside an MDX file while the dev server is running. Review state is stored in a sibling `.state.json` file:
 
 ```text
 artifact-docs/examples/hello.mdx
@@ -194,16 +194,16 @@ Native MDX prose can be reviewed through the section anchor.
 Agents can add a user thread, append an assistant reply, and validate that saved threads still point at anchors in the current MDX:
 
 ```bash
-pnpm exec artifact-kit review add artifact-docs/examples/hello.mdx \
+pnpm exec mdx-artifacts review add artifact-docs/examples/hello.mdx \
   --anchor set.stage-one \
   --body "Clarify this decision."
 
-pnpm exec artifact-kit review reply artifact-docs/examples/hello.mdx \
+pnpm exec mdx-artifacts review reply artifact-docs/examples/hello.mdx \
   --thread thr_set_stage_one \
   --body "Updated the decision copy." \
   --status resolved
 
-pnpm exec artifact-kit review validate artifact-docs/examples/hello.mdx
+pnpm exec mdx-artifacts review validate artifact-docs/examples/hello.mdx
 ```
 
 Review commands read and write the sibling `.state.json` file for the source MDX. They do not edit the MDX source. `review validate` checks whether saved review threads still point at anchors that exist in the current MDX.
@@ -230,8 +230,8 @@ Validate and build the repository example artifact:
 
 ```bash
 pnpm check
-pnpm artifact:validate
-pnpm artifact:build
+pnpm mdx-artifacts:validate
+pnpm mdx-artifacts:build
 ```
 
 Develop components in Storybook:
@@ -240,14 +240,14 @@ Develop components in Storybook:
 pnpm storybook
 ```
 
-Storybook is only for component development. The artifact workflow is still verified through `artifact-kit validate/build`.
+Storybook is only for component development. The artifact workflow is still verified through `mdx-artifacts validate/build`.
 
 Run the test baseline:
 
 ```bash
 pnpm test
 pnpm typecheck
-pnpm artifact:validate
+pnpm mdx-artifacts:validate
 ```
 
 Run the package smoke test before publishing:
@@ -258,10 +258,10 @@ pnpm pack:smoke
 
 ## Style Injection
 
-Artifact Kit injects default styles by default. Users can add brand styles through `artifact-kit.config.mjs`:
+MDX Artifacts injects default styles by default. Users can add brand styles through `mdx-artifacts.config.mjs`:
 
 ```js
-/** @type {import("mdx-artifacts").ArtifactKitConfig} */
+/** @type {import("mdx-artifacts").MdxArtifactsConfig} */
 const config = {
   docsDir: "artifact-docs",
   outDir: "dist/artifacts",
@@ -273,7 +273,7 @@ const config = {
 export default config;
 ```
 
-Custom styles are imported after the default styles, so they can override CSS variables or `ak-*` classes. Set `includeDefaultStyles: false` to disable Artifact Kit default styles.
+Custom styles are imported after the default styles, so they can override CSS variables or `ak-*` classes. Set `includeDefaultStyles: false` to disable MDX Artifacts default styles.
 
 The CLI automatically registers the current MDX file as a Tailwind source, so Tailwind utility classes inside local MDX components are generated during artifact builds. Use `tailwindSources` for project-local component files that are imported by MDX and also contain Tailwind classes.
 

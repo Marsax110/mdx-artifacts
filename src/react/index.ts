@@ -91,4 +91,4 @@ export type {
 } from "./interactions/sortable-list/SortableList";
 export { componentRegistry, findComponentMeta } from "./registry";
 export type { ComponentMeta, ComponentPropMeta } from "./registry";
-export type { ArtifactKitConfig } from "../cli/config/types";
+export type { MdxArtifactsConfig } from "../cli/config/types";

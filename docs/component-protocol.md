@@ -50,9 +50,9 @@ import { ContentSet, ExportPanel } from "mdx-artifacts/react";
 The CLI reads the same registry:
 
 ```bash
-artifact-kit components
-artifact-kit components ContentSet
-artifact-kit components --json
+mdx-artifacts components
+mdx-artifacts components ContentSet
+mdx-artifacts components --json
 ```
 
 When adding or changing a component, update the registry in the same change.
@@ -137,7 +137,7 @@ For interactive data components:
 - Keep item records short. Do not put long prose, Markdown lists, or narrative rationale into item data.
 - Persist user-controlled state into artifact interactions when available.
 - Treat MDX props as the authored truth and artifact interactions as the runtime overlay.
-- Use `artifact-kit interactions inspect <file.mdx> <id>` to read the current truth from MDX plus the state overlay.
+- Use `mdx-artifacts interactions inspect <file.mdx> <id>` to read the current truth from MDX plus the state overlay.
 - Use `Section` beside the component for long explanation, criteria, or rationale.
 
 `interactions inspect` is read-only. It reports the resolved order, ignores stale state ids that no longer exist in MDX, and appends new MDX item ids that are not yet present in the state overlay.
@@ -145,25 +145,25 @@ For interactive data components:
 Use narrow CLI writes for runtime interaction state:
 
 ```bash
-artifact-kit interactions set-order artifact-docs/examples/decision-matrix.mdx \
+mdx-artifacts interactions set-order artifact-docs/examples/decision-matrix.mdx \
   list.next-priorities \
   --ordered-ids example-output validate-build adapter-design
 
-artifact-kit interactions reset artifact-docs/examples/decision-matrix.mdx \
+mdx-artifacts interactions reset artifact-docs/examples/decision-matrix.mdx \
   list.next-priorities
 
-artifact-kit interactions promote artifact-docs/examples/decision-matrix.mdx \
+mdx-artifacts interactions promote artifact-docs/examples/decision-matrix.mdx \
   list.next-priorities
 
-artifact-kit interactions add-item artifact-docs/examples/decision-matrix.mdx \
+mdx-artifacts interactions add-item artifact-docs/examples/decision-matrix.mdx \
   list.next-priorities \
   --item-id docs --title "Update docs" --tags docs,protocol
 
-artifact-kit interactions update-item artifact-docs/examples/decision-matrix.mdx \
+mdx-artifacts interactions update-item artifact-docs/examples/decision-matrix.mdx \
   list.next-priorities \
   --item-id docs --summary "Document the workflow."
 
-artifact-kit interactions remove-item artifact-docs/examples/decision-matrix.mdx \
+mdx-artifacts interactions remove-item artifact-docs/examples/decision-matrix.mdx \
   list.next-priorities \
   --item-id docs
 ```
@@ -189,7 +189,7 @@ When a local writable dev server is available, `SortableList` may expose a small
 
 ## Authoring Kinds
 
-Every public component should declare an authoring kind in `src/react/registry.ts`. This keeps the component API aligned with the product philosophy and gives `artifact-kit components <ComponentName>` enough guidance for agents.
+Every public component should declare an authoring kind in `src/react/registry.ts`. This keeps the component API aligned with the product philosophy and gives `mdx-artifacts components <ComponentName>` enough guidance for agents.
 
 Use these kinds:
 
@@ -244,7 +244,7 @@ Complex props must be self-describing through the registry. Do not rely on TypeS
 }
 ```
 
-The CLI must show these nested fields in `artifact-kit components <ComponentName>` and return them in `artifact-kit components <ComponentName> --json`.
+The CLI must show these nested fields in `mdx-artifacts components <ComponentName>` and return them in `mdx-artifacts components <ComponentName> --json`.
 
 ## Extension Lifecycle
 
@@ -407,16 +407,16 @@ Example state:
 Use narrow CLI writes for review state:
 
 ```bash
-artifact-kit review add artifact-docs/examples/decision-matrix.mdx \
+mdx-artifacts review add artifact-docs/examples/decision-matrix.mdx \
   --anchor decision.stage-one \
   --body "Clarify why native MDX remains the default."
 
-artifact-kit review reply artifact-docs/examples/decision-matrix.mdx \
+mdx-artifacts review reply artifact-docs/examples/decision-matrix.mdx \
   --thread thr_decision_stage_one \
   --body "Updated the decision copy." \
   --status resolved
 
-artifact-kit review validate artifact-docs/examples/decision-matrix.mdx
+mdx-artifacts review validate artifact-docs/examples/decision-matrix.mdx
 ```
 
 `review add` creates one open thread for an existing anchor. `review reply` appends assistant messages to existing threads and may update status. `review validate` reports state threads whose `anchorId` no longer exists in the current MDX. None of these commands edits MDX.

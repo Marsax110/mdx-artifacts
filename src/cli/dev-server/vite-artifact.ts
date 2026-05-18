@@ -24,7 +24,7 @@ import {
   setInteractionOrderService,
   updateInteractionItemService
 } from "../services/interaction-service";
-import type { ArtifactKitConfig } from "../config/types";
+import type { MdxArtifactsConfig } from "../config/types";
 
 const packageCliDir = path.dirname(fileURLToPath(import.meta.url));
 const defaultStylesPath = path.resolve(packageCliDir, "../../react/styles.css");
@@ -40,9 +40,9 @@ export type ArtifactProject = {
 export async function createArtifactProject(
   projectRoot: string,
   mdxPath: string,
-  config: Required<ArtifactKitConfig>
+  config: Required<MdxArtifactsConfig>
 ): Promise<ArtifactProject> {
-  const tmpDir = path.join(projectRoot, ".artifact-kit", "tmp", randomUUID());
+  const tmpDir = path.join(projectRoot, ".mdx-artifacts", "tmp", randomUUID());
   const artifact = createArtifactRoute(projectRoot, mdxPath, config.docsDir);
   const srcDir = path.join(tmpDir, "src");
   const distDir = path.join(tmpDir, "dist");
@@ -141,7 +141,7 @@ createRoot(document.getElementById("root")!).render(<App />);
 
 function artifactStatePlugin(projectRoot: string, artifact: ArtifactRoute): Plugin {
   return {
-    name: "artifact-kit-state",
+    name: "mdx-artifacts-state",
     configureServer(server) {
       server.middlewares.use(async (request, response, next) => {
         const requestUrl = new URL(request.url ?? "/", "http://localhost");
@@ -496,7 +496,7 @@ function toRelativeImport(fromFile: string, targetFile: string) {
 function createStyleImports(
   projectRoot: string,
   entryPath: string,
-  config: Required<ArtifactKitConfig>,
+  config: Required<MdxArtifactsConfig>,
   tailwindSourcePath: string
 ) {
   const styles = [
@@ -512,7 +512,7 @@ function createTailwindSourceCss(
   projectRoot: string,
   sourceStylesPath: string,
   mdxPath: string,
-  config: Required<ArtifactKitConfig>
+  config: Required<MdxArtifactsConfig>
 ) {
   const sources = [
     mdxPath,

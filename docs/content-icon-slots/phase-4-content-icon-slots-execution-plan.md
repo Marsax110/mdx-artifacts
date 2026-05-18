@@ -43,7 +43,7 @@ Phase 4 verifies that content icon slots are ready for package-level review with
 - [x] Run the repository light check.
   - Complete when `rtk pnpm check` passes.
 - [x] Inspect component metadata.
-  - Complete when `rtk pnpm artifact components ContentItem` and `ContentSet` show the icon slot without excessive guidance.
+  - Complete when `rtk pnpm mdx-artifacts components ContentItem` and `ContentSet` show the icon slot without excessive guidance.
 - [x] Confirm dependency boundary.
   - Complete when package files contain no `lucide-react` dependency.
 - [x] Record the results.
@@ -51,11 +51,11 @@ Phase 4 verifies that content icon slots are ready for package-level review with
 
 ## Verification Record
 
-- 2026-05-17: `rtk pnpm check` passed. This covered `pnpm typecheck`, `pnpm test`, and `pnpm artifact:validate`.
+- 2026-05-17: `rtk pnpm check` passed. This covered `pnpm typecheck`, `pnpm test`, and `pnpm mdx-artifacts:validate`.
 - 2026-05-17: Unit tests passed with 17 files and 95 tests.
-- 2026-05-17: `artifact:validate` returned `validate ok` for `artifact-docs/examples/decision-matrix.mdx`.
-- 2026-05-17: `rtk pnpm artifact components ContentItem` showed `icon: ReactNode` with concise decorative-marker guidance and an emoji example.
-- 2026-05-17: `rtk pnpm artifact components ContentSet` showed set-level and item-level `icon: ReactNode` metadata with concise placement guidance.
+- 2026-05-17: `mdx-artifacts:validate` returned `validate ok` for `artifact-docs/examples/decision-matrix.mdx`.
+- 2026-05-17: `rtk pnpm mdx-artifacts components ContentItem` showed `icon: ReactNode` with concise decorative-marker guidance and an emoji example.
+- 2026-05-17: `rtk pnpm mdx-artifacts components ContentSet` showed set-level and item-level `icon: ReactNode` metadata with concise placement guidance.
 - 2026-05-17: `rtk grep "lucide-react" package.json pnpm-lock.yaml` returned no matches.
 
 ## Findings

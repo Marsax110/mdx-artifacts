@@ -146,12 +146,12 @@ Current direction:
 - Show a side review rail on wide screens and click-open popovers on narrow screens.
 - Share the same thread/message rendering between rails and popovers so editing behavior stays consistent.
 - Persist local review state through sibling `.state.json` files when the local daemon is available, and keep open pages synchronized with external state writes from agents.
-- Use `artifact-kit review add` and `artifact-kit review reply` for narrow state writes from agents.
+- Use `mdx-artifacts review add` and `mdx-artifacts review reply` for narrow state writes from agents.
 
 Next validation step:
 
 - Keep validating `Section id="..."` as the explicit prose boundary in `docs/local/streamlit-style-mixed.zh-CN.local.mdx`.
-- Keep expanding `artifact-kit review validate <file.mdx>` so agents can detect state threads whose `anchorId` no longer exists in the current MDX, including more derived component child anchors as components are added.
+- Keep expanding `mdx-artifacts review validate <file.mdx>` so agents can detect state threads whose `anchorId` no longer exists in the current MDX, including more derived component child anchors as components are added.
 - Verify the minimal loop: user creates a thread, agent edits MDX, agent replies through the CLI, and the page shows the assistant reply without a manual state export.
 
 Deferred:
@@ -173,7 +173,7 @@ Current direction:
 
 - Build publishable output into `dist/lib`.
 - Run a post-build ESM rewrite so TypeScript output uses Node-compatible `.js` relative imports.
-- Generate `artifact-kit.config.mjs` from `artifact-kit init` for npm users.
+- Generate `mdx-artifacts.config.mjs` from `mdx-artifacts init` for npm users.
 - Treat `react` and `react-dom` as peer dependencies while keeping them as repository dev dependencies.
 - Use `pnpm pack:smoke` to verify import, CLI lookup, init, validate, build, and package file boundaries.
 

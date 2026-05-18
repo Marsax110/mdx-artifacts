@@ -1,4 +1,4 @@
-export type ArtifactKitConfig = {
+export type MdxArtifactsConfig = {
   docsDir?: string;
   includeDefaultStyles?: boolean;
   outDir?: string;

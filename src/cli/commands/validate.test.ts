@@ -4,13 +4,13 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
 import { describe, expect, it } from "vitest";
-import type { ArtifactKitConfig } from "../config/types";
+import type { MdxArtifactsConfig } from "../config/types";
 import { validateMdx } from "./validate";
 
 const execFileAsync = promisify(execFile);
 const cli = path.resolve("src/cli/index.ts");
 const tsx = path.resolve("node_modules/.bin/tsx");
-const baseConfig: Required<ArtifactKitConfig> = {
+const baseConfig: Required<MdxArtifactsConfig> = {
   docsDir: "artifact-docs",
   includeDefaultStyles: true,
   outDir: "dist/artifacts",

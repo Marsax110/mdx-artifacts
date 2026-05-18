@@ -66,8 +66,8 @@ The registry can label prop content with these content types:
 Agents should inspect content types through:
 
 ```bash
-artifact-kit components <ComponentName>
-artifact-kit components <ComponentName> --json
+mdx-artifacts components <ComponentName>
+mdx-artifacts components <ComponentName> --json
 ```
 
 ## Complex Prop Types
