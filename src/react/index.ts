@@ -30,6 +30,13 @@ export type {
   ContentSetSurface,
   ContentSetProps
 } from "./composites/content-set/ContentItem";
+export { DecisionMatrix, OptionGrid } from "./legacy/LegacyContentComponents";
+export type {
+  DecisionMatrixOptionProps,
+  DecisionMatrixProps,
+  OptionGridItemProps,
+  OptionGridProps
+} from "./legacy/LegacyContentComponents";
 export { CodeBlock, CodeBlockView } from "./primitives/code-block/CodeBlock";
 export type { CodeBlockProps, CodeBlockViewProps } from "./primitives/code-block/CodeBlock";
 export { CodeSurface } from "./primitives/code-surface/CodeSurface";

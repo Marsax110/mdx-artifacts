@@ -35,6 +35,17 @@ export function componentsCommand(input?: string, options: { json?: boolean } = 
 function printComponent(component: (typeof componentRegistry)[number]) {
   console.log(`${component.name}\n`);
   console.log(component.description);
+
+  if (component.deprecated) {
+    console.log(`\nDeprecated: use ${component.deprecated.replacement} for new artifacts.`);
+    for (const item of component.deprecated.guidance) {
+      console.log(`- ${item}`);
+    }
+    console.log("\nReplacement example:");
+    console.log(component.example);
+    return;
+  }
+
   if (component.category || component.stability) {
     console.log(
       `\nMetadata: ${[component.category ? `category=${component.category}` : undefined, component.stability ? `stability=${component.stability}` : undefined].filter(Boolean).join(", ")}`

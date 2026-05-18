@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { CommentLayer } from "../../interactions/comments/Comments";
+import { DecisionMatrix, OptionGrid } from "../../legacy/LegacyContentComponents";
 import { ContentItem, ContentSet } from "./ContentItem";
 
 describe("ContentItem", () => {
@@ -91,5 +92,62 @@ describe("ContentSet", () => {
     expect(html).toContain("ak-content-item-tone-danger");
     expect(html).toContain("ak-content-item-emphasis-primary");
     expect(html).not.toContain("ak-content-item-tone-warning");
+  });
+});
+
+describe("legacy content components", () => {
+  it("renders DecisionMatrix through the ContentSet compatibility layer", () => {
+    const html = renderToStaticMarkup(
+      <CommentLayer>
+        <DecisionMatrix
+          id="decision.path"
+          question="Choose a path"
+          options={[
+            {
+              id: "path-a",
+              name: "Path A",
+              confidence: "High",
+              verdict: "Best first step.",
+              pros: ["Readable source"],
+              cons: ["Legacy API"],
+              risks: ["Needs migration"]
+            }
+          ]}
+        />
+      </CommentLayer>
+    );
+
+    expect(html).toContain('data-anchor-id="decision.path.path-a"');
+    expect(html).toContain("Choose a path");
+    expect(html).toContain("Path A");
+    expect(html).toContain("High");
+    expect(html).toContain("Best first step.");
+    expect(html).toContain("Readable source");
+    expect(html).toContain("Legacy API");
+    expect(html).toContain("Needs migration");
+  });
+
+  it("renders OptionGrid compound children through the ContentSet compatibility layer", () => {
+    const html = renderToStaticMarkup(
+      <CommentLayer>
+        <OptionGrid id="options.path" title="Options">
+          <OptionGrid.Item
+            id="path-a"
+            name="Path A"
+            intent="Fastest path"
+            tradeoffs={["Less explicit than ContentSet"]}
+          >
+            <p>Existing MDX still renders.</p>
+          </OptionGrid.Item>
+        </OptionGrid>
+      </CommentLayer>
+    );
+
+    expect(html).toContain('data-anchor-id="options.path.path-a"');
+    expect(html).toContain("Options");
+    expect(html).toContain("Path A");
+    expect(html).toContain("Fastest path");
+    expect(html).toContain("Existing MDX still renders.");
+    expect(html).toContain("Less explicit than ContentSet");
   });
 });

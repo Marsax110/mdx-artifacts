@@ -68,9 +68,9 @@ It is a good fit for:
 
 Do not use it for ordinary README files, simple notes, raw HTML pages, full web apps, or artifacts that require arbitrary application state and custom runtime code.
 
-## 0.2.0 Breaking Changes
+## 0.2.0 Migration Notes
 
-`DecisionMatrix` and `OptionGrid` have been removed from the public API. Use `ContentSet` for grouped content cards and `ContentItem` for standalone content cards.
+`DecisionMatrix` and `OptionGrid` are deprecated compatibility components. Existing MDX can still render, but new artifacts should use `ContentSet` for grouped content cards and `ContentItem` for standalone content cards.
 
 This release makes the content authoring model more consistent: readable explanation, rationale, pros, cons, risks, and tradeoffs should live in MDX children instead of object-array props.
 
@@ -94,7 +94,7 @@ Use:
 </ContentSet>
 ```
 
-Do not use `DecisionMatrix`, `DecisionMatrix.Option`, `OptionGrid`, `OptionGrid.Item`, or `options={[...]}`. The `validate` command warns when removed components or older props such as `question`, `name`, `intent`, `pros`, `cons`, `risks`, `confidence`, `verdict`, or `tradeoffs` are found.
+Do not use `DecisionMatrix`, `DecisionMatrix.Option`, `OptionGrid`, `OptionGrid.Item`, or `options={[...]}` for new artifacts. The `validate` command warns when deprecated compatibility components or older props such as `question`, `name`, `intent`, `pros`, `cons`, `risks`, `confidence`, `verdict`, or `tradeoffs` are found.
 
 ## Current Scope
 

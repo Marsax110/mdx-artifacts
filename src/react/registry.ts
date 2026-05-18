@@ -29,6 +29,10 @@ export type ComponentMeta = {
   name: string;
   category?: "artifact" | "content" | "layout" | "semantic";
   stability?: "stable" | "advanced";
+  deprecated?: {
+    replacement: string;
+    guidance: string[];
+  };
   authoring?: ComponentAuthoringMeta;
   description: string;
   useWhen: string[];
@@ -1279,6 +1283,81 @@ This section can contain native MDX paragraphs, lists, and code fences.
   }
 ];
 
+const legacyComponentRegistry: ComponentMeta[] = [
+  {
+    name: "DecisionMatrix",
+    deprecated: {
+      replacement: "ContentSet",
+      guidance: [
+        "DecisionMatrix is kept only as a runtime compatibility shim for older MDX.",
+        "Use ContentSet with ContentSet.Item for new artifacts.",
+        "Existing MDX can still render, but validate will warn and guide migration."
+      ]
+    },
+    description: "Deprecated compatibility component. Use ContentSet with ContentSet.Item instead.",
+    useWhen: [],
+    props: [],
+    example: `<ContentSet id="decision.path" title="Choose the implementation path">
+  <ContentSet.Item id="path-a" title="Path A">Readable option body.</ContentSet.Item>
+</ContentSet>`
+  },
+  {
+    name: "DecisionMatrix.Option",
+    deprecated: {
+      replacement: "ContentSet.Item",
+      guidance: [
+        "DecisionMatrix.Option is kept only as a runtime compatibility shim for older MDX.",
+        "Use ContentSet.Item for new artifacts.",
+        "Move long pros, cons, risks, and rationale into MDX children."
+      ]
+    },
+    description: "Deprecated compatibility child component. Use ContentSet.Item instead.",
+    useWhen: [],
+    props: [],
+    example: `<ContentSet.Item id="path-a" title="Path A">
+  ### Tradeoffs
+
+  - Keep readable rationale in MDX children
+</ContentSet.Item>`
+  },
+  {
+    name: "OptionGrid",
+    deprecated: {
+      replacement: "ContentSet",
+      guidance: [
+        "OptionGrid is kept only as a runtime compatibility shim for older MDX.",
+        "Use ContentSet with ContentSet.Item for new artifacts.",
+        "Existing MDX can still render, but validate will warn and guide migration."
+      ]
+    },
+    description: "Deprecated compatibility component. Use ContentSet with ContentSet.Item instead.",
+    useWhen: [],
+    props: [],
+    example: `<ContentSet id="options.path" title="Implementation options">
+  <ContentSet.Item id="path-a" title="Path A">Readable option body.</ContentSet.Item>
+</ContentSet>`
+  },
+  {
+    name: "OptionGrid.Item",
+    deprecated: {
+      replacement: "ContentSet.Item",
+      guidance: [
+        "OptionGrid.Item is kept only as a runtime compatibility shim for older MDX.",
+        "Use ContentSet.Item for new artifacts.",
+        "Move long descriptions and tradeoffs into MDX children."
+      ]
+    },
+    description: "Deprecated compatibility child component. Use ContentSet.Item instead.",
+    useWhen: [],
+    props: [],
+    example: `<ContentSet.Item id="path-a" title="Path A">
+  Readable option body.
+</ContentSet.Item>`
+  }
+];
+
 export function findComponentMeta(name: string) {
-  return componentRegistry.find((component) => component.name.toLowerCase() === name.toLowerCase());
+  return [...componentRegistry, ...legacyComponentRegistry].find(
+    (component) => component.name.toLowerCase() === name.toLowerCase()
+  );
 }

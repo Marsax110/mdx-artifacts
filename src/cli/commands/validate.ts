@@ -35,22 +35,22 @@ const componentsRequiringStableId = [
 const deprecatedAuthoringComponents = [
   {
     componentName: "DecisionMatrix",
-    warning: "DecisionMatrix has been removed from the public API. Use ContentSet with ContentSet.Item children.",
+    warning: "DecisionMatrix is a deprecated compatibility component. Use ContentSet with ContentSet.Item children.",
     suggestion: "Replace DecisionMatrix with ContentSet and ContentSet.Item children."
   },
   {
     componentName: "DecisionMatrix.Option",
-    warning: "DecisionMatrix.Option has been removed from the public API. Use ContentSet.Item.",
+    warning: "DecisionMatrix.Option is a deprecated compatibility component. Use ContentSet.Item.",
     suggestion: "Replace DecisionMatrix.Option with ContentSet.Item."
   },
   {
     componentName: "OptionGrid",
-    warning: "OptionGrid has been removed from the public API. Use ContentSet with ContentSet.Item children.",
+    warning: "OptionGrid is a deprecated compatibility component. Use ContentSet with ContentSet.Item children.",
     suggestion: "Replace OptionGrid with ContentSet and ContentSet.Item children."
   },
   {
     componentName: "OptionGrid.Item",
-    warning: "OptionGrid.Item has been removed from the public API. Use ContentSet.Item.",
+    warning: "OptionGrid.Item is a deprecated compatibility component. Use ContentSet.Item.",
     suggestion: "Replace OptionGrid.Item with ContentSet.Item."
   }
 ];

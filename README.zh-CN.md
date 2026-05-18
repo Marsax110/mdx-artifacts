@@ -66,9 +66,9 @@ MDX Artifacts 是一个 Markdown-native 的 artifact system。
 
 不适合的场景：普通 README、简单笔记、裸 HTML 页面、完整 web app，或者需要任意应用状态和自定义运行时代码的 artifact。
 
-## 0.2.0 破坏性变更
+## 0.2.0 迁移说明
 
-`DecisionMatrix` 和 `OptionGrid` 已从公开 API 中移除。成组内容卡片请使用 `ContentSet`，独立内容卡片请使用 `ContentItem`。
+`DecisionMatrix` 和 `OptionGrid` 现在是 deprecated compatibility components。已有 MDX 仍可渲染，但新 artifact 应使用 `ContentSet` 表达成组内容卡片，使用 `ContentItem` 表达独立内容卡片。
 
 这次变更的目标是统一内容写作模型：解释、理由、优缺点、风险和取舍这类可读正文，应该放在 MDX children 中，而不是继续塞进对象数组 props。
 
@@ -92,7 +92,7 @@ MDX Artifacts 是一个 Markdown-native 的 artifact system。
 </ContentSet>
 ```
 
-不要再使用 `DecisionMatrix`、`DecisionMatrix.Option`、`OptionGrid`、`OptionGrid.Item` 或 `options={[...]}`。`validate` 命令会对这些已移除组件，以及 `question`、`name`、`intent`、`pros`、`cons`、`risks`、`confidence`、`verdict`、`tradeoffs` 等旧 props 给出迁移 warning。
+新 artifact 不要再使用 `DecisionMatrix`、`DecisionMatrix.Option`、`OptionGrid`、`OptionGrid.Item` 或 `options={[...]}`。`validate` 命令会对这些 deprecated compatibility components，以及 `question`、`name`、`intent`、`pros`、`cons`、`risks`、`confidence`、`verdict`、`tradeoffs` 等旧 props 给出迁移 warning。
 
 ## 当前阶段
 

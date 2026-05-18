@@ -170,9 +170,9 @@ describe("validateMdx", () => {
     const result = await validateMdx(filePath);
 
     expect(result.warnings).toContain(
-      "DecisionMatrix has been removed from the public API. Use ContentSet with ContentSet.Item children."
+      "DecisionMatrix is a deprecated compatibility component. Use ContentSet with ContentSet.Item children."
     );
-    expect(result.warnings).toContain("DecisionMatrix.Option has been removed from the public API. Use ContentSet.Item.");
+    expect(result.warnings).toContain("DecisionMatrix.Option is a deprecated compatibility component. Use ContentSet.Item.");
     expect(result.warnings).toContain(
       'DecisionMatrix prop "question" is deprecated. Use ContentSet prop "title".'
     );
@@ -185,9 +185,9 @@ describe("validateMdx", () => {
       'OptionGrid.Item prop "intent" is deprecated. Use "summary" for short intent text.'
     );
     expect(result.warnings).toContain(
-      "OptionGrid has been removed from the public API. Use ContentSet with ContentSet.Item children."
+      "OptionGrid is a deprecated compatibility component. Use ContentSet with ContentSet.Item children."
     );
-    expect(result.warnings).toContain("OptionGrid.Item has been removed from the public API. Use ContentSet.Item.");
+    expect(result.warnings).toContain("OptionGrid.Item is a deprecated compatibility component. Use ContentSet.Item.");
     expect(result.warnings).toContain('OptionGrid prop "options" is deprecated. Use ContentSet.Item children.');
     expect(result.warnings).toContain(
       'OptionGrid.Item prop "tradeoffs" is deprecated. Move tradeoff lists into MDX children.'

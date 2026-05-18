@@ -24,6 +24,8 @@ describe("componentsCommand", () => {
     const text = output.join("\n");
     expect(text).toContain("prefer MDX children for human-readable content");
     expect(text).toContain("props for stable ids");
+    expect(text).not.toContain("DecisionMatrix");
+    expect(text).not.toContain("OptionGrid");
   });
 
   it("prints block markdown content type metadata", () => {
@@ -59,5 +61,19 @@ describe("componentsCommand", () => {
     expect(text).toContain("Authoring: content-block");
     expect(text).toContain("Use title, badge, and summary for short visible display slots.");
     expect(text).toContain("Use MDX children for long explanations");
+  });
+
+  it("prints migration guidance for a deprecated compatibility component", () => {
+    const output: string[] = [];
+    vi.spyOn(console, "log").mockImplementation((value = "") => output.push(String(value)));
+
+    componentsCommand("DecisionMatrix");
+
+    const text = output.join("\n");
+    expect(text).toContain("Deprecated: use ContentSet for new artifacts.");
+    expect(text).toContain("runtime compatibility shim");
+    expect(text).toContain("Replacement example:");
+    expect(text).toContain("<ContentSet");
+    expect(text).not.toContain("\nProps:");
   });
 });
