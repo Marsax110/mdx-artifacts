@@ -118,7 +118,7 @@ const config = {
   outDir: "dist/artifacts",
   includeDefaultStyles: true,
   styles: ["artifact-theme.css"],
-  tailwindSources: ["artifact-docs/components/**/*.{ts,tsx}"]
+  tailwindSources: ["artifact-components/**/*.{ts,tsx}"]
 };
 ```
 

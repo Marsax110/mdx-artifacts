@@ -121,13 +121,21 @@ Initialize a workspace:
 pnpm exec mdx-artifacts init
 ```
 
+For non-interactive setup, pass the project structure explicitly:
+
+```bash
+pnpm exec mdx-artifacts init --yes --docs-dir docs/artifacts --components-dir artifact-components --agent codex
+```
+
 This creates:
 
 ```text
 mdx-artifacts.config.mjs
-artifact-docs/examples/hello.mdx
+<docsDir>/examples/hello.mdx
 agents/AGENTS.snippet.md
 ```
+
+`components-dir` is a project-local component source directory. It is added to `tailwindSources` for Tailwind class discovery, but it does not automatically register components.
 
 Build the initialized example:
 
@@ -267,7 +275,7 @@ const config = {
   outDir: "dist/artifacts",
   includeDefaultStyles: true,
   styles: ["artifact-theme.css"],
-  tailwindSources: ["artifact-docs/components/**/*.{ts,tsx}"]
+  tailwindSources: ["artifact-components/**/*.{ts,tsx}"]
 };
 
 export default config;

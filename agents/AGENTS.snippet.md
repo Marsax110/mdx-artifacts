@@ -6,7 +6,7 @@ Do not use MDX Artifacts for ordinary README files, simple notes, raw HTML pages
 
 Authoring rules:
 
-1. Create `.mdx` files under `artifact-docs/`.
+1. Create `.mdx` files under the configured `docsDir`. If no config exists, use `artifact-docs/`.
 2. Keep prose in Markdown and use semantic React components as islands.
 3. Prefer high-level components from `mdx-artifacts/react`.
 4. Prefer MDX children for human-readable body content when a component supports it.
@@ -20,3 +20,5 @@ Authoring rules:
 12. Run `mdx-artifacts validate <file.mdx> --json` when structured diagnostics are useful for repairs.
 13. If validation reports diagnostics, fix errors first, review warnings, and validate again.
 14. Run `mdx-artifacts build <file.mdx>` to produce standalone HTML.
+
+For project-local components, choose a stable project-local component source directory and include it in `tailwindSources` when those files use Tailwind classes. This directory is a source location for user-owned React components, not automatic component registration.

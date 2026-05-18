@@ -120,13 +120,21 @@ pnpm add -D mdx-artifacts react react-dom
 pnpm exec mdx-artifacts init
 ```
 
+非交互初始化时，可以显式传入项目结构：
+
+```bash
+pnpm exec mdx-artifacts init --yes --docs-dir docs/artifacts --components-dir artifact-components --agent codex
+```
+
 这会创建：
 
 ```text
 mdx-artifacts.config.mjs
-artifact-docs/examples/hello.mdx
+<docsDir>/examples/hello.mdx
 agents/AGENTS.snippet.md
 ```
+
+`components-dir` 是项目本地组件源码目录，会写入 `tailwindSources` 供 Tailwind 扫描 class，但不等于自动注册组件。
 
 验证和构建示例：
 
@@ -200,7 +208,7 @@ const config = {
   outDir: "dist/artifacts",
   includeDefaultStyles: true,
   styles: ["artifact-theme.css"],
-  tailwindSources: ["artifact-docs/components/**/*.{ts,tsx}"]
+  tailwindSources: ["artifact-components/**/*.{ts,tsx}"]
 };
 
 export default config;

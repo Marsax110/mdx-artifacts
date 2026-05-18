@@ -5,7 +5,7 @@ import { componentsCommand } from "./commands/components";
 import { devCommand } from "./commands/dev";
 import { interactionsCommand } from "./commands/interactions";
 import { reviewCommand } from "./commands/review";
-import { initProject, parseInitAgent } from "./commands/scaffold";
+import { initProject, parseInitOptions } from "./commands/scaffold";
 import { formatValidationJson, printValidationResult, validateMdx } from "./commands/validate";
 import { loadConfig } from "./config/config";
 
@@ -19,13 +19,7 @@ async function main() {
   }
 
   if (command === "init") {
-    const args = process.argv.slice(3);
-    const agentFlagIndex = args.indexOf("--agent");
-    if (agentFlagIndex >= 0 && !args[agentFlagIndex + 1]) {
-      throw new Error("mdx-artifacts init --agent requires a value: generic, codex, claude-code, cursor, or all.");
-    }
-    const agent = parseInitAgent(agentFlagIndex >= 0 ? args[agentFlagIndex + 1] : undefined);
-    await initProject(projectRoot, { agent });
+    await initProject(projectRoot, await parseInitOptions(process.argv.slice(3)));
     return;
   }
 
@@ -86,7 +80,7 @@ function printHelp() {
   console.log(`mdx-artifacts
 
 Usage:
-  mdx-artifacts init [--agent <generic|codex|claude-code|cursor|all>]
+  mdx-artifacts init [--yes] [--docs-dir <dir>] [--components-dir <dir>] [--agent <generic|codex|claude-code|cursor|all>]
   mdx-artifacts components [ComponentName] [--json]
   mdx-artifacts validate <file.mdx> [--json]
   mdx-artifacts interactions inspect <file.mdx> <id> [--json]

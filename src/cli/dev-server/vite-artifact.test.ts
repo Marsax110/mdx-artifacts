@@ -59,14 +59,14 @@ describe("createArtifactProject", () => {
       outDir: "dist/artifacts",
       port: 4321,
       styles: [],
-      tailwindSources: ["artifact-docs/components/**/*.{ts,tsx}"]
+      tailwindSources: ["artifact-components/**/*.{ts,tsx}"]
     });
     projects.push(project);
 
     const tailwindSources = await readFile(path.join(project.tmpDir, "src", "artifact-tailwind-sources.css"), "utf8");
 
     expect(tailwindSources).toContain('entry.mdx";');
-    expect(tailwindSources).toContain('artifact-docs/components/**/*.{ts,tsx}";');
+    expect(tailwindSources).toContain('artifact-components/**/*.{ts,tsx}";');
   });
 
   it("serves narrow interaction state endpoints", async () => {
