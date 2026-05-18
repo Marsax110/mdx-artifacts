@@ -102,7 +102,9 @@ async function runDevSmoke(cwd) {
     const artifactUrl = await waitForDevServer(server);
     const origin = new URL(artifactUrl).origin;
     const entrySource = await fetchText(new URL("/src/entry.tsx", origin));
-    const shellReactImport = entrySource.match(/import \{ ArtifactStateProvider, CommentLayer \} from "([^"]+)"/)?.[1];
+    const shellReactImport = entrySource.match(
+      /import \{[^}]*\bArtifactStateProvider\b[^}]*\bCommentLayer\b[^}]*\} from "([^"]+)"/
+    )?.[1];
 
     if (!shellReactImport) {
       throw new Error(`Could not find shell react import in dev entry:\n${entrySource}`);
