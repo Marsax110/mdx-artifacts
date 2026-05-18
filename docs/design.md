@@ -159,6 +159,7 @@ Current workflow:
 Component development: pnpm storybook
 Protocol verification: pnpm typecheck / pnpm test / pnpm mdx-artifacts:validate
 Artifact verification: pnpm mdx-artifacts:build
+Release readiness: pnpm release:check / pnpm pack:smoke / npm pack --dry-run
 ```
 
 ## Testing Protocol
@@ -179,7 +180,9 @@ Out of scope for the first baseline:
 - browser E2E
 - visual regression
 - Astro adapter tests
-- package tarball smoke tests
+- package tarball smoke tests as part of the default `pnpm check` baseline
+
+Package readiness is covered separately by `pnpm release:check`, `pnpm pack:smoke`, and manual `npm pack --dry-run` before publishing.
 
 ## Agent Contract
 
@@ -213,6 +216,19 @@ Component naming rules:
 - Avoid generic names such as `Panel` or `CardList`.
 - A component should represent an artifact workflow, not a primitive UI element.
 - Text rendering is intentionally split into `InlineText`, `MarkdownBody`, and future long-form prose components.
+
+## Package Boundary
+
+MDX Artifacts remains a single npm package for now.
+
+The package exposes separate entry points for the current public surfaces:
+
+- `mdx-artifacts` for the CLI
+- `mdx-artifacts/react` for React components
+- `mdx-artifacts/registry` for registry metadata
+- `mdx-artifacts/styles.css` for default styles
+
+Do not split into packages such as `@mdx-artifacts/react`, `@mdx-artifacts/cli`, or `@mdx-artifacts/schema` until there is real maintenance pressure from independent versioning, dependency isolation, or adapter-specific release needs. The current priority is keeping installation, initialization, and agent guidance simple.
 
 ## Public Roadmap and Local Execution Notes
 

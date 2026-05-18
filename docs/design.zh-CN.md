@@ -110,9 +110,10 @@ Astro 的代价：
 
 MDX Artifacts 提供默认 CSS，但默认样式不是闭环的一部分。
 
-使用者可以通过 `mdx-artifacts.config.ts` 注入品牌样式：
+使用者可以通过 `mdx-artifacts.config.mjs` 注入品牌样式：
 
-```ts
+```js
+/** @type {import("mdx-artifacts").MdxArtifactsConfig} */
 const config = {
   docsDir: "artifact-docs",
   outDir: "dist/artifacts",
@@ -179,7 +180,9 @@ artifact 验证：pnpm mdx-artifacts:build
 - 浏览器 E2E
 - 视觉回归
 - Astro adapter 测试
-- npm tarball 安装 smoke test
+- 默认 `pnpm check` 中的 npm tarball 安装 smoke test
+
+Package readiness 由单独命令覆盖：`pnpm release:check`、`pnpm pack:smoke`，以及发布前手动 `npm pack --dry-run`。
 
 ## Agent 使用约定
 
@@ -206,6 +209,19 @@ mdx-artifacts components ExportPanel --json
 ```
 
 查询数据来自 `componentRegistry`，未来应同时服务 CLI 查询、Storybook docs、validate 规则和 Agent skill 说明。
+
+## 包边界
+
+当前继续保持单个 npm 包。
+
+这个包通过不同入口暴露当前稳定表面：
+
+- `mdx-artifacts`：CLI。
+- `mdx-artifacts/react`：React components。
+- `mdx-artifacts/registry`：组件 registry metadata。
+- `mdx-artifacts/styles.css`：默认样式。
+
+暂不拆成 `@mdx-artifacts/react`、`@mdx-artifacts/cli` 或 `@mdx-artifacts/schema`。只有当独立版本、依赖隔离、adapter 发布节奏成为真实维护压力时，再重新评估拆包。当前优先保持安装、初始化和 agent guidance 简单。
 
 ## 公开路线图与本地执行记录
 

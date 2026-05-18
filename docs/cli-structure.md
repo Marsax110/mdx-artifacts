@@ -8,8 +8,9 @@ The CLI entry remains `src/cli/index.ts`. It wires the command parser and delega
 
 The current CLI structure is the result of two stabilization passes:
 
-1. The source tree was moved from a flat `src/cli` directory into command, service, MDX, state, dev-server, and config boundaries.
+1. The source tree was moved from a flat `src/cli` directory into command, service, MDX, state, dev-server, config, diagnostics, and resources boundaries.
 2. The interaction and review commands were split so command modules stay focused on argument parsing, terminal output, and exit-code behavior, while service modules own stateful workflow operations.
+3. Validation now emits structured diagnostics and resource checks share a project-root safety policy.
 
 This means future CLI changes should start by identifying the real owner of the behavior:
 
@@ -19,6 +20,8 @@ This means future CLI changes should start by identifying the real owner of the 
 - browser-local endpoint handling belongs in `dev-server/`
 - state file format and route helpers belong in `state/`
 - config loading and config types belong in `config/`
+- structured diagnostic types belong in `diagnostics/`
+- local resource path safety and resource policy checks belong in `resources/`
 
 Do not put reusable workflow logic into a command module just because the first caller is a CLI command. If the same behavior could be triggered by the dev server, an agent, or a future automation entry point, place it below `services/` and keep the command as a thin wrapper.
 
@@ -30,7 +33,9 @@ src/cli/
   commands/
   config/
   dev-server/
+  diagnostics/
   mdx/
+  resources/
   services/
   state/
 ```
@@ -40,7 +45,9 @@ src/cli/
 | `commands/` | Command-level orchestration for each public CLI command. | `build`, `components`, `dev`, `interactions`, `review`, `scaffold`, `validate` |
 | `config/` | Shared CLI config loading and public config types. | `loadMdxArtifactsConfig`, `MdxArtifactsConfig` |
 | `dev-server/` | Vite dev server integration and browser-facing dev endpoints. | artifact dev server middleware |
+| `diagnostics/` | Shared structured diagnostic types used by validation and resource checks. | `ArtifactDiagnostic` |
 | `mdx/` | MDX source updates, parsing helpers, and document mutation helpers. | `sortable-list` source patching |
+| `resources/` | Project-root resource safety and resource policy diagnostics. | safe path checks, resource policy checks |
 | `services/` | Reusable CLI workflows that sit below commands but above low-level helpers. | interaction and review operation handling |
 | `state/` | Artifact state file IO and state-shape helpers. | artifact state snapshots |
 
@@ -66,6 +73,10 @@ Dev server modules should own runtime endpoints, Vite configuration, and browser
 
 Config modules should remain small and stable. Runtime UI components may import config types, but should not import command or service modules.
 
+Diagnostics modules should stay data-focused. They define result shapes that commands, validation, resource checks, and future agent repair loops can consume without depending on terminal formatting.
+
+Resources modules should own path safety and resource policy decisions. They may return diagnostics, but they should not read arbitrary MDX import graphs or turn artifacts into a data-loading framework.
+
 ## Import Direction
 
 Prefer this dependency direction:
@@ -75,6 +86,8 @@ index.ts
   -> commands/
     -> services/
     -> config/
+    -> diagnostics/
+    -> resources/
     -> state/
     -> mdx/
     -> dev-server/
@@ -88,6 +101,9 @@ services/
   -> state/
   -> mdx/
   -> config/
+
+resources/
+  -> diagnostics/
 ```
 
 Avoid importing from `commands/` into lower-level modules. If logic is needed outside a command, move it into `services/`, `mdx/`, `state/`, or `config/` first.

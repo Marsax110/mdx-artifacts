@@ -309,9 +309,27 @@ pnpm typecheck
 pnpm mdx-artifacts:validate
 ```
 
+发布前或修改 package metadata、公开文档、examples、agent guidance 后，运行轻量 release 检查：
+
+```bash
+pnpm release:check
+```
+
+发布前或修改 package 边界、CLI 输出、config loading、scaffold、依赖边界、build output 后，运行 package smoke test：
+
+```bash
+pnpm pack:smoke
+```
+
+最终手动发布前，可以再运行：
+
+```bash
+npm pack --dry-run --cache /private/tmp/mdx-artifacts-npm-cache
+```
+
 ## 样式注入
 
-默认情况下，MDX Artifacts 会注入内置样式。使用者可以在 `mdx-artifacts.config.ts` 里追加自己的品牌 CSS：
+默认情况下，MDX Artifacts 会注入内置样式。使用者可以在 `mdx-artifacts.config.mjs` 里追加自己的品牌 CSS：
 
 ```js
 /** @type {import("mdx-artifacts").MdxArtifactsConfig} */

@@ -190,6 +190,11 @@ Next validation step:
 - Keep `npm pack --dry-run` in the manual pre-publish checklist.
 - Decide whether npm publishing should stay local-manual or move to a separate manually triggered publish workflow.
 
+Package boundary:
+
+- Keep `mdx-artifacts` as a single npm package with separate exports for CLI, React components, registry metadata, and styles.
+- Do not split into `@mdx-artifacts/react`, `@mdx-artifacts/cli`, or `@mdx-artifacts/schema` until independent versioning, dependency isolation, or adapter release cadence creates real maintenance pressure.
+
 ## Phase 3: Docs Site Adapter
 
 Goal:

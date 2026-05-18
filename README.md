@@ -330,10 +330,22 @@ pnpm typecheck
 pnpm mdx-artifacts:validate
 ```
 
-Run the package smoke test before publishing:
+Run the lightweight release check before publishing or after package metadata, public docs, examples, or agent guidance changes:
+
+```bash
+pnpm release:check
+```
+
+Run the package smoke test before publishing or after package boundary, CLI output, config loading, scaffold, dependency, or build output changes:
 
 ```bash
 pnpm pack:smoke
+```
+
+For a final manual pre-publish check, run:
+
+```bash
+npm pack --dry-run --cache /private/tmp/mdx-artifacts-npm-cache
 ```
 
 ## Style Injection
