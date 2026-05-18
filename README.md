@@ -55,6 +55,19 @@ Use this product boundary when making component and authoring decisions:
 
 This means new component APIs should usually be children-first for human-readable content and props-first for machine-readable configuration.
 
+## When To Use It
+
+Use MDX Artifacts when an agent should create a local, reviewable MDX artifact with semantic React components, structured validation, and a standalone HTML output.
+
+It is a good fit for:
+
+- decision reports, option comparisons, code review handoffs, and implementation plans
+- artifacts that should remain readable as MDX source
+- workflows where agents should query component metadata and validate before build
+- project-local React components that supplement, but do not replace, the MDX document
+
+Do not use it for ordinary README files, simple notes, raw HTML pages, full web apps, or artifacts that require arbitrary application state and custom runtime code.
+
 ## 0.2.0 Breaking Changes
 
 `DecisionMatrix` and `OptionGrid` have been removed from the public API. Use `ContentSet` for grouped content cards and `ContentItem` for standalone content cards.
@@ -87,10 +100,10 @@ Do not use `DecisionMatrix`, `DecisionMatrix.Option`, `OptionGrid`, `OptionGrid.
 
 The first stage focuses on the smallest useful loop:
 
-1. `artifact-docs/**/*.mdx` is the source format.
-2. `src/react` provides high-level artifact components.
-3. `src/cli` provides `init`, `components`, `validate`, `dev`, `build`, and narrow review-state commands.
-4. `components` exposes component props and examples for agents.
+1. The configured `docsDir` is the MDX source root. The default is `artifact-docs/`.
+2. `mdx-artifacts/react` exports high-level artifact components.
+3. The `mdx-artifacts` CLI provides `init`, `components`, `validate`, `dev`, `build`, and narrow review-state commands.
+4. `mdx-artifacts components` exposes component props and examples for agents.
 5. `build` outputs a standalone HTML artifact.
 
 Astro is intentionally not part of the core yet. It can become a later adapter for long-lived docs sites.
@@ -121,13 +134,28 @@ Initialize a workspace:
 pnpm exec mdx-artifacts init
 ```
 
+Interactive init uses numbered choices. Press Enter to accept defaults:
+
+```text
+Where should MDX artifact source files live?
+  1. ./artifact-docs/ (default)
+  2. Enter a custom directory
+Select an option (1)
+
+Use project-local React components?
+  Adds a Tailwind source directory; it does not auto-register components.
+  1. No (default)
+  2. Yes, choose a project-local component source directory
+Select an option (1)
+```
+
 For non-interactive setup, pass the project structure explicitly:
 
 ```bash
 pnpm exec mdx-artifacts init --yes --docs-dir docs/artifacts --components-dir artifact-components --agent codex
 ```
 
-This creates:
+After init, the CLI prints a summary of the selected directories, generated guidance files, and next validation/build commands. The scaffold includes:
 
 ```text
 mdx-artifacts.config.mjs
@@ -135,14 +163,29 @@ mdx-artifacts.config.mjs
 agents/AGENTS.snippet.md
 ```
 
-`components-dir` is a project-local component source directory. It is added to `tailwindSources` for Tailwind class discovery, but it does not automatically register components.
+`components-dir` is a project-local component source directory. It is added to `tailwindSources` for Tailwind class discovery, but it does not automatically register components or make components available through `mdx-artifacts components`.
 
-Build the initialized example:
+### Agent Guidance
+
+`mdx-artifacts init --agent <agent>` can install project-local writing guidance for coding agents:
+
+```text
+--agent codex       .agents/skills/mdx-artifacts/SKILL.md
+--agent claude-code .claude/skills/mdx-artifacts/SKILL.md
+--agent cursor      .cursor/rules/mdx-artifacts.mdc
+--agent all         all supported project-local guidance files
+```
+
+The generated guidance tells agents when to use MDX Artifacts, where to place `.mdx` files, how to query component metadata, how to handle local resources, and to run `mdx-artifacts validate` before build. Keep the CLI registry as the source of truth for component props instead of copying long component metadata into agent instructions.
+
+Build the initialized example. For the default init choices, the example lives under `artifact-docs/`:
 
 ```bash
 pnpm exec mdx-artifacts validate artifact-docs/examples/hello.mdx
 pnpm exec mdx-artifacts build artifact-docs/examples/hello.mdx
 ```
+
+If you initialized with a custom `--docs-dir`, use `<docsDir>/examples/hello.mdx` instead.
 
 Default output:
 
@@ -226,6 +269,18 @@ missing: 1
 
 Resolve missing anchors by restoring the old id, migrating the thread to a new anchor, or marking the thread resolved with an assistant reply that explains the structural change.
 
+## Local Resource And Security Model
+
+MDX Artifacts is intended for local, reviewable artifacts generated inside a project workspace.
+
+- Local resources that go through the resource policy must stay inside the project root.
+- Remote URLs, `~` paths, and project-root escapes are rejected for resources that go through the resource policy.
+- Today, `validate` checks configured `styles` resources; data, artifact, and component-module references can use the same policy as those features become first-class inputs.
+- `tailwindSources` is for Tailwind class discovery and should point only at project-local source files. It is a config convention, not component registration.
+- `componentsDir` is a source location for user-owned React components, not a component registry.
+- Raw React imports are still normal MDX imports, so use project-local components only when a semantic built-in component is not enough.
+- Run `mdx-artifacts validate <file.mdx>` before build to catch supported path, component, and diagnostic issues before producing HTML.
+
 ## Repository Development
 
 Install dependencies:
@@ -293,7 +348,7 @@ The CLI automatically registers the current MDX file as a Tailwind source, so Ta
 - Component APIs should be semantic and self-describing.
 - Human-readable body content should prefer MDX children or explicit slots over long string props.
 - Props should carry ids, short labels, variants, layout controls, and structured data.
-- Interactive artifacts must provide an export path.
+- Interactive artifacts should provide an export path; `validate` warns when one is missing.
 - Bulky data should live in adjacent JSON files instead of JSX props.
 - Core components stay React/TypeScript and should be reusable from Vite, Astro, or artifact builders.
 - Tailwind is an internal styling build tool; the final artifact still inlines CSS.
