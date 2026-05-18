@@ -56,9 +56,9 @@ const reviewAddOutput = run(
     "add",
     "artifact-docs/examples/hello.mdx",
     "--anchor",
-    "set.initialized",
+    "set.component-boundaries",
     "--body",
-    "Clarify the initialized content set."
+    "Clarify the component boundary guidance."
   ],
   projectDir
 );
@@ -74,7 +74,7 @@ run(
     "--thread",
     threadId,
     "--body",
-    "Updated the initialized content set.",
+    "Updated the component boundary guidance.",
     "--status",
     "resolved"
   ],

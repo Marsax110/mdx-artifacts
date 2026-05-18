@@ -1,6 +1,6 @@
 {
   "name": "mdx-artifacts",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Build interactive MDX artifacts with reusable React components and a local CLI.",
   "type": "module",
   "license": "MIT",

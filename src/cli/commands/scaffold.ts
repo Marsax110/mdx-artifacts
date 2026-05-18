@@ -184,32 +184,275 @@ export default config;
 
   await writeFile(
     path.join(docsExamplesDir, "hello.mdx"),
-    `import { ContentSet, ExportPanel } from "mdx-artifacts/react";
+    `import {
+  AnnotatedCode,
+  Callout,
+  CodeBlock,
+  Columns,
+  ContentItem,
+  ContentSet,
+  DiffBlock,
+  ExportPanel,
+  Frame,
+  Section,
+  Stack,
+  SortableList
+} from "mdx-artifacts/react";
 
-# Hello Artifact
+# Hello MDX Artifact
+
+<Section id="section.context">
+
+## Context
+
+Use native Markdown for the document narrative. Keep headings, paragraphs, and short lists readable in the source:
+
+- write prose as Markdown
+- use semantic components for workflow regions
+- give reviewable blocks stable ids
+
+</Section>
+
+<Callout id="callout.authoring-rule" tone="success" title="Authoring rule">
+Prefer MDX children for human-readable body content. Keep props for stable ids, short labels, variants, layout controls, and structured data.
+</Callout>
+
+<ContentItem
+  id="item.source-boundary"
+  title="Markdown-native source"
+  badge="Best practice"
+  tone="positive"
+  emphasis="primary"
+  summary="The source should remain useful during review, not only after HTML build."
+>
+  ### Use children for readable content
+
+  Put rationale, risks, tradeoffs, and lists here. This keeps the artifact easy to review in Git and easy for agents to modify safely.
+</ContentItem>
 
 <ContentSet
-  id="set.initialized"
-  title="Has MDX Artifacts been initialized?"
-  columns={2}
+  id="set.component-boundaries"
+  title="Recommended component boundaries"
+  icon="*"
+  columns={3}
+  surface="subtle"
 >
   <ContentSet.Item
-    id="initialized"
-    title="Initialized"
-    badge="Ready"
+    id="content-set"
+    title="ContentSet"
+    badge="Grouped content"
     tone="positive"
     emphasis="primary"
-    summary="Ready to continue generating artifacts."
+    summary="Use for comparable cards, option groups, risks, findings, or recommendation sets."
   >
-    - MDX source exists
-    - Export panel exists
-    - Real content still needs to be added
+    ### Good fit
+
+    - several related items
+    - each item needs a stable anchor
+    - long body content should remain Markdown
+  </ContentSet.Item>
+  <ContentSet.Item
+    id="code-review"
+    title="Code components"
+    badge="Structured"
+    tone="info"
+    summary="Use code and diff components when line structure matters."
+  >
+    ### Good fit
+
+    - implementation notes
+    - review walkthroughs
+    - line-level explanations
+  </ContentSet.Item>
+  <ContentSet.Item
+    id="export"
+    title="ExportPanel"
+    badge="Handoff"
+    tone="accent"
+    summary="Use for final decisions, summaries, or machine-readable handoff values."
+  >
+    ### Good fit
+
+    Interactive artifacts should end with an explicit export path so the result can leave the browser.
   </ContentSet.Item>
 </ContentSet>
 
+<Section id="section.visual-semantics">
+
+## Visual semantics
+
+Use \`icon\`, \`tone\`, and \`emphasis\` as visual semantics, not as hidden data. They should help readers scan the artifact while the real explanation stays in Markdown.
+
+</Section>
+
+<ContentSet
+  id="set.visual-semantics"
+  title="Icon, tone, and emphasis"
+  icon="*"
+  columns={3}
+  surface="outlined"
+  tone="info"
+  emphasis="subtle"
+>
+  <ContentSet.Item
+    id="inherited"
+    title="Inherited defaults"
+    badge="Info"
+    summary="Parent tone and emphasis can set the baseline for a whole group."
+  >
+    This item inherits \`tone="info"\` and \`emphasis="subtle"\` from the parent \`ContentSet\`.
+  </ContentSet.Item>
+  <ContentSet.Item
+    id="override"
+    title="Per-item override"
+    badge="Watch"
+    tone="warning"
+    emphasis="default"
+    summary="Override tone when one item needs a different reading priority."
+  >
+    Use overrides sparingly. If every card needs a different visual system, the group may be mixing unrelated ideas.
+  </ContentSet.Item>
+  <ContentSet.Item
+    id="critical"
+    title="Strong emphasis"
+    icon="!"
+    badge="Risk"
+    tone="danger"
+    emphasis="primary"
+    summary="Reserve primary emphasis for the item that should catch attention first."
+  >
+    Icons are decorative markers. Keep the meaning available in text through \`title\`, \`badge\`, \`summary\`, and children.
+  </ContentSet.Item>
+</ContentSet>
+
+<Section id="section.layout-local-components">
+
+## Layout and project-local components
+
+Use semantic components first. Reach for layout containers only when a document needs a custom arrangement that the workflow components do not already express.
+
+</Section>
+
+<Stack gap="md">
+  <Columns ratio="2:1" gap="md">
+    <Frame surface="subtle" padding="md">
+      ### Container guidance
+
+      \`Stack\`, \`Columns\`, \`Grid\`, \`SplitPane\`, and \`Frame\` are layout primitives. They should arrange content, not replace semantic components such as \`ContentSet\`, \`Callout\`, or \`ExportPanel\`.
+    </Frame>
+    <Frame surface="outlined" padding="md">
+      ### Local component boundary
+
+      Use project-local React components only when the built-in artifact components cannot express the domain-specific UI.
+    </Frame>
+  </Columns>
+</Stack>
+
+<CodeBlock
+  id="code.local-component"
+  filename="artifact-docs/examples/custom-component.mdx"
+  language="mdx"
+  showLineNumbers
+  code={\`import { ExportPanel } from "mdx-artifacts/react";
+import { ReleaseChart } from "../../artifact-components/ReleaseChart";
+
+<ReleaseChart data={releaseData} />
+
+<ExportPanel value={{ status: "ready" }} />\`}
+/>
+
+<AnnotatedCode
+  id="code.best-practice-imports"
+  filename="artifact-docs/examples/hello.mdx"
+  language="mdx"
+  code={\`import { ContentSet, ExportPanel, Section } from "mdx-artifacts/react";
+
+<Section id="section.context">
+  ## Context
+  Native MDX stays readable.
+</Section>\`}
+  annotations={[
+    {
+      id: "semantic-imports",
+      line: 1,
+      severity: "info",
+      title: "Semantic imports",
+      body: "Import workflow-level components from \`mdx-artifacts/react\`; avoid rebuilding the same patterns with generic layout wrappers."
+    },
+    {
+      id: "stable-section",
+      line: 3,
+      severity: "medium",
+      title: "Stable review anchor",
+      body: "Stable ids keep comments and state attached as the artifact evolves."
+    }
+  ]}
+/>
+
+<CodeBlock
+  id="code.export-shape"
+  filename="handoff-value.ts"
+  language="ts"
+  showLineNumbers
+  copyable
+  code={\`export const result = {
+  recommendation: "Use MDX children for readable content",
+  nextSteps: ["validate", "build", "share the HTML artifact"]
+};\`}
+/>
+
+<DiffBlock
+  id="diff.children-first"
+  filename="artifact-docs/examples/decision.mdx"
+  language="mdx"
+  lines={[
+    { type: "remove", oldLine: 7, content: 'summary="Long rationale, risks, and tradeoffs all packed into one prop."' },
+    { type: "add", newLine: 7, content: 'summary="Short visible summary."' },
+    { type: "add", newLine: 8, content: ">" },
+    { type: "add", newLine: 9, content: "  ### Tradeoffs" },
+    { type: "add", newLine: 10, content: "  - Keep long reasoning in MDX children" }
+  ]}
+/>
+
+<SortableList
+  id="list.next-steps"
+  title="Next steps"
+  summary="Use structured data for interactive ordering. Keep each item short."
+  items={[
+    {
+      id: "query-components",
+      title: "Query component metadata",
+      summary: "Run mdx-artifacts components before inventing a component API.",
+      badge: "1",
+      tags: ["authoring"]
+    },
+    {
+      id: "validate-source",
+      title: "Validate the MDX source",
+      summary: "Fix errors first, then review warnings.",
+      badge: "2",
+      tags: ["quality"]
+    },
+    {
+      id: "build-html",
+      title: "Build the standalone artifact",
+      summary: "Share the generated HTML only after validation is clean.",
+      badge: "3",
+      tags: ["handoff"]
+    }
+  ]}
+/>
+
 <ExportPanel
+  title="Export artifact summary"
   value={{
-    recommendation: "Continue generating interactive HTML artifacts with MDX and high-level components"
+    recommendation: "Use MDX Artifacts as a Markdown-native source format with semantic React islands.",
+    bestPractices: [
+      "Keep prose in Markdown or MDX children",
+      "Use stable ids for reviewable sections and components",
+      "Use structured props only for short labels, variants, layout controls, and export values"
+    ],
+    nextSteps: ["mdx-artifacts components", "mdx-artifacts validate", "mdx-artifacts build"]
   }}
 />
 `,

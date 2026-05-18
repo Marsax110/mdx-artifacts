@@ -12,10 +12,12 @@ const cli = path.resolve("src/cli/index.ts");
 const tsx = path.resolve("node_modules/.bin/tsx");
 
 describe("initProject", () => {
-  it("keeps the default generic scaffold small", async () => {
+  it("writes a best-practice default example", async () => {
     const projectRoot = await createTempProject();
 
     await initProject(projectRoot);
+
+    const hello = await readFile(path.join(projectRoot, "artifact-docs", "examples", "hello.mdx"), "utf8");
 
     await expect(pathExists(path.join(projectRoot, "mdx-artifacts.config.mjs"))).resolves.toBe(true);
     await expect(pathExists(path.join(projectRoot, "artifact-docs", "examples", "hello.mdx"))).resolves.toBe(true);
@@ -23,6 +25,24 @@ describe("initProject", () => {
     await expect(pathExists(path.join(projectRoot, ".agents", "skills", "mdx-artifacts", "SKILL.md"))).resolves.toBe(false);
     await expect(pathExists(path.join(projectRoot, ".claude", "skills", "mdx-artifacts", "SKILL.md"))).resolves.toBe(false);
     await expect(pathExists(path.join(projectRoot, ".cursor", "rules", "mdx-artifacts.mdc"))).resolves.toBe(false);
+    expect(hello).toContain("Section");
+    expect(hello).toContain("Callout");
+    expect(hello).toContain('icon="*"');
+    expect(hello).toContain('tone="danger"');
+    expect(hello).toContain('emphasis="primary"');
+    expect(hello).toContain("Columns");
+    expect(hello).toContain("Frame");
+    expect(hello).toContain("Stack");
+    expect(hello).toContain("ReleaseChart");
+    expect(hello).toContain("project-local React components");
+    expect(hello).toContain("ContentSet");
+    expect(hello).toContain("ContentItem");
+    expect(hello).toContain("AnnotatedCode");
+    expect(hello).toContain("CodeBlock");
+    expect(hello).toContain("DiffBlock");
+    expect(hello).toContain("SortableList");
+    expect(hello).toContain("ExportPanel");
+    expect(hello).toContain("Prefer MDX children for human-readable body content");
   });
 
   it("installs Codex project skill guidance", async () => {
