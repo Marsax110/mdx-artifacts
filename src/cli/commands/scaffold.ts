@@ -18,6 +18,21 @@ type InitPromptIo = {
   question?: (query: string) => Promise<string>;
 };
 
+type PromptQuestion = (query: string) => Promise<string>;
+
+type PromptChoice = {
+  value: string;
+  label: string;
+  aliases?: string[];
+  description?: string;
+};
+
+type PromptStyle = {
+  heading: (value: string) => string;
+  muted: (value: string) => string;
+  option: (value: string) => string;
+};
+
 const defaultDocsDir = "artifact-docs";
 const defaultComponentsDir = "artifact-components";
 
@@ -203,7 +218,7 @@ export default config;
 
   await installAgentGuidance(projectRoot, agent, scaffoldOptions);
 
-  console.log("MDX Artifacts initialized.");
+  console.log(formatInitSummary({ agent, docsDir, componentsDir }));
 }
 
 export async function parseInitOptions(args: string[], io: InitPromptIo = { input: defaultInput, output: defaultOutput }): Promise<InitProjectOptions> {
@@ -283,29 +298,108 @@ function agentGuidanceTargets(
 async function promptInitOptions(options: InitProjectOptions, io: InitPromptIo): Promise<InitProjectOptions> {
   const rl = io.question ? undefined : createInterface({ input: io.input, output: io.output });
   const question = io.question ?? ((query: string) => rl?.question(query) ?? Promise.resolve(""));
+  const style = createPromptStyle(io.output.isTTY === true && !io.question);
   try {
-    const docsDir = options.docsDir ?? await askWithDefault(question, "Docs directory?", defaultDocsDir);
-    const useComponents = options.componentsDir ? true : await askYesNo(question, "Use project-local components?", false);
-    const componentsDir = options.componentsDir ?? (useComponents ? await askWithDefault(question, "Component source directory?", defaultComponentsDir) : undefined);
-    const agent = options.agent ?? parseInitAgent(await askWithDefault(question, "Install agent guidance?", "generic"));
+    const docsDir = options.docsDir ?? await askPathChoice(question, {
+      title: "Where should MDX artifact source files live?",
+      defaultPath: defaultDocsDir,
+      customQuestion: "Custom MDX artifact source directory:",
+      style
+    });
+    const useComponents = options.componentsDir
+      ? true
+      : await askChoice(question, {
+        title: "Use project-local React components?",
+        description: "Adds a Tailwind source directory; it does not auto-register components.",
+        defaultIndex: 0,
+        choices: [
+          { value: "no", label: "No", aliases: ["n"] },
+          { value: "yes", label: "Yes, choose a project-local component source directory", aliases: ["y"] }
+        ],
+        style
+      }) === "yes";
+    const componentsDir = options.componentsDir
+      ?? (useComponents
+        ? await askPathChoice(question, {
+          title: "Where should project-local component source files live?",
+          defaultPath: defaultComponentsDir,
+          customQuestion: "Custom project-local component source directory:",
+          style
+        })
+        : undefined);
+    const agent = options.agent
+      ?? parseInitAgent(await askChoice(question, {
+        title: "Install agent guidance for which tool?",
+        defaultIndex: 0,
+        choices: [
+          { value: "generic", label: "generic" },
+          { value: "codex", label: "codex" },
+          { value: "claude-code", label: "claude-code", aliases: ["claude_code"] },
+          { value: "cursor", label: "cursor" },
+          { value: "all", label: "all" }
+        ],
+        style
+      }));
     return { ...options, docsDir, componentsDir, agent };
   } finally {
     rl?.close();
   }
 }
 
-async function askWithDefault(questionFn: (query: string) => Promise<string>, question: string, defaultValue: string) {
-  const answer = (await questionFn(`${question} (${defaultValue}) `)).trim();
-  return answer || defaultValue;
+async function askPathChoice(
+  question: PromptQuestion,
+  options: { title: string; defaultPath: string; customQuestion: string; style: PromptStyle }
+) {
+  const selected = await askChoice(question, {
+    title: options.title,
+    defaultIndex: 0,
+    choices: [
+      { value: "default", label: formatPromptPath(options.defaultPath) },
+      { value: "custom", label: "Enter a custom directory" }
+    ],
+    style: options.style
+  });
+
+  if (selected === "default") {
+    return options.defaultPath;
+  }
+
+  return askText(question, options.customQuestion, options.style);
 }
 
-async function askYesNo(questionFn: (query: string) => Promise<string>, question: string, defaultValue: boolean) {
-  const suffix = defaultValue ? "Y/n" : "y/N";
-  const answer = (await questionFn(`${question} (${suffix}) `)).trim().toLowerCase();
+async function askChoice(
+  question: PromptQuestion,
+  options: { title: string; description?: string; defaultIndex: number; choices: PromptChoice[]; style: PromptStyle }
+) {
+  const prompt = formatChoicePrompt(options);
+  const answer = (await question(prompt)).trim();
   if (!answer) {
-    return defaultValue;
+    return options.choices[options.defaultIndex]?.value ?? "";
   }
-  return answer === "y" || answer === "yes";
+
+  const selectedIndex = Number.parseInt(answer, 10);
+  if (Number.isInteger(selectedIndex) && String(selectedIndex) === answer && selectedIndex >= 1 && selectedIndex <= options.choices.length) {
+    return options.choices[selectedIndex - 1].value;
+  }
+
+  const normalized = answer.toLowerCase();
+  const direct = options.choices.find((choice) => {
+    const aliases = choice.aliases ?? [];
+    return choice.value.toLowerCase() === normalized || choice.label.toLowerCase() === normalized || aliases.includes(normalized);
+  });
+  if (direct) {
+    return direct.value;
+  }
+
+  throw new Error(`Unsupported selection: ${answer}. Use 1-${options.choices.length}.`);
+}
+
+async function askText(question: PromptQuestion, title: string, style: PromptStyle) {
+  const answer = (await question(`${style.heading(title)} `)).trim();
+  if (!answer) {
+    throw new Error(`${title} requires a value.`);
+  }
+  return answer;
 }
 
 function shouldPromptInitOptions(options: InitProjectOptions, io: InitPromptIo) {
@@ -359,6 +453,87 @@ function formatTailwindSources(componentsDir: string | undefined) {
   }
 
   return `[\n    ${JSON.stringify(`${componentsDir}/**/*.{ts,tsx}`)}\n  ]`;
+}
+
+function formatChoicePrompt(options: { title: string; description?: string; defaultIndex: number; choices: PromptChoice[]; style: PromptStyle }) {
+  const lines = [
+    "",
+    options.style.heading(options.title),
+    options.description ? `  ${options.style.muted(options.description)}` : undefined,
+    ...options.choices.map((choice, index) => {
+      const defaultLabel = index === options.defaultIndex ? options.style.muted(" (default)") : "";
+      const description = choice.description ? options.style.muted(` - ${choice.description}`) : "";
+      return `  ${options.style.option(String(index + 1))}. ${choice.label}${defaultLabel}${description}`;
+    }),
+    `Select an option (${options.defaultIndex + 1}) `
+  ];
+
+  return lines.filter((line): line is string => line !== undefined).join("\n");
+}
+
+function formatPromptPath(value: string) {
+  return `./${value.replace(/^\.?\//, "").replace(/\/+$/g, "")}/`;
+}
+
+function createPromptStyle(useColor: boolean): PromptStyle {
+  if (!useColor || process.env.NO_COLOR) {
+    return {
+      heading: identity,
+      muted: identity,
+      option: identity
+    };
+  }
+
+  return {
+    heading: (value) => `\x1b[1m${value}\x1b[22m`,
+    muted: (value) => `\x1b[2m${value}\x1b[22m`,
+    option: (value) => `\x1b[36m${value}\x1b[39m`
+  };
+}
+
+function identity(value: string) {
+  return value;
+}
+
+function formatInitSummary(options: Required<Pick<InitProjectOptions, "agent" | "docsDir">> & Pick<InitProjectOptions, "componentsDir">) {
+  const examplePath = `${options.docsDir}/examples/hello.mdx`;
+  const files = [
+    "  config: mdx-artifacts.config.mjs",
+    `  example: ${examplePath}`,
+    "  agent snippet: agents/AGENTS.snippet.md",
+    ...agentGuidanceSummaryFiles(options.agent),
+    ...(options.componentsDir ? [`  component source: ${options.componentsDir}/`] : [])
+  ];
+
+  return [
+    "MDX Artifacts initialized.",
+    "",
+    "Summary:",
+    `  docsDir: ${options.docsDir}`,
+    `  componentsDir: ${options.componentsDir ?? "none"}`,
+    `  agent: ${options.agent}`,
+    "",
+    "Files:",
+    ...files,
+    "",
+    "Next steps:",
+    `  mdx-artifacts validate ${examplePath}`,
+    `  mdx-artifacts build ${examplePath}`
+  ].join("\n");
+}
+
+function agentGuidanceSummaryFiles(agent: InitAgent) {
+  const files: string[] = [];
+  if (agent === "codex" || agent === "all") {
+    files.push("  Codex skill: .agents/skills/mdx-artifacts/SKILL.md");
+  }
+  if (agent === "claude-code" || agent === "all") {
+    files.push("  Claude Code skill: .claude/skills/mdx-artifacts/SKILL.md");
+  }
+  if (agent === "cursor" || agent === "all") {
+    files.push("  Cursor rule: .cursor/rules/mdx-artifacts.mdc");
+  }
+  return files;
 }
 
 function projectLocalComponentGuidance(options: Pick<InitProjectOptions, "componentsDir">) {

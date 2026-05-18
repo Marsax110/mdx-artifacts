@@ -104,13 +104,18 @@ describe("initProject", () => {
   it("supports --agent through the CLI entrypoint", async () => {
     const projectRoot = await createTempProject();
 
-    await execFileAsync(tsx, [cli, "init", "--agent", "all", "--docs-dir", "docs/reports", "--components-dir", "ui/artifacts"], { cwd: projectRoot });
+    const { stdout } = await execFileAsync(tsx, [cli, "init", "--agent", "all", "--docs-dir", "docs/reports", "--components-dir", "ui/artifacts"], { cwd: projectRoot });
 
     await expect(pathExists(path.join(projectRoot, ".agents", "skills", "mdx-artifacts", "SKILL.md"))).resolves.toBe(true);
     await expect(pathExists(path.join(projectRoot, ".claude", "skills", "mdx-artifacts", "SKILL.md"))).resolves.toBe(true);
     await expect(pathExists(path.join(projectRoot, ".cursor", "rules", "mdx-artifacts.mdc"))).resolves.toBe(true);
     await expect(pathExists(path.join(projectRoot, "docs", "reports", "examples", "hello.mdx"))).resolves.toBe(true);
     await expect(pathExists(path.join(projectRoot, "ui", "artifacts"))).resolves.toBe(true);
+    expect(stdout).toContain("Summary:");
+    expect(stdout).toContain("docsDir: docs/reports");
+    expect(stdout).toContain("componentsDir: ui/artifacts");
+    expect(stdout).toContain("agent: all");
+    expect(stdout).toContain("mdx-artifacts validate docs/reports/examples/hello.mdx");
   });
 });
 
@@ -153,10 +158,15 @@ describe("parseInitOptions", () => {
       docsDir: "artifact-docs",
       componentsDir: undefined
     });
+    expect(io.questions).toEqual([
+      "\nWhere should MDX artifact source files live?\n  1. ./artifact-docs/ (default)\n  2. Enter a custom directory\nSelect an option (1) ",
+      "\nUse project-local React components?\n  Adds a Tailwind source directory; it does not auto-register components.\n  1. No (default)\n  2. Yes, choose a project-local component source directory\nSelect an option (1) ",
+      "\nInstall agent guidance for which tool?\n  1. generic (default)\n  2. codex\n  3. claude-code\n  4. cursor\n  5. all\nSelect an option (1) "
+    ]);
   });
 
   it("prompts for project-local component source directory when enabled", async () => {
-    const io = createPromptIo(["docs/reports", "y", "ui/artifacts", "all"]);
+    const io = createPromptIo(["2", "docs/reports", "2", "2", "ui/artifacts", "5"]);
 
     await expect(parseInitOptions([], io)).resolves.toEqual({
       yes: false,
@@ -164,10 +174,18 @@ describe("parseInitOptions", () => {
       docsDir: "docs/reports",
       componentsDir: "ui/artifacts"
     });
+    expect(io.questions).toEqual([
+      "\nWhere should MDX artifact source files live?\n  1. ./artifact-docs/ (default)\n  2. Enter a custom directory\nSelect an option (1) ",
+      "Custom MDX artifact source directory: ",
+      "\nUse project-local React components?\n  Adds a Tailwind source directory; it does not auto-register components.\n  1. No (default)\n  2. Yes, choose a project-local component source directory\nSelect an option (1) ",
+      "\nWhere should project-local component source files live?\n  1. ./artifact-components/ (default)\n  2. Enter a custom directory\nSelect an option (1) ",
+      "Custom project-local component source directory: ",
+      "\nInstall agent guidance for which tool?\n  1. generic (default)\n  2. codex\n  3. claude-code\n  4. cursor\n  5. all\nSelect an option (1) "
+    ]);
   });
 
   it("does not re-prompt for init options already passed as flags", async () => {
-    const io = createPromptIo(["y", "artifact-components", "cursor"]);
+    const io = createPromptIo(["2", "1", "cursor"]);
 
     await expect(parseInitOptions(["--docs-dir", "docs/reports"], io)).resolves.toEqual({
       yes: false,
@@ -175,6 +193,11 @@ describe("parseInitOptions", () => {
       docsDir: "docs/reports",
       componentsDir: "artifact-components"
     });
+    expect(io.questions).toEqual([
+      "\nUse project-local React components?\n  Adds a Tailwind source directory; it does not auto-register components.\n  1. No (default)\n  2. Yes, choose a project-local component source directory\nSelect an option (1) ",
+      "\nWhere should project-local component source files live?\n  1. ./artifact-components/ (default)\n  2. Enter a custom directory\nSelect an option (1) ",
+      "\nInstall agent guidance for which tool?\n  1. generic (default)\n  2. codex\n  3. claude-code\n  4. cursor\n  5. all\nSelect an option (1) "
+    ]);
   });
 });
 
@@ -202,10 +225,13 @@ function createPromptIo(answers: string[]) {
   input.isTTY = true;
   output.isTTY = true;
   const pending = [...answers];
+  const questions: string[] = [];
   return {
     input,
     output,
-    question: async () => {
+    questions,
+    question: async (query: string) => {
+      questions.push(query);
       const answer = pending.shift();
       if (answer === undefined) {
         throw new Error("Missing prompt answer in test.");
