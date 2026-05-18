@@ -58,6 +58,7 @@
     "build:esm": "node scripts/fix-dist-esm.mjs",
     "build:styles": "cp src/react/styles.css dist/lib/react/styles.css",
     "build:cli": "pnpm clean:lib && pnpm build:lib && pnpm build:esm && pnpm build:styles",
+    "release:check": "node scripts/check-release.mjs",
     "pack:smoke": "node scripts/pack-smoke.mjs",
     "prepack": "pnpm build:cli"
   },

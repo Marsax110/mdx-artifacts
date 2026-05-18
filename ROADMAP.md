@@ -176,17 +176,19 @@ Current direction:
 - Generate `mdx-artifacts.config.mjs` from `mdx-artifacts init` for npm users.
 - Treat `react` and `react-dom` as peer dependencies while keeping them as repository dev dependencies.
 - Use `pnpm pack:smoke` to verify import, CLI lookup, init, validate, build, and package file boundaries.
+- Use `pnpm release:check` as a lightweight static gate for package allowlist, forbidden package files, public language policy, and legacy naming.
 
 Verified:
 
 - Published MDX examples under `artifact-docs/examples/*.mdx` import from `mdx-artifacts/react`.
 - `pnpm pack:smoke` verifies tarball install, React import, component lookup, init, validate, build, dev server import resolution, and review-state commands.
 - `npm pack --dry-run --cache /private/tmp/mdx-artifacts-npm-cache` confirms package file boundaries without shipping `src/`, `.storybook`, story files, sourcemaps, `node_modules`, `docs/local`, or generated artifacts.
+- CI covers `pnpm check`, `pnpm build:cli`, `pnpm release:check`, and `pnpm pack:smoke`.
 
 Next validation step:
 
-- Add CI coverage for `pnpm check`, `pnpm build:cli`, and `pnpm pack:smoke`.
 - Keep `npm pack --dry-run` in the manual pre-publish checklist.
+- Decide whether npm publishing should stay local-manual or move to a separate manually triggered publish workflow.
 
 ## Phase 3: Docs Site Adapter
 

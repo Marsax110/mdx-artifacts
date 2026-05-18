@@ -38,5 +38,8 @@ jobs:
       - name: Build CLI package output
         run: pnpm build:cli
 
+      - name: Run release checks
+        run: pnpm release:check
+
       - name: Run package smoke test
         run: pnpm pack:smoke

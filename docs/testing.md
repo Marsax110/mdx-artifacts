@@ -28,7 +28,24 @@ Current test files:
 - `src/react/registry.test.ts`
 - `src/react/primitives/markdown-body/text-components.test.tsx`
 - `src/cli/components.test.ts`
-- `src/cli/validate.test.ts`
+- `src/cli/commands/validate.test.ts`
+
+## Release Check
+
+Run the release check before publishing or after changes to package metadata, public docs, agent guidance, examples, or release scripts:
+
+```bash
+pnpm release:check
+```
+
+The release check is a lightweight static gate. It does not build the package and does not publish to npm.
+
+It verifies:
+
+- `package.json` `files` matches the intended publish allowlist
+- package file candidates do not include forbidden paths such as `src/`, `docs/local/`, `.state.json`, `.local.*`, logs, tarballs, sourcemaps, Storybook output, or generated artifacts
+- public English/code files do not contain Han characters
+- public files do not contain legacy package naming
 
 ## Package Smoke Test
 
