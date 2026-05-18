@@ -15,6 +15,7 @@ export type InitProjectOptions = {
 type InitPromptIo = {
   input: NodeJS.ReadStream;
   output: NodeJS.WriteStream;
+  question?: (query: string) => Promise<string>;
 };
 
 const defaultDocsDir = "artifact-docs";
@@ -280,26 +281,27 @@ function agentGuidanceTargets(
 }
 
 async function promptInitOptions(options: InitProjectOptions, io: InitPromptIo): Promise<InitProjectOptions> {
-  const rl = createInterface({ input: io.input, output: io.output });
+  const rl = io.question ? undefined : createInterface({ input: io.input, output: io.output });
+  const question = io.question ?? ((query: string) => rl?.question(query) ?? Promise.resolve(""));
   try {
-    const docsDir = options.docsDir ?? await askWithDefault(rl, "Docs directory?", defaultDocsDir);
-    const useComponents = options.componentsDir ? true : await askYesNo(rl, "Use project-local components?", false);
-    const componentsDir = options.componentsDir ?? (useComponents ? await askWithDefault(rl, "Component source directory?", defaultComponentsDir) : undefined);
-    const agent = options.agent ?? parseInitAgent(await askWithDefault(rl, "Install agent guidance?", "generic"));
+    const docsDir = options.docsDir ?? await askWithDefault(question, "Docs directory?", defaultDocsDir);
+    const useComponents = options.componentsDir ? true : await askYesNo(question, "Use project-local components?", false);
+    const componentsDir = options.componentsDir ?? (useComponents ? await askWithDefault(question, "Component source directory?", defaultComponentsDir) : undefined);
+    const agent = options.agent ?? parseInitAgent(await askWithDefault(question, "Install agent guidance?", "generic"));
     return { ...options, docsDir, componentsDir, agent };
   } finally {
-    rl.close();
+    rl?.close();
   }
 }
 
-async function askWithDefault(rl: ReturnType<typeof createInterface>, question: string, defaultValue: string) {
-  const answer = (await rl.question(`${question} (${defaultValue}) `)).trim();
+async function askWithDefault(questionFn: (query: string) => Promise<string>, question: string, defaultValue: string) {
+  const answer = (await questionFn(`${question} (${defaultValue}) `)).trim();
   return answer || defaultValue;
 }
 
-async function askYesNo(rl: ReturnType<typeof createInterface>, question: string, defaultValue: boolean) {
+async function askYesNo(questionFn: (query: string) => Promise<string>, question: string, defaultValue: boolean) {
   const suffix = defaultValue ? "Y/n" : "y/N";
-  const answer = (await rl.question(`${question} (${suffix}) `)).trim().toLowerCase();
+  const answer = (await questionFn(`${question} (${suffix}) `)).trim().toLowerCase();
   if (!answer) {
     return defaultValue;
   }

@@ -2,6 +2,7 @@ import { execFile } from "node:child_process";
 import { access, mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import { PassThrough } from "node:stream";
 import { promisify } from "node:util";
 import { describe, expect, it } from "vitest";
 import { initProject, parseInitAgent, parseInitOptions } from "./scaffold";
@@ -142,6 +143,39 @@ describe("parseInitOptions", () => {
   it("rejects flags without values", async () => {
     await expect(parseInitOptions(["--docs-dir"])).rejects.toThrow("requires a value");
   });
+
+  it("prompts for interactive defaults when attached to a TTY", async () => {
+    const io = createPromptIo(["", "", "codex"]);
+
+    await expect(parseInitOptions([], io)).resolves.toEqual({
+      yes: false,
+      agent: "codex",
+      docsDir: "artifact-docs",
+      componentsDir: undefined
+    });
+  });
+
+  it("prompts for project-local component source directory when enabled", async () => {
+    const io = createPromptIo(["docs/reports", "y", "ui/artifacts", "all"]);
+
+    await expect(parseInitOptions([], io)).resolves.toEqual({
+      yes: false,
+      agent: "all",
+      docsDir: "docs/reports",
+      componentsDir: "ui/artifacts"
+    });
+  });
+
+  it("does not re-prompt for init options already passed as flags", async () => {
+    const io = createPromptIo(["y", "artifact-components", "cursor"]);
+
+    await expect(parseInitOptions(["--docs-dir", "docs/reports"], io)).resolves.toEqual({
+      yes: false,
+      agent: "cursor",
+      docsDir: "docs/reports",
+      componentsDir: "artifact-components"
+    });
+  });
 });
 
 async function createTempProject() {
@@ -160,4 +194,23 @@ async function pathExists(filePath: string) {
 async function writeFileWithParents(filePath: string, content: string) {
   await mkdir(path.dirname(filePath), { recursive: true });
   await writeFile(filePath, content, "utf8");
+}
+
+function createPromptIo(answers: string[]) {
+  const input = new PassThrough() as unknown as NodeJS.ReadStream;
+  const output = new PassThrough() as unknown as NodeJS.WriteStream;
+  input.isTTY = true;
+  output.isTTY = true;
+  const pending = [...answers];
+  return {
+    input,
+    output,
+    question: async () => {
+      const answer = pending.shift();
+      if (answer === undefined) {
+        throw new Error("Missing prompt answer in test.");
+      }
+      return answer;
+    }
+  };
 }
