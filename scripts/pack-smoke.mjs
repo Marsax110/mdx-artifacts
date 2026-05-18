@@ -24,7 +24,7 @@ await writeFile(
   "utf8"
 );
 
-run("pnpm", ["add", "--offline", tarballPath], projectDir);
+run("pnpm", ["add", "--prefer-offline", tarballPath], projectDir);
 run("node", ["-e", 'import("mdx-artifacts/react").then(() => console.log("import ok"))'], projectDir);
 run("pnpm", ["exec", "mdx-artifacts", "components"], projectDir);
 run("pnpm", ["exec", "mdx-artifacts", "init"], projectDir);
