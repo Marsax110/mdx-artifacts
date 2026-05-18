@@ -394,4 +394,5 @@ The CLI automatically registers the current MDX file as a Tailwind source, so Ta
 - [Component taxonomy](docs/component-taxonomy.md)
 - [CLI structure](docs/cli-structure.md)
 - [Testing](docs/testing.md)
+- [Releasing](docs/releasing.md)
 - [Chinese README](README.zh-CN.md)

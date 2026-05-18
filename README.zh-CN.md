@@ -383,3 +383,4 @@ MDX Artifacts 面向项目工作区内生成的本地、可 review artifact。
 - [英文组件协议](docs/component-protocol.md)
 - [英文组件分类](docs/component-taxonomy.md)
 - [英文测试协议](docs/testing.md)
+- [英文发布检查清单](docs/releasing.md)
